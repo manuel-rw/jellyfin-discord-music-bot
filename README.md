@@ -1,10 +1,29 @@
-# Jellyfin Discord Music Bot
+<p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/walkxhub/dashboard-icons/png/jellyfin.png" alt="Jellyfin Logo" width="80" height="80">
+  <h1 align="center">Jellyfin Discord Music Bot</h1>
+  <div align="center">
+    <span>A fork of the <a href="https://github.com/KGT1/jellyfin-discord-music-bot">original project</a> with improved readability and stability, compatible with Jellyfin 10.8.x</span>
+  </div>
+</p>
+
+# ✨ Features
+- Simple Discord Bot that hooks into the [Jellyfin](http://github.com/jellyfin/jellyfin) API of your instance
+- Request, pause and play songs directly from your Discord Server
+- Interactive Media control message to control playback
+
+# 🦾 About this fork
+The original version is decent for Jellyfin 10.6.x and before. After the breaking changes of 10.7 and 10.8, users were unable to stream music from their Jellyfin.
+For this reason, I made this fork to address those changes to the API and improve the bot with my own ideas / features. Please check out the original project by [KGT1](https://github.com/KGT1).
+
+I will gradually update documentation & code of the bot. Please wait patiently.
+
+## Original README from https://github.com/KGT1/jellyfin-discord-music-bot
 
 Jellyfin Discord Music Bot is a Discord Bot for the [Jellyfin Media Server!](http://github.com/jellyfin/jellyfin)
 
-## Capabilities
+### Capabilities
 
-### Play to
+#### Play to
 
 Just `summon` the Bot into your Channel, than choose the Bot in Jellyfin as the Device you want to cast to
 
@@ -12,13 +31,13 @@ Just `summon` the Bot into your Channel, than choose the Bot in Jellyfin as the 
 
  and start playing you favourite Music
 
-### Interactive Play Message
+#### Interactive Play Message
 
 When you start playing something you can easily controll the Bot with just clicking on the Buttons under the Play Message
 
 ![Image to Interactive Play Message](img/discordplaymessage.png)
 
-### Commands
+#### Commands
 
 Beware that you'll always need to add your prefix(default: ?) in front of the command.
 
@@ -34,12 +53,12 @@ skip | Skip this Song
 spawn | Spawns an Interactive Play Controller
 help | Display the help message
 
-### Limitations
+#### Limitations
 - No Playlist Repeat Mode.
 - Multi Server support.
 - [Playing Video Content](https://github.com/discordjs/discord.js/issues/4116) (if Discord ever adds this, I'll implement it into this Bot)
 
-## Getting Started
+### Getting Started
 You'll need a Discord Application for this Bot to work, as you will host it yourself.
 
 [Generate an Api and bot here](https://discord.com/developers/applications/). 
@@ -98,7 +117,7 @@ docker run -d \
 
 MESSAGE_UPDATE_INTERVAL is the amount of time in ms the play message gets updated with the current time
 
-### Alternatively you can run the Application natively with NodeJS:
+#### Alternatively you can run the Application natively with NodeJS:
 
 Dependencies:
 
@@ -116,7 +135,7 @@ npm run start
 ```
 
 
-## How to build
+### How to build
 ```
 git clone https://github.com/kgt1/jellyfin-discord-music-bot.git
 cd jellyfin-discord-music-bot
