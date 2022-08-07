@@ -17,6 +17,8 @@ For this reason, I made this fork to address those changes to the API and improv
 
 I will gradually update documentation & code of the bot. Please wait patiently.
 
+<br/><br/><br/><br/><br/><br/><hr/><br/>
+
 ## Original README from https://github.com/KGT1/jellyfin-discord-music-bot
 
 Jellyfin Discord Music Bot is a Discord Bot for the [Jellyfin Media Server!](http://github.com/jellyfin/jellyfin)
