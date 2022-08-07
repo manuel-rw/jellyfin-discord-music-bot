@@ -1,6 +1,8 @@
 const InterActivePlayMessage = require("./InterActivePlayMessage");
 const CONFIG = require("../config.json");
 
+const log = require("loglevel");
+
 var iapm;
 
 var updateInterval;
@@ -83,6 +85,8 @@ function updateCurrentSongMessage(
 	playlistIndex,
 	playlistLenth
 ) {
+	log.log(iapm);
+
 	if (typeof iapm !== "undefined") {
 		iapm.updateCurrentSongMessage(
 			title,

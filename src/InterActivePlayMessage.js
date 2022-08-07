@@ -1,6 +1,7 @@
 const discordclientmanager = require("./discordclientmanager");
 const CONFIG = require("../config.json");
 const { secondsToHms, ticksToSeconds } = require("./util");
+const log = require("loglevel");
 
 function getProgressString(percent) {
 	// the min with of the discord window allows for this many chars
@@ -58,7 +59,7 @@ class InterActivePlayMessage {
 		onStop,
 		onNext,
 		onRepeat,
-		playlistLenth
+		playlistLenth,
 	) {
 		this.ticksLength = ticksLength;
 		var exampleEmbed = {
@@ -66,7 +67,7 @@ class InterActivePlayMessage {
 			title: "Now Playing",
 			url: itemURL,
 			description: `\`\`${getMaxWidthString(title)}\`\` by \`\`${getMaxWidthString(
-				artist
+				artist,
 			)}\`\``,
 			thumbnail: {
 				url: imageURL,
@@ -78,7 +79,7 @@ class InterActivePlayMessage {
 			exampleEmbed.fields.push({
 				name: getProgressString(0 / this.ticksLength),
 				value: `${secondsToHms(0)} / ${secondsToHms(
-					ticksToSeconds(this.ticksLength)
+					ticksToSeconds(this.ticksLength),
 				)}`,
 				inline: false,
 			});
@@ -151,7 +152,7 @@ class InterActivePlayMessage {
 			this.musicplayermessage.embeds[0].fields[0] = {
 				name: getProgressString(ticks / this.ticksLength),
 				value: `${secondsToHms(ticksToSeconds(ticks))} / ${secondsToHms(
-					ticksToSeconds(this.ticksLength)
+					ticksToSeconds(this.ticksLength),
 				)}`,
 				inline: false,
 			};
@@ -168,11 +169,21 @@ class InterActivePlayMessage {
 		itemURL,
 		ticksLength,
 		playlistIndex,
-		playlistLenth
+		playlistLenth,
 	) {
+		if (!this.musicplayermessage) {
+			log.error("Interactive play message was not found");
+			return;
+		}
+
+		if (this.musicplayermessage.embeds.length === 0) {
+			log.error("Interactive play message was unable to access embeds");
+			return;
+		}
+
 		this.musicplayermessage.embeds[0].url = itemURL;
 		this.musicplayermessage.embeds[0].description = `\`\`${getMaxWidthString(
-			title
+			title,
 		)}\`\` by \`\`${getMaxWidthString(artist)}\`\``;
 		this.musicplayermessage.embeds[0].thumbnail = { url: imageURL };
 		const indexOfPlaylistMessage =

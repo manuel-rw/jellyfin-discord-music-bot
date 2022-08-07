@@ -5,7 +5,7 @@ const log = require("loglevel");
 
 const {
 	getAudioDispatcher,
-	setAudioDispatcher,
+	setAudioDispatcher
 } = require("./dispachermanager");
 const { ticksToSeconds } = require("./util");
 
@@ -19,6 +19,7 @@ var _disconnectOnFinish;
 var _seek;
 
 const jellyfinClientManager = require("./jellyfinclientmanager");
+const { VoiceConnection } = require("discord.js");
 
 function streamURLbuilder(itemID, bitrate) {
 	// so the server transcodes. Seems appropriate as it has the source file.(doesnt yet work i dont know why)
@@ -45,19 +46,29 @@ function startPlaying(
 	disconnectOnFinish = _disconnectOnFinish
 ) {
 	log.debug(
-		"start playing ",
+		"Start playing",
+		itemIDPlaylist[playlistIndex],
+		"with index",
 		playlistIndex,
-		". of list: ",
-		itemIDPlaylist,
-		" in a voiceconnection?: ",
-		typeof voiceconnection !== "undefined"
+		"of list with length of",
+		itemIDPlaylist.length,
+		"in",
+		voiceconnection && voiceconnection.channel
+			? '"' +
+					voiceconnection.channel.name +
+					'" (' +
+					voiceconnection.channel.id +
+					")"
+			: "an unknown voice channel"
 	);
+
 	isPaused = false;
 	currentPlayingPlaylist = itemIDPlaylist;
 	currentPlayingPlaylistIndex = playlistIndex;
 	_disconnectOnFinish = disconnectOnFinish;
 	_seek = seekTo * 1000;
 	updatePlayMessage();
+
 	async function playasync() {
 		const url = streamURLbuilder(
 			itemIDPlaylist[playlistIndex],
@@ -65,7 +76,7 @@ function startPlaying(
 		);
 		setAudioDispatcher(
 			voiceconnection.play(url, {
-				seek: seekTo,
+				seek: seekTo
 			})
 		);
 		if (seekTo) {
@@ -78,43 +89,35 @@ function startPlaying(
 				itemID: `${itemIDPlaylist[playlistIndex]}`,
 				canSeek: true,
 				playSessionId: getPlaySessionId(),
-				playMethod: getPlayMethod(),
+				playMethod: getPlayMethod()
 			});
 		}
 
 		getAudioDispatcher().on("finish", () => {
+			// report playback stop and start the same index again
 			if (isRepeat) {
-				log.debug(
-					"repeat and sending following payload as reportPlaybackStopped to the server: ",
-					getStopPayload()
+				reportPlaybackStoppedAndStartPlaying(
+					voiceconnection,
+					currentPlayingPlaylistIndex
 				);
-				jellyfinClientManager
-					.getJellyfinClient()
-					.reportPlaybackStopped(getStopPayload());
-				startPlaying(voiceconnection, undefined, currentPlayingPlaylistIndex, 0);
-			} else {
-				if (currentPlayingPlaylist.length < playlistIndex) {
-					if (disconnectOnFinish) {
-						stop(voiceconnection, currentPlayingPlaylist[playlistIndex - 1]);
-					} else {
-						stop(undefined, currentPlayingPlaylist[playlistIndex - 1]);
-					}
-				} else {
-					log.debug(
-						"repeat and sending following payload as reportPlaybackStopped to the server: ",
-						getStopPayload()
-					);
-					jellyfinClientManager
-						.getJellyfinClient()
-						.reportPlaybackStopped(getStopPayload());
-					startPlaying(
-						voiceconnection,
-						undefined,
-						currentPlayingPlaylistIndex + 1,
-						0
-					);
-				}
+				return;
 			}
+
+			if (currentPlayingPlaylist.length < playlistIndex) {
+				if (disconnectOnFinish) {
+					stop(voiceconnection, currentPlayingPlaylist[playlistIndex - 1]);
+					return;
+				}
+
+				stop(undefined, currentPlayingPlaylist[playlistIndex - 1]);
+				return;
+			}
+
+			// play the next song in the playlist
+			reportPlaybackStoppedAndStartPlaying(
+				voiceconnection,
+				currentPlayingPlaylistIndex + 1
+			);
 		});
 	}
 	playasync().catch((rsn) => {
@@ -122,8 +125,41 @@ function startPlaying(
 	});
 }
 
+/**
+ *
+ * @param {VoiceConnection} voiceconnection - The voiceConnection where the bot should play
+ * @param {number} playlistIndex - The target playlist index
+ * @param {any} disconnectOnFinish
+ */
+const reportPlaybackStoppedAndStartPlaying = (
+	voiceconnection,
+	playlistIndex,
+	disconnectOnFinish
+) => {
+	const stopPayload = getStopPayload();
+
+	log.debug(
+		"Repeat and sending following payload as reportPlaybackStopped to the server: ",
+		stopPayload
+	);
+
+	jellyfinClientManager.getJellyfinClient().reportPlaybackStopped(stopPayload);
+	startPlaying(voiceconnection, undefined, playlistIndex, 0, disconnectOnFinish);
+};
+
 async function spawnPlayMessage(message) {
-	log.debug("spawned Play Message?: ", typeof message !== "undefined");
+	if (!message.channel) {
+		log.error("Unable to send play message in channel");
+		log.debug(message);
+		return;
+	}
+
+	log.debug(
+		"Sending play message to channel",
+		message.channel.name,
+		"(" + message.channel.id + ")"
+	);
+
 	const itemIdDetails = await jellyfinClientManager
 		.getJellyfinClient()
 		.getItem(
@@ -164,37 +200,46 @@ async function spawnPlayMessage(message) {
 			interactivemsghandler.startUpate(getPostitionTicks);
 		}
 	} catch (error) {
-		console.error(error);
+		log.error(error);
 	}
 }
 
 async function updatePlayMessage() {
-	if (getItemId() !== undefined) {
-		const itemIdDetails = await jellyfinClientManager
-			.getJellyfinClient()
-			.getItem(
-				jellyfinClientManager.getJellyfinClient().getCurrentUserId(),
-				getItemId()
-			);
-		const imageURL = await jellyfinClientManager
-			.getJellyfinClient()
-			.getImageUrl(itemIdDetails.AlbumId || getItemId(), { type: "Primary" });
+	const itemId = getItemId();
 
-		try {
-			interactivemsghandler.updateCurrentSongMessage(
-				itemIdDetails.Name,
-				itemIdDetails.Artists[0] || "VA",
-				imageURL,
-				`${jellyfinClientManager
-					.getJellyfinClient()
-					.serverAddress()}/web/index.html#!/details?id=${itemIdDetails.AlbumId}`,
-				itemIdDetails.RunTimeTicks,
-				currentPlayingPlaylistIndex + 1,
-				currentPlayingPlaylist.length
-			);
-		} catch (exception) {
-			console.error(exception);
-		}
+	if (!itemId) {
+		return;
+	}
+
+	const jellyfinItemDetails = await jellyfinClientManager
+		.getJellyfinClient()
+		.getItem(
+			jellyfinClientManager.getJellyfinClient().getCurrentUserId(),
+			getItemId()
+		);
+
+	const primaryAlbumCover = await jellyfinClientManager
+		.getJellyfinClient()
+		.getImageUrl(jellyfinItemDetails.AlbumId || itemId, { type: "Primary" });
+
+	log.debug("Extracted primary Album cover url:", primaryAlbumCover);
+
+	try {
+		interactivemsghandler.updateCurrentSongMessage(
+			jellyfinItemDetails.Name,
+			jellyfinItemDetails.Artists[0] || "VA",
+			primaryAlbumCover,
+			`${jellyfinClientManager
+				.getJellyfinClient()
+				.serverAddress()}/web/index.html#!/details?id=${
+				jellyfinItemDetails.AlbumId
+			}`,
+			jellyfinItemDetails.RunTimeTicks,
+			currentPlayingPlaylistIndex + 1,
+			currentPlayingPlaylist.length
+		);
+	} catch (exception) {
+		log.error("Exception during updating the current song message:", exception);
 	}
 }
 
@@ -202,88 +247,90 @@ async function updatePlayMessage() {
  * @param {Number} toSeek - where to seek in ticks
  */
 function seek(toSeek = 0) {
-	log.debug("seek to: ", toSeek);
-	if (getAudioDispatcher()) {
-		startPlaying(
-			undefined,
-			undefined,
-			undefined,
-			ticksToSeconds(toSeek),
-			_disconnectOnFinish
-		);
-		jellyfinClientManager
-			.getJellyfinClient()
-			.reportPlaybackProgress(getProgressPayload());
-	} else {
-		throw Error("No Song Playing");
-	}
-}
-/**
- *
- * @param {Array} itemID - array of itemIDs to be added
- */
-function addTracks(itemID) {
-	log.debug("added track: ", itemID);
-	currentPlayingPlaylist = currentPlayingPlaylist.concat(itemID);
-}
+	log.debug("Seeking to: ", toSeek);
 
-function nextTrack() {
-	log.debug("nextTrack");
-	if (!currentPlayingPlaylist) {
-		throw Error("There is currently nothing playing");
-	} else if (currentPlayingPlaylistIndex + 1 >= currentPlayingPlaylist.length) {
-		throw Error("This is the Last song");
+	if (!getAudioDispatcher()) {
+		log.warn("Failed to seek because no song is playing.");
 	}
 
-	log.debug(
-		"sending following payload as reportPlaybackStopped to the server: ",
-		getStopPayload()
-	);
-	jellyfinClientManager
-		.getJellyfinClient()
-		.reportPlaybackStopped(getStopPayload());
-
+	// start playing the same track but with a specified time
 	startPlaying(
 		undefined,
 		undefined,
+		undefined,
+		ticksToSeconds(toSeek),
+		_disconnectOnFinish
+	);
+
+	// report change about playback progress to Jellyfin
+	jellyfinClientManager
+		.getJellyfinClient()
+		.reportPlaybackProgress(getProgressPayload());
+}
+/**
+ *
+ * @param {Array} trackItemIdsArray - array of itemIDs to be added
+ */
+function addTracks(trackItemIdsArray) {
+	currentPlayingPlaylist = currentPlayingPlaylist.concat(trackItemIdsArray);
+	log.debug(
+		"Added tracks of",
+		trackItemIdsArray.length,
+		"to the current playlist"
+	);
+}
+
+function nextTrack() {
+	log.debug("Going to the next track...");
+
+	if (!currentPlayingPlaylist) {
+		log.warn(
+			"Can't go to the next track, because there is currently nothing playing"
+		);
+		return;
+	}
+
+	if (currentPlayingPlaylistIndex + 1 >= currentPlayingPlaylist.length) {
+		log.warn(
+			"Can't go to next track, because the current playing song is the last song."
+		);
+		return;
+	}
+
+	reportPlaybackStoppedAndStartPlaying(
+		undefined,
 		currentPlayingPlaylistIndex + 1,
-		0,
 		_disconnectOnFinish
 	);
 }
 
 function previousTrack() {
-	log.debug("previousTrack");
-	if (ticksToSeconds(getPostitionTicks()) < 10) {
-		if (!currentPlayingPlaylist) {
-			throw Error("There is currently nothing playing");
-		} else if (currentPlayingPlaylistIndex - 1 < 0) {
-			startPlaying(
-				undefined,
-				undefined,
-				currentPlayingPlaylistIndex,
-				0,
-				_disconnectOnFinish
-			);
-			throw Error("This is the First song");
-		}
+	log.debug("Going to the previous track...");
 
-		log.debug(
-			"sending following payload as reportPlaybackStopped to the server: ",
-			getStopPayload()
-		);
-		jellyfinClientManager
-			.getJellyfinClient()
-			.reportPlaybackStopped(getStopPayload());
-
-		startPlaying(
-			undefined,
-			undefined,
-			currentPlayingPlaylistIndex - 1,
-			0,
-			_disconnectOnFinish
-		);
+	if (ticksToSeconds(getPostitionTicks()) > 10) {
+		return;
 	}
+
+	// don't go to the previous track when nothing is playing
+	if (!currentPlayingPlaylist) {
+		log.warn(
+			"Can't go to the previous track, because there's currently nothing playing"
+		);
+		return;
+	}
+
+	if (currentPlayingPlaylistIndex - 1 < 0) {
+		log.warn(
+			"Can't go to the previous track, because this is the first track in the playlist"
+		);
+		return;
+	}
+
+	reportPlaybackStoppedAndStartPlaying(
+		undefined,
+		currentPlayingPlaylistIndex - 1,
+		_disconnectOnFinish
+	);
 }
 
 /**
@@ -315,32 +362,54 @@ function stop(disconnectVoiceConnection, itemId = getItemId()) {
 }
 
 function pause() {
-	log.debug("pause");
+	log.debug("Pausing the current track...");
 	isPaused = true;
+
+	// report to Jellyfin that the client has paused the track
 	jellyfinClientManager
 		.getJellyfinClient()
 		.reportPlaybackProgress(getProgressPayload());
+
+	// pause the track in the audio dispatcher
 	getAudioDispatcher().pause(true);
 }
 
 function resume() {
-	log.debug("resume");
+	log.debug("Resuming playback of the current track...");
+
 	isPaused = false;
+
+	// report to Jellyfin that the client has resumed playback
 	jellyfinClientManager
 		.getJellyfinClient()
 		.reportPlaybackProgress(getProgressPayload());
+
+	// resume playback in the audio dispatcher
 	getAudioDispatcher().resume();
 }
 
+/**
+ * Pauses the playback of the current track is playing or
+ * resumes the placback if the current track is paused
+ */
 function playPause() {
-	if (!getAudioDispatcher()) {
-		throw Error("There is nothing Playing right now!");
+	const audioDispatcher = getAudioDispatcher();
+
+	if (!audioDispatcher) {
+		log.warn(
+			"Can't toggle the playback of the current song because there is nothing playing right now"
+		);
+		return;
 	}
-	if (getAudioDispatcher().paused) {
+
+	if (audioDispatcher.paused) {
+		log.debug("Resuming playback because the current track is paused...");
 		resume();
-	} else {
-		pause();
+		return;
 	}
+
+	log.debug("Pausing the playback because the current track is playing...");
+	pause();
 }
 
 function getPostitionTicks() {
@@ -359,9 +428,9 @@ function getPlayMethod() {
 function getRepeatMode() {
 	if (isRepeat) {
 		return "RepeatOne";
-	} else {
-		return "RepeatNone";
 	}
+
+	return "RepeatNone";
 }
 
 function getPlaylistItemId() {
@@ -369,7 +438,7 @@ function getPlaylistItemId() {
 }
 
 function getPlaySessionId() {
-	// i think its just a number which you dont need to retrieve but need to report
+	// TODO: generate a unique identifier for identification at Jellyfin. This may cause conflicts when running multiple bots on the same Jellyfin server.
 	return "ae2436edc6b91b11d72aeaa67f84e0ea";
 }
 
@@ -378,8 +447,8 @@ function getNowPLayingQueue() {
 		{
 			Id: getItemId(),
 			// as I curently dont support Playlists
-			PlaylistItemId: getPlaylistItemId(),
-		},
+			PlaylistItemId: getPlaylistItemId()
+		}
 	];
 }
 
@@ -435,20 +504,19 @@ function getProgressPayload() {
 		PositionTicks: getPostitionTicks(),
 		RepeatMode: getRepeatMode(),
 		VolumeLevel: getVolumeLevel(),
-		EventName: "pauseplayupdate",
+		EventName: "pauseplayupdate"
 	};
 	return payload;
 }
 
 function getStopPayload() {
-	const payload = {
+	return {
 		userId: jellyfinClientManager.getJellyfinClient().getCurrentUserId(),
 		itemId: getItemId(),
 		sessionID: getPlaySessionId(),
 		playSessionId: getPlaySessionId(),
-		positionTicks: getPostitionTicks(),
+		positionTicks: getPostitionTicks()
 	};
-	return payload;
 }
 
 module.exports = {
@@ -463,5 +531,5 @@ module.exports = {
 	previousTrack,
 	addTracks,
 	getPostitionTicks,
-	spawnPlayMessage,
+	spawnPlayMessage
 };
