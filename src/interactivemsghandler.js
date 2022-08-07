@@ -5,14 +5,40 @@ var iapm;
 
 var updateInterval;
 
-function init (message, title, artist, imageURL, itemURL, getProgress, onPrevious, onPausePlay, onStop, onNext, onRepeat, playlistLenth) {
+function init(
+	message,
+	title,
+	artist,
+	imageURL,
+	itemURL,
+	getProgress,
+	onPrevious,
+	onPausePlay,
+	onStop,
+	onNext,
+	onRepeat,
+	playlistLenth
+) {
 	if (typeof iapm !== "undefined") {
 		destroy();
 	}
-	iapm = new InterActivePlayMessage(message, title, artist, imageURL, itemURL, getProgress, onPrevious, onPausePlay, onStop, onNext, onRepeat, playlistLenth);
+	iapm = new InterActivePlayMessage(
+		message,
+		title,
+		artist,
+		imageURL,
+		itemURL,
+		getProgress,
+		onPrevious,
+		onPausePlay,
+		onStop,
+		onNext,
+		onRepeat,
+		playlistLenth
+	);
 }
 
-function destroy () {
+function destroy() {
 	if (typeof iapm !== "undefined") {
 		iapm.destroy();
 		iapm = undefined;
@@ -26,7 +52,7 @@ function destroy () {
 	}
 }
 
-function hasMessage () {
+function hasMessage() {
 	if (typeof iapm === "undefined") {
 		return false;
 	} else {
@@ -37,17 +63,36 @@ function hasMessage () {
  *
  * @param {Function} callback function to retrieve current ticks
  */
-function startUpate (callback) {
-	if (typeof CONFIG["interactive-seek-bar-update-intervall"] === "number" && CONFIG["interactive-seek-bar-update-intervall"] > 0) {
+function startUpate(callback) {
+	if (
+		typeof CONFIG["interactive-seek-bar-update-intervall"] === "number" &&
+		CONFIG["interactive-seek-bar-update-intervall"] > 0
+	) {
 		updateInterval = setInterval(() => {
 			iapm.updateProgress(callback());
 		}, CONFIG["interactive-seek-bar-update-intervall"]);
 	}
 }
 
-function updateCurrentSongMessage (title, artist, imageURL, itemURL, ticksLength, playlistIndex, playlistLenth) {
+function updateCurrentSongMessage(
+	title,
+	artist,
+	imageURL,
+	itemURL,
+	ticksLength,
+	playlistIndex,
+	playlistLenth
+) {
 	if (typeof iapm !== "undefined") {
-		iapm.updateCurrentSongMessage(title, artist, imageURL, itemURL, ticksLength, playlistIndex, playlistLenth);
+		iapm.updateCurrentSongMessage(
+			title,
+			artist,
+			imageURL,
+			itemURL,
+			ticksLength,
+			playlistIndex,
+			playlistLenth
+		);
 	} else {
 		throw Error("No Interactive Message Found");
 	}
@@ -58,5 +103,5 @@ module.exports = {
 	destroy,
 	hasMessage,
 	startUpate,
-	updateCurrentSongMessage
+	updateCurrentSongMessage,
 };

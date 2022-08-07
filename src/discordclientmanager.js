@@ -2,14 +2,14 @@ const Discord = require("discord.js");
 
 var discordClient;
 
-function init () {
+function init() {
 	discordClient = new Discord.Client();
 }
-function getDiscordClient () {
+function getDiscordClient() {
 	return discordClient;
 }
 
 module.exports = {
 	getDiscordClient,
-	init
+	init,
 };

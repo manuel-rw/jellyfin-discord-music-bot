@@ -1,0 +1,10 @@
+{
+  "token": "",
+  "server-address": "",
+  "jellyfin-username": "",
+  "jellyfin-password": "",
+  "discord-prefix": "?",
+  "jellyfin-app-name": "Jellyfin Discord Music Bot",
+  "interactive-seek-bar-update-intervall": 10000,
+  "log-level": "info"
+}

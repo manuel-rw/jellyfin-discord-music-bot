@@ -1,13 +1,13 @@
 var audioDispatcher;
 
-function setAudioDispatcher (par) {
+function setAudioDispatcher(par) {
 	audioDispatcher = par;
 }
-function getAudioDispatcher () {
+function getAudioDispatcher() {
 	return audioDispatcher;
 }
 
 module.exports = {
 	setAudioDispatcher,
-	getAudioDispatcher
+	getAudioDispatcher,
 };
