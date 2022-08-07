@@ -3,11 +3,11 @@ const CONFIG = require("../config.json");
 
 const log = require("loglevel");
 
-var iapm;
+var interactivePlayMessage;
 
 var updateInterval;
 
-function init(
+const init = (
 	message,
 	title,
 	artist,
@@ -20,11 +20,11 @@ function init(
 	onNext,
 	onRepeat,
 	playlistLenth
-) {
-	if (typeof iapm !== "undefined") {
+) => {
+	if (typeof interactivePlayMessage !== "undefined") {
 		destroy();
 	}
-	iapm = new InterActivePlayMessage(
+	interactivePlayMessage = new InterActivePlayMessage(
 		message,
 		title,
 		artist,
@@ -38,12 +38,12 @@ function init(
 		onRepeat,
 		playlistLenth
 	);
-}
+};
 
-function destroy() {
-	if (typeof iapm !== "undefined") {
-		iapm.destroy();
-		iapm = undefined;
+const destroy = () => {
+	if (typeof interactivePlayMessage !== "undefined") {
+		interactivePlayMessage.destroy();
+		interactivePlayMessage = undefined;
 	} else {
 		throw Error("No Interactive Message Found");
 	}
@@ -52,31 +52,32 @@ function destroy() {
 		clearInterval(updateInterval);
 		updateInterval = undefined;
 	}
-}
+};
 
-function hasMessage() {
-	if (typeof iapm === "undefined") {
+const hasMessage = () => {
+	if (typeof interactivePlayMessage === "undefined") {
 		return false;
 	} else {
 		return true;
 	}
-}
+};
+
 /**
  *
  * @param {Function} callback function to retrieve current ticks
  */
-function startUpate(callback) {
+const startUpate = (callback) => {
 	if (
 		typeof CONFIG["interactive-seek-bar-update-intervall"] === "number" &&
 		CONFIG["interactive-seek-bar-update-intervall"] > 0
 	) {
 		updateInterval = setInterval(() => {
-			iapm.updateProgress(callback());
+			interactivePlayMessage.updateProgress(callback());
 		}, CONFIG["interactive-seek-bar-update-intervall"]);
 	}
-}
+};
 
-function updateCurrentSongMessage(
+const updateCurrentSongMessage = (
 	title,
 	artist,
 	imageURL,
@@ -84,11 +85,11 @@ function updateCurrentSongMessage(
 	ticksLength,
 	playlistIndex,
 	playlistLenth
-) {
-	log.log(iapm);
+) => {
+	log.log(interactivePlayMessage);
 
-	if (typeof iapm !== "undefined") {
-		iapm.updateCurrentSongMessage(
+	if (typeof interactivePlayMessage !== "undefined") {
+		interactivePlayMessage.updateCurrentSongMessage(
 			title,
 			artist,
 			imageURL,
@@ -100,12 +101,12 @@ function updateCurrentSongMessage(
 	} else {
 		throw Error("No Interactive Message Found");
 	}
-}
+};
 
 module.exports = {
 	init,
 	destroy,
 	hasMessage,
 	startUpate,
-	updateCurrentSongMessage,
+	updateCurrentSongMessage
 };
