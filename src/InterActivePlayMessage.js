@@ -23,7 +23,7 @@ const getProgressString = (percent) => {
  * @returns {String}
  */
 // TODO do this with something like wcwidth
-function getMaxWidthString = (string) => {
+function getMaxWidthString (string) {
 	const NUMBER_OF_CHARS = 12;
 	if (string.length > NUMBER_OF_CHARS) {
 		return string.slice(0, NUMBER_OF_CHARS - 3) + "...";
