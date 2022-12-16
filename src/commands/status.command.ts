@@ -8,8 +8,11 @@ import {
   UsePipes,
 } from '@discord-nestjs/core';
 import { EmbedBuilder } from '@discordjs/builders';
-import { Client, InteractionReplyOptions } from 'discord.js';
+import { Client, InteractionReplyOptions, Status } from 'discord.js';
 import { DefaultJellyfinColor } from 'src/types/colors';
+
+import { formatDuration, intervalToDuration } from 'date-fns';
+import { Constants } from 'src/utils/constants';
 
 @Command({
   name: 'status',
@@ -27,6 +30,13 @@ export class StatusCommand implements DiscordTransformedCommand<unknown> {
     executionContext: TransformedCommandExecutionContext<any>,
   ): InteractionReplyOptions {
     const ping = this.client.ws.ping;
+    const status = Status[this.client.ws.status];
+
+    const interval = intervalToDuration({
+      start: this.client.uptime,
+      end: 0,
+    });
+    const formattedDuration = formatDuration(interval);
 
     return {
       embeds: [
@@ -35,13 +45,23 @@ export class StatusCommand implements DiscordTransformedCommand<unknown> {
           .setColor(DefaultJellyfinColor)
           .addFields([
             {
+              name: 'Version',
+              value: Constants.Metadata.Version,
+              inline: false,
+            },
+            {
               name: 'Ping',
               value: `${ping}ms`,
               inline: true,
             },
             {
-              name: 'Source code',
-              value: 'https://github.com/manuel-rw/jellyfin-discord-music-bot',
+              name: 'Status',
+              value: `${status}`,
+              inline: true,
+            },
+            {
+              name: 'Uptime',
+              value: `${formattedDuration}`,
               inline: true,
             },
           ])
