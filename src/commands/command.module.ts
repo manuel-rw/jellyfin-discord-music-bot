@@ -11,6 +11,8 @@ import { PlayCommand } from './play.command';
 import { SkipTrackCommand } from './skip.command';
 import { StopPlaybackCommand } from './stop.command';
 import { SummonCommand } from './summon.command';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { PlaybackService } from '../playback/playback.service';
 
 @Module({
   imports: [DiscordModule.forFeature()],
@@ -26,6 +28,8 @@ import { SummonCommand } from './summon.command';
     SkipTrackCommand,
     StopPlaybackCommand,
     SummonCommand,
+    DiscordMessageService,
+    PlaybackService,
   ],
   exports: [],
 })

@@ -11,6 +11,7 @@ import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
 import { DiscordConfigService } from './clients/discord/discord.config.service';
+import { PlaybackModule } from './playback/playback.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DiscordConfigService } from './clients/discord/discord.config.service';
     CommandModule,
     DiscordClientModule,
     JellyfinClientModule,
+    PlaybackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

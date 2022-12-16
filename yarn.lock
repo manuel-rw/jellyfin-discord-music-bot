@@ -4487,6 +4487,7 @@ __metadata:
     ts-node: ^10.0.0
     tsconfig-paths: 4.1.0
     typescript: ^4.7.4
+    uuid: ^9.0.0
   languageName: unknown
   linkType: soft
 
@@ -7246,7 +7247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:9.0.0":
+"uuid@npm:9.0.0, uuid@npm:^9.0.0":
   version: 9.0.0
   resolution: "uuid@npm:9.0.0"
   bin:

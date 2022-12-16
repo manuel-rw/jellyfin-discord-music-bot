@@ -7,9 +7,9 @@ import {
   CommandInteraction,
   EmbedBuilder,
   GuildMember,
-  InteractionReplyOptions
+  InteractionReplyOptions,
 } from 'discord.js';
-import { DefaultJellyfinColor } from '../types/colors';
+import { DefaultJellyfinColor, ErrorJellyfinColor } from '../types/colors';
 
 @Command({
   name: 'summon',
@@ -26,7 +26,7 @@ export class SummonCommand implements DiscordCommand {
       return {
         embeds: [
           new EmbedBuilder()
-            .setColor(DefaultJellyfinColor)
+            .setColor(ErrorJellyfinColor)
             .setAuthor({
               name: 'Unable to join your channel',
               iconURL:
