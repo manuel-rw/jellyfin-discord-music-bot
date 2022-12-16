@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import * as Joi from 'joi';
 
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DiscordModule } from '@discord-nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
-import { CommandHandlerModule } from './commands/handler/command-handler.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
+import { CommandModule } from './commands/command.module';
+import { DiscordConfigService } from './clients/discord/jellyfin.config.service';
 
 @Module({
   imports: [
@@ -20,10 +22,14 @@ import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
         JELLYFIN_AUTHENTICATION_PASSWORD: Joi.string().required(),
       }),
     }),
+    DiscordModule.forRootAsync({
+      useClass: DiscordConfigService,
+    }),
+    DiscordModule,
     EventEmitterModule.forRoot(),
+    CommandModule,
     DiscordClientModule,
     JellyfinClientModule,
-    CommandHandlerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

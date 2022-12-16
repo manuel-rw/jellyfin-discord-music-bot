@@ -35,10 +35,18 @@ export class JellyfinService {
         process.env.JELLYFIN_AUTHENTICATION_PASSWORD,
       )
       .then((response) => {
+        if (response.data.SessionInfo === undefined) {
+          this.logger.error(
+            `Failed to authenticate with response code ${response.status}: '${response.data}'`,
+          );
+          return;
+        }
+
         this.logger.debug(
           `Connected using user '${response.data.SessionInfo.UserId}'`,
         );
-      }).catch((test) => {
+      })
+      .catch((test) => {
         this.logger.error(test);
       });
   }
