@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { ActivityType, Client } from 'discord.js';
+import { Client } from 'discord.js';
 
 @Injectable()
 export class DiscordService {

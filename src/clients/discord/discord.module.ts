@@ -1,5 +1,5 @@
-import { Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { DiscordService } from "./discord.service";
+import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { DiscordService } from './discord.service';
 
 @Module({
   imports: [],
@@ -8,7 +8,6 @@ import { DiscordService } from "./discord.service";
   exports: [DiscordService],
 })
 export class DiscordClientModule implements OnModuleInit, OnModuleDestroy {
-  
   constructor(private discordService: DiscordService) {}
   onModuleDestroy() {
     this.discordService.destroyClient();
