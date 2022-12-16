@@ -1,16 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Api, Jellyfin } from '@jellyfin/sdk';
-
-import { Constants } from 'src/utils/constants';
+import { Constants } from '../../utils/constants';
 
 @Injectable()
 export class JellyfinService {
   private readonly logger = new Logger(JellyfinService.name);
   private jellyfin: Jellyfin;
   private api: Api;
-
-  constructor() {}
 
   init() {
     this.jellyfin = new Jellyfin({

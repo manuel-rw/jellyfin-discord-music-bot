@@ -61,3 +61,8 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## 👤 Credits
+- https://tabler-icons.io/ (MIT)
+- https://docs.nestjs.com/ (MIT)
+- https://discord.js.org/ (Apache 2.0)

@@ -10,7 +10,7 @@ import { AppService } from './app.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
-import { DiscordConfigService } from './clients/discord/jellyfin.config.service';
+import { DiscordConfigService } from './clients/discord/discord.config.service';
 
 @Module({
   imports: [

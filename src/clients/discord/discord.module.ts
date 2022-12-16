@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DiscordConfigService } from './jellyfin.config.service';
+import { DiscordConfigService } from './discord.config.service';
 
 @Module({
   imports: [],

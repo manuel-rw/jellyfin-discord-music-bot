@@ -12,7 +12,7 @@ import { Client, InteractionReplyOptions, Status } from 'discord.js';
 import { DefaultJellyfinColor } from 'src/types/colors';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
-import { Constants } from 'src/utils/constants';
+import { Constants } from '../utils/constants';
 
 @Command({
   name: 'status',
