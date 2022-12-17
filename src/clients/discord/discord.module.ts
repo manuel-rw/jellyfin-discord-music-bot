@@ -8,7 +8,7 @@ import { DiscordVoiceService } from './discord.voice.service';
   imports: [],
   controllers: [],
   providers: [DiscordConfigService, DiscordVoiceService, DiscordMessageService],
-  exports: [DiscordConfigService, DiscordMessageService],
+  exports: [DiscordConfigService, DiscordVoiceService, DiscordMessageService],
 })
 export class DiscordClientModule implements OnModuleDestroy {
   constructor(private readonly discordVoiceService: DiscordVoiceService) {}

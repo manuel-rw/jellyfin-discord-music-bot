@@ -8,12 +8,12 @@ import {
   TransformedCommandExecutionContext,
   UsePipes,
 } from '@discord-nestjs/core';
-import { SearchHint } from '@jellyfin/sdk/lib/generated-client/models';
 import { Logger } from '@nestjs/common/services';
 import {
   ComponentType,
   EmbedBuilder,
   Events,
+  GuildMember,
   Interaction,
   InteractionReplyOptions,
 } from 'discord.js';
@@ -21,11 +21,12 @@ import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.servi
 import { TrackRequestDto } from '../models/track-request.dto';
 import { DefaultJellyfinColor } from '../types/colors';
 
-import { v4 as uuidv4 } from 'uuid';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
+import { createAudioResource } from '@discordjs/voice';
 import { formatDuration, intervalToDuration } from 'date-fns';
-import { format } from 'path';
+import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { PlaybackService } from '../playback/playback.service';
 
 @Command({
@@ -41,7 +42,9 @@ export class SearchItemCommand
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,
     private readonly discordMessageService: DiscordMessageService,
+    private readonly discordVoiceService: DiscordVoiceService,
     private readonly playbackService: PlaybackService,
+    private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
   ) {}
 
   async handler(
@@ -148,6 +151,20 @@ export class SearchItemCommand
       name: item.Name,
       durationInMilliseconds: milliseconds,
     });
+
+    const guildMember = interaction.member as GuildMember;
+    const bitrate = guildMember.voice.channel.bitrate;
+
+    this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
+      guildMember,
+    );
+
+    this.jellyfinStreamBuilder
+      .buildStreamUrl(item.Id, bitrate)
+      .then((stream) => {
+        const resource = createAudioResource(stream);
+        this.discordVoiceService.playResource(resource);
+      });
 
     await interaction.update({
       embeds: [

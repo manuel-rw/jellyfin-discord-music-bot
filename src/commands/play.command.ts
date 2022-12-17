@@ -6,23 +6,14 @@ import {
   TransformedCommandExecutionContext,
   UsePipes,
 } from '@discord-nestjs/core';
-import {
-  EmbedBuilder,
-  GuildMember,
-  InteractionReplyOptions,
-  MessagePayload,
-} from 'discord.js';
+import { GuildMember, InteractionReplyOptions } from 'discord.js';
 
+import { createAudioResource } from '@discordjs/voice';
 import { Injectable } from '@nestjs/common';
-import { TrackRequestDto } from '../models/track-request.dto';
-import {
-  createAudioPlayer,
-  createAudioResource,
-  getVoiceConnection,
-  joinVoiceChannel,
-} from '@discordjs/voice';
 import { Logger } from '@nestjs/common/services';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { TrackRequestDto } from '../models/track-request.dto';
 
 @Command({
   name: 'play',
@@ -33,64 +24,37 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 export class PlayCommand implements DiscordTransformedCommand<TrackRequestDto> {
   private readonly logger = new Logger(PlayCommand.name);
 
-  constructor(private readonly discordMessageService: DiscordMessageService) {}
+  constructor(
+    private readonly discordMessageService: DiscordMessageService,
+    private readonly discordVoiceService: DiscordVoiceService,
+  ) {}
 
   handler(
     @Payload() dto: TrackRequestDto,
     executionContext: TransformedCommandExecutionContext<any>,
   ):
     | string
-    | void
-    | MessagePayload
     | InteractionReplyOptions
-    | Promise<string | void | MessagePayload | InteractionReplyOptions> {
+    | Promise<string | InteractionReplyOptions> {
     const guildMember = executionContext.interaction.member as GuildMember;
 
-    if (guildMember.voice.channel === null) {
-      return {
-        embeds: [
-          this.discordMessageService.buildErrorMessage({
-            title: 'Unable to join your channel',
-            description:
-              'You are in a channel, I am either unabelt to connect to or you aren&apost in a channel yet',
-          }),
-        ],
-      };
+    const joinVoiceChannel =
+      this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
+        guildMember,
+      );
+
+    if (!joinVoiceChannel.success) {
+      return joinVoiceChannel.reply;
     }
 
-    const channel = guildMember.voice.channel;
-
-    joinVoiceChannel({
-      channelId: channel.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
-      guildId: channel.guildId,
-    });
-
-    const connection = getVoiceConnection(executionContext.interaction.guildId);
-
-    if (!connection) {
-      return {
-        embeds: [
-          this.discordMessageService.buildErrorMessage({
-            title: 'Unable to establish audio connection',
-            description:
-              'I was unable to establish an audio connection to your voice channel',
-          }),
-        ],
-      };
-    }
-
-    const player = createAudioPlayer();
-
-    const resource = createAudioResource(dto.search);
-
-    connection.subscribe(player);
-
-    player.play(resource);
-    player.unpause();
+    this.discordVoiceService.playResource(createAudioResource(dto.search));
 
     return {
-      embeds: [new EmbedBuilder().setTitle(`Playing ${dto.search}`).toJSON()],
+      embeds: [
+        this.discordMessageService.buildMessage({
+          title: `Playing ${dto.search}`,
+        }),
+      ],
     };
   }
 }

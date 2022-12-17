@@ -2,6 +2,7 @@ import { DiscordModule } from '@discord-nestjs/core';
 import { Module } from '@nestjs/common';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { DiscordClientModule } from '../clients/discord/discord.module';
 import { JellyfinClientModule } from '../clients/jellyfin/jellyfin.module';
 import { PlaybackService } from '../playback/playback.service';
 import { CurrentTrackCommand } from './current.command';
@@ -17,7 +18,11 @@ import { StopPlaybackCommand } from './stop.command';
 import { SummonCommand } from './summon.command';
 
 @Module({
-  imports: [DiscordModule.forFeature(), JellyfinClientModule],
+  imports: [
+    DiscordModule.forFeature(),
+    JellyfinClientModule,
+    DiscordClientModule,
+  ],
   controllers: [],
   providers: [
     HelpCommand,
