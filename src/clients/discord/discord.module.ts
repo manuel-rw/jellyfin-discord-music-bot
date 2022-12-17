@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { OnModuleDestroy } from '@nestjs/common/interfaces/hooks';
+import { PlaybackModule } from '../../playback/playback.module';
 import { DiscordConfigService } from './discord.config.service';
 import { DiscordMessageService } from './discord.message.service';
 import { DiscordVoiceService } from './discord.voice.service';
 
 @Module({
-  imports: [],
+  imports: [PlaybackModule],
   controllers: [],
   providers: [DiscordConfigService, DiscordVoiceService, DiscordMessageService],
   exports: [DiscordConfigService, DiscordVoiceService, DiscordMessageService],

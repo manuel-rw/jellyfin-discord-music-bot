@@ -3,6 +3,7 @@ import { Playlist } from '../types/playlist';
 import { Track } from '../types/track';
 
 import { v4 as uuidv4 } from 'uuid';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PlaybackService {
@@ -10,6 +11,8 @@ export class PlaybackService {
     tracks: [],
     activeTrack: null,
   };
+
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
   getActiveTrack() {
     return this.getTrackById(this.playlist.activeTrack);
@@ -38,6 +41,7 @@ export class PlaybackService {
 
     const newKey = keys[index + 1];
     this.setActiveTrack(newKey);
+    this.controlAudioPlayer();
     return true;
   }
 
@@ -51,6 +55,7 @@ export class PlaybackService {
     const keys = this.getTrackIds();
     const newKey = keys[index - 1];
     this.setActiveTrack(newKey);
+    this.controlAudioPlayer();
     return true;
   }
 
@@ -66,6 +71,7 @@ export class PlaybackService {
 
     if (emptyBefore) {
       this.setActiveTrack(this.playlist.tracks.find((x) => x.id === uuid).id);
+      this.controlAudioPlayer();
     }
 
     return this.playlist.tracks.findIndex((x) => x.id === uuid);
@@ -80,6 +86,10 @@ export class PlaybackService {
 
   clear() {
     this.playlist.tracks = [];
+  }
+
+  hasNextTrack() {
+    return this.getActiveIndex() + 1 < this.getTrackIds().length;
   }
 
   hasActiveTrack() {
@@ -100,5 +110,12 @@ export class PlaybackService {
 
   private getActiveIndex() {
     return this.getTrackIds().indexOf(this.playlist.activeTrack);
+  }
+
+  private controlAudioPlayer() {
+    const activeTrack = this.getActiveTrack();
+    console.log('received track change');
+    console.log(activeTrack.track);
+    this.eventEmitter.emit('playback.newTrack', activeTrack.track);
   }
 }

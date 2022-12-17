@@ -29,6 +29,7 @@ import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
+import { trimStringToFixedLength } from '../utils/stringUtils';
 
 @Command({
   name: 'play',
@@ -69,9 +70,9 @@ export class PlayItemCommand
 
     const lines: string[] = firstItems.map(
       (item) =>
-        `:white_small_square: ${this.markSearchTermOverlap(
-          item.Name,
-          dto.search,
+        `:white_small_square: ${trimStringToFixedLength(
+          this.markSearchTermOverlap(item.Name, dto.search),
+          30,
         )} *(${item.Type})*`,
     );
 
@@ -104,7 +105,8 @@ export class PlayItemCommand
     return {
       embeds: [
         this.discordMessageService.buildMessage({
-          title: '',
+          title: 'a',
+          description: description,
           mixin(embedBuilder) {
             return embedBuilder.setAuthor({
               name: 'Jellyfin Search Results',
@@ -158,12 +160,6 @@ export class PlayItemCommand
 
     const artists = item.Artists.join(', ');
 
-    const addedIndex = this.playbackService.eneuqueTrack({
-      jellyfinId: item.Id,
-      name: item.Name,
-      durationInMilliseconds: milliseconds,
-    });
-
     const guildMember = interaction.member as GuildMember;
     const bitrate = guildMember.voice.channel.bitrate;
 
@@ -171,12 +167,17 @@ export class PlayItemCommand
       guildMember,
     );
 
-    this.jellyfinStreamBuilder
-      .buildStreamUrl(item.Id, bitrate)
-      .then((stream) => {
-        const resource = createAudioResource(stream);
-        this.discordVoiceService.playResource(resource);
-      });
+    const stream = await this.jellyfinStreamBuilder.buildStreamUrl(
+      item.Id,
+      bitrate,
+    );
+
+    const addedIndex = this.playbackService.eneuqueTrack({
+      jellyfinId: item.Id,
+      name: item.Name,
+      durationInMilliseconds: milliseconds,
+      streamUrl: stream,
+    });
 
     await interaction.update({
       embeds: [

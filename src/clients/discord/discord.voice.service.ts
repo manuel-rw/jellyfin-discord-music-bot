@@ -1,9 +1,9 @@
 import {
   AudioPlayer,
-  AudioPlayerPausedState,
   AudioPlayerStatus,
   AudioResource,
   createAudioPlayer,
+  createAudioResource,
   getVoiceConnection,
   getVoiceConnections,
   joinVoiceChannel,
@@ -11,8 +11,11 @@ import {
 } from '@discordjs/voice';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
+import { OnEvent } from '@nestjs/event-emitter';
 import { GuildMember } from 'discord.js';
 import { GenericTryHandler } from '../../models/generic-try-handler';
+import { PlaybackService } from '../../playback/playback.service';
+import { Track } from '../../types/track';
 import { DiscordMessageService } from './discord.message.service';
 
 @Injectable()
@@ -21,7 +24,16 @@ export class DiscordVoiceService {
   private audioPlayer: AudioPlayer;
   private voiceConnection: VoiceConnection;
 
-  constructor(private readonly discordMessageService: DiscordMessageService) {}
+  constructor(
+    private readonly discordMessageService: DiscordMessageService,
+    private readonly playbackService: PlaybackService,
+  ) {}
+
+  @OnEvent('playback.newTrack')
+  handleOnNewTrack(newTrack: Track) {
+    const resource = createAudioResource(newTrack.streamUrl);
+    this.playResource(resource);
+  }
 
   tryJoinChannelAndEstablishVoiceConnection(
     member: GuildMember,
@@ -155,6 +167,17 @@ export class DiscordVoiceService {
       });
       this.audioPlayer.on('error', (message) => {
         this.logger.error(message);
+      });
+      this.audioPlayer.on('stateChange', (statusChange) => {
+        if (statusChange.status !== AudioPlayerStatus.AutoPaused) {
+          return;
+        }
+
+        if (!this.playbackService.hasNextTrack()) {
+          return;
+        }
+
+        this.playbackService.nextTrack();
       });
       this.voiceConnection.subscribe(this.audioPlayer);
       return this.audioPlayer;
