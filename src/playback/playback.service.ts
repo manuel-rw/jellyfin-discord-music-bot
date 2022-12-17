@@ -19,6 +19,7 @@ export class PlaybackService {
   }
 
   setActiveTrack(trackId: string) {
+    console.log(`getting track by id ${trackId}`);
     const track = this.getTrackById(trackId);
 
     if (!track) {
@@ -30,12 +31,15 @@ export class PlaybackService {
 
   nextTrack() {
     const keys = this.getTrackIds();
+    console.log('keys:');
+    console.log(keys);
+
     const index = this.getActiveIndex();
 
     console.log(keys);
     console.log(index);
 
-    if (!this.hasActiveTrack() || index >= keys.length) {
+    if (!this.hasActiveTrack() || index + 1 >= keys.length) {
       return false;
     }
 
@@ -105,7 +109,7 @@ export class PlaybackService {
   }
 
   private getTrackIds() {
-    return Object.keys(this.playlist.tracks);
+    return this.playlist.tracks.map((item) => item.id);
   }
 
   private getActiveIndex() {
@@ -114,8 +118,6 @@ export class PlaybackService {
 
   private controlAudioPlayer() {
     const activeTrack = this.getActiveTrack();
-    console.log('received track change');
-    console.log(activeTrack.track);
     this.eventEmitter.emit('playback.newTrack', activeTrack.track);
   }
 }
