@@ -93,6 +93,13 @@ export class DiscordVoiceService {
   }
 
   /**
+   * Stops the audio player
+   */
+  stop(force: boolean): boolean {
+    return this.createAndReturnOrGetAudioPlayer().stop(force);
+  }
+
+  /**
    * Unpauses the current audio player
    */
   unpause() {
