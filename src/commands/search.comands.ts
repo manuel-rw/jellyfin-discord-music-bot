@@ -3,20 +3,30 @@ import { TransformPipe } from '@discord-nestjs/common';
 import {
   Command,
   DiscordTransformedCommand,
-  Param,
+  On,
   Payload,
   TransformedCommandExecutionContext,
   UsePipes,
 } from '@discord-nestjs/core';
+import { SearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import { Logger } from '@nestjs/common/services';
 import {
-  APIEmbedField,
   ComponentType,
   EmbedBuilder,
+  Events,
+  Interaction,
   InteractionReplyOptions,
 } from 'discord.js';
 import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
 import { TrackRequestDto } from '../models/track-request.dto';
 import { DefaultJellyfinColor } from '../types/colors';
+
+import { v4 as uuidv4 } from 'uuid';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+
+import { formatDuration, intervalToDuration } from 'date-fns';
+import { format } from 'path';
+import { PlaybackService } from '../playback/playback.service';
 
 @Command({
   name: 'search',
@@ -26,7 +36,13 @@ import { DefaultJellyfinColor } from '../types/colors';
 export class SearchItemCommand
   implements DiscordTransformedCommand<TrackRequestDto>
 {
-  constructor(private readonly jellyfinSearchService: JellyfinSearchService) {}
+  private readonly logger: Logger = new Logger(SearchItemCommand.name);
+
+  constructor(
+    private readonly jellyfinSearchService: JellyfinSearchService,
+    private readonly discordMessageService: DiscordMessageService,
+    private readonly playbackService: PlaybackService,
+  ) {}
 
   async handler(
     @Payload() dto: TrackRequestDto,
@@ -88,13 +104,68 @@ export class SearchItemCommand
           components: [
             {
               type: ComponentType.StringSelect,
-              customId: 'cool',
+              customId: 'searchItemSelect',
               options: selectOptions,
             },
           ],
         },
       ],
     };
+  }
+
+  @On(Events.InteractionCreate)
+  async onStringSelect(interaction: Interaction) {
+    if (!interaction.isStringSelectMenu()) return;
+
+    if (interaction.customId !== 'searchItemSelect') {
+      return;
+    }
+
+    if (interaction.values.length !== 1) {
+      this.logger.warn(
+        `Failed to process interaction select with values [${interaction.values.length}]`,
+      );
+      return;
+    }
+
+    const item = await this.jellyfinSearchService.getById(
+      interaction.values[0],
+    );
+
+    const milliseconds = item.RunTimeTicks / 10000;
+
+    const duration = formatDuration(
+      intervalToDuration({
+        start: milliseconds,
+        end: 0,
+      }),
+    );
+
+    const artists = item.Artists.join(', ');
+
+    const addedIndex = this.playbackService.eneuqueTrack({
+      jellyfinId: item.Id,
+      name: item.Name,
+      durationInMilliseconds: milliseconds,
+    });
+
+    await interaction.update({
+      embeds: [
+        new EmbedBuilder()
+          .setAuthor({
+            name: 'Jellyfin Search',
+            iconURL:
+              'https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true',
+          })
+          .setTitle(item.Name)
+          .setDescription(
+            `**Duration**: ${duration}\n**Artists**: ${artists}\n\nTrack was added to the queue at position ${addedIndex}`,
+          )
+          .setColor(DefaultJellyfinColor)
+          .toJSON(),
+      ],
+      components: [],
+    });
   }
 
   private markSearchTermOverlap(value: string, searchTerm: string) {

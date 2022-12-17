@@ -1,1 +1,5 @@
-export interface Track {}
+export interface Track {
+  jellyfinId: string;
+  name: string;
+  durationInMilliseconds: number;
+}

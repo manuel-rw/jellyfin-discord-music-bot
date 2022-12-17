@@ -28,7 +28,8 @@ export class EnqueueCommand
     dto: TrackRequestDto,
     executionContext: TransformedCommandExecutionContext<any>,
   ): InteractionReplyOptions | string {
-    const index = this.playbackService.eneuqueTrack({});
+    // const index = this.playbackService.eneuqueTrack({});
+    const index = 0;
     return {
       embeds: [
         this.discordMessageService.buildMessage({
