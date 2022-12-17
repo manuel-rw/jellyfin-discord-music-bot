@@ -10,8 +10,8 @@ import { DisconnectCommand } from './disconnect.command';
 import { EnqueueCommand } from './enqueue.command';
 import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
-import { PlayCommand } from './play.command';
-import { SearchItemCommand } from './search.comands';
+import { PreviousTrackCommand } from './previous.command';
+import { PlayItemCommand } from './play.comands';
 import { SkipTrackCommand } from './skip.command';
 import { StatusCommand } from './status.command';
 import { StopPlaybackCommand } from './stop.command';
@@ -31,11 +31,11 @@ import { SummonCommand } from './summon.command';
     DisconnectCommand,
     EnqueueCommand,
     PausePlaybackCommand,
-    PlayCommand,
     SkipTrackCommand,
     StopPlaybackCommand,
     SummonCommand,
-    SearchItemCommand,
+    PlayItemCommand,
+    PreviousTrackCommand,
     DiscordMessageService,
     PlaybackService,
   ],

@@ -6,24 +6,24 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { PlaybackService } from '../playback/playback.service';
 
 @Command({
-  name: 'skip',
-  description: 'Skip the current track',
+  name: 'previous',
+  description: 'Go to the previous track',
 })
 @UsePipes(TransformPipe)
-export class SkipTrackCommand implements DiscordCommand {
+export class PreviousTrackCommand implements DiscordCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
   handler(
-    interactionCommand: CommandInteraction,
+    dcommandInteraction: CommandInteraction,
   ): InteractionReplyOptions | string {
-    if (!this.playbackService.nextTrack()) {
+    if (!this.playbackService.previousTrack()) {
       return {
         embeds: [
           this.discordMessageService.buildErrorMessage({
-            title: 'There is no next track',
+            title: 'There is no previous track',
           }),
         ],
       };
@@ -32,7 +32,7 @@ export class SkipTrackCommand implements DiscordCommand {
     return {
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'Skipped to the next track',
+          title: 'Went to previous track',
         }),
       ],
     };

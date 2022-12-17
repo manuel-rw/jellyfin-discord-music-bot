@@ -22,8 +22,7 @@ export class DiscordMessageService {
         return embedBuilder
           .setAuthor({
             name: title,
-            iconURL:
-              'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/alert-circle.png?raw=true',
+            iconURL: Constants.Design.Icons.ErrorIcon,
           })
           .setFooter({
             text: `${date} - Report an issue: ${Constants.Links.ReportIssue}`,
@@ -48,8 +47,7 @@ export class DiscordMessageService {
       .setColor(DefaultJellyfinColor)
       .setAuthor({
         name: title,
-        iconURL:
-          'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/circle-check.png?raw=true',
+        iconURL: Constants.Design.Icons.JellyfinLogo,
       })
       .setFooter({
         text: `${date}`,

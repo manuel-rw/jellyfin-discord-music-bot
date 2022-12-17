@@ -25,12 +25,49 @@ export class PlaybackService {
     this.playlist.activeTrack = track.id;
   }
 
+  nextTrack() {
+    const keys = this.getTrackIds();
+    const index = this.getActiveIndex();
+
+    console.log(keys);
+    console.log(index);
+
+    if (!this.hasActiveTrack() || index >= keys.length) {
+      return false;
+    }
+
+    const newKey = keys[index + 1];
+    this.setActiveTrack(newKey);
+    return true;
+  }
+
+  previousTrack() {
+    const index = this.getActiveIndex();
+
+    if (!this.hasActiveTrack() || index < 1) {
+      return false;
+    }
+
+    const keys = this.getTrackIds();
+    const newKey = keys[index - 1];
+    this.setActiveTrack(newKey);
+    return true;
+  }
+
   eneuqueTrack(track: Track) {
     const uuid = uuidv4();
+
+    const emptyBefore = this.playlist.tracks.length === 0;
+
     this.playlist.tracks.push({
       id: uuid,
       track: track,
     });
+
+    if (emptyBefore) {
+      this.setActiveTrack(this.playlist.tracks.find((x) => x.id === uuid).id);
+    }
+
     return this.playlist.tracks.findIndex((x) => x.id === uuid);
   }
 
@@ -45,7 +82,23 @@ export class PlaybackService {
     this.playlist.tracks = [];
   }
 
+  hasActiveTrack() {
+    return this.playlist.activeTrack !== null;
+  }
+
+  getPlaylist(): Playlist {
+    return this.playlist;
+  }
+
   private getTrackById(id: string) {
     return this.playlist.tracks.find((x) => x.id === id);
+  }
+
+  private getTrackIds() {
+    return Object.keys(this.playlist.tracks);
+  }
+
+  private getActiveIndex() {
+    return this.getTrackIds().indexOf(this.playlist.activeTrack);
   }
 }

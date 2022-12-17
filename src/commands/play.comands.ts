@@ -28,16 +28,17 @@ import { formatDuration, intervalToDuration } from 'date-fns';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { PlaybackService } from '../playback/playback.service';
+import { Constants } from '../utils/constants';
 
 @Command({
-  name: 'search',
+  name: 'play',
   description: 'Search for an item on your Jellyfin instance',
 })
 @UsePipes(TransformPipe)
-export class SearchItemCommand
+export class PlayItemCommand
   implements DiscordTransformedCommand<TrackRequestDto>
 {
-  private readonly logger: Logger = new Logger(SearchItemCommand.name);
+  private readonly logger: Logger = new Logger(PlayItemCommand.name);
 
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,
@@ -102,15 +103,15 @@ export class SearchItemCommand
 
     return {
       embeds: [
-        new EmbedBuilder()
-          .setAuthor({
-            name: 'Jellyfin Search Results',
-            iconURL:
-              'https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true',
-          })
-          .setColor(DefaultJellyfinColor)
-          .setDescription(description)
-          .toJSON(),
+        this.discordMessageService.buildMessage({
+          title: '',
+          mixin(embedBuilder) {
+            return embedBuilder.setAuthor({
+              name: 'Jellyfin Search Results',
+              iconURL: Constants.Design.Icons.JellyfinLogo,
+            });
+          },
+        }),
       ],
       components: [
         {
