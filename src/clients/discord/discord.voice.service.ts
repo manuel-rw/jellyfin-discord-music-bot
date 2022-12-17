@@ -122,11 +122,11 @@ export class DiscordVoiceService {
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();
-      return true;
+      return false;
     }
 
     this.pause();
-    return false;
+    return true;
   }
 
   disconnect(): GenericTryHandler {

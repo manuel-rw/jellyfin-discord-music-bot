@@ -11,7 +11,6 @@ import {
 import { Logger } from '@nestjs/common/services';
 import {
   ComponentType,
-  EmbedBuilder,
   Events,
   GuildMember,
   Interaction,
@@ -19,7 +18,6 @@ import {
 } from 'discord.js';
 import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
 import { TrackRequestDto } from '../models/track-request.dto';
-import { DefaultJellyfinColor } from '../types/colors';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
@@ -192,18 +190,10 @@ export class PlayItemCommand
 
     await interaction.update({
       embeds: [
-        new EmbedBuilder()
-          .setAuthor({
-            name: 'Jellyfin Search',
-            iconURL:
-              'https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true',
-          })
-          .setTitle(item.Name)
-          .setDescription(
-            `**Duration**: ${duration}\n**Artists**: ${artists}\n\nTrack was added to the queue at position ${addedIndex}`,
-          )
-          .setColor(DefaultJellyfinColor)
-          .toJSON(),
+        this.discordMessageService.buildMessage({
+          title: 'Jellyfin Search',
+          description: `**Duration**: ${duration}\n**Artists**: ${artists}\n\nTrack was added to the queue at position ${addedIndex}`,
+        }),
       ],
       components: [],
     });
