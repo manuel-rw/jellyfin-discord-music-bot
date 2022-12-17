@@ -73,13 +73,19 @@ export class PlayItemCommand
         )} *(${item.Type})*`,
     );
 
-    const description = `I have found **${
-      items.length
-    }** results for your search \`\`${
-      dto.search
-    }\`\`.\nFor better readability, I have limited the search results to 10\n\n ${lines.join(
-      '\n',
-    )}`;
+    let description =
+      'I have found **' +
+      items.length +
+      '** results for your search ``' +
+      dto.search +
+      '``.';
+
+    if (items.length > 10) {
+      description +=
+        '\nSince the results exceed 10 items, I truncated them for better readability.';
+    }
+
+    description += '\n\n' + lines.join('\n');
 
     const emojiForType = (type: string) => {
       switch (type) {
@@ -146,17 +152,6 @@ export class PlayItemCommand
       interaction.values[0],
     );
 
-    const milliseconds = item.RunTimeTicks / 10000;
-
-    const duration = formatDuration(
-      intervalToDuration({
-        start: milliseconds,
-        end: 0,
-      }),
-    );
-
-    const artists = item.Artists.join(', ');
-
     const guildMember = interaction.member as GuildMember;
 
     const tryResult =
@@ -165,6 +160,9 @@ export class PlayItemCommand
       );
 
     if (!tryResult.success) {
+      this.logger.warn(
+        `Unable to process select result because the member was not in a voice channcel`,
+      );
       const replyOptions = tryResult.reply as InteractionReplyOptions;
       await interaction.update({
         embeds: replyOptions.embeds,
@@ -181,12 +179,23 @@ export class PlayItemCommand
       bitrate,
     );
 
+    const milliseconds = item.RunTimeTicks / 10000;
+
+    const duration = formatDuration(
+      intervalToDuration({
+        start: milliseconds,
+        end: 0,
+      }),
+    );
+
     const addedIndex = this.playbackService.eneuqueTrack({
       jellyfinId: item.Id,
       name: item.Name,
       durationInMilliseconds: milliseconds,
       streamUrl: stream,
     });
+
+    const artists = item.Artists.join(', ');
 
     await interaction.update({
       embeds: [

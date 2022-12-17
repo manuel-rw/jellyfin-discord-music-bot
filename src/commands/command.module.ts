@@ -6,7 +6,6 @@ import { JellyfinClientModule } from '../clients/jellyfin/jellyfin.module';
 import { PlaybackModule } from '../playback/playback.module';
 import { CurrentTrackCommand } from './current.command';
 import { DisconnectCommand } from './disconnect.command';
-import { EnqueueCommand } from './enqueue.command';
 import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
 import { PlayItemCommand } from './play.comands';
@@ -29,7 +28,6 @@ import { SummonCommand } from './summon.command';
     StatusCommand,
     CurrentTrackCommand,
     DisconnectCommand,
-    EnqueueCommand,
     PausePlaybackCommand,
     SkipTrackCommand,
     StopPlaybackCommand,

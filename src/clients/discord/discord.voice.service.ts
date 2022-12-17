@@ -40,12 +40,15 @@ export class DiscordVoiceService {
   ): GenericTryHandler {
     if (this.voiceConnection !== undefined) {
       return {
-        success: false,
+        success: true,
         reply: {},
       };
     }
 
     if (member.voice.channel === null) {
+      this.logger.log(
+        `Unable to join a voice channel because the member ${member.user.username} is not in a voice channel`,
+      );
       return {
         success: false,
         reply: {
