@@ -20,6 +20,11 @@ export class DiscordMessageService {
       description: description,
       mixin(embedBuilder) {
         return embedBuilder
+          .setAuthor({
+            name: title,
+            iconURL:
+              'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/alert-circle.png?raw=true',
+          })
           .setFooter({
             text: `${date} - Report an issue: ${Constants.Links.ReportIssue}`,
           })

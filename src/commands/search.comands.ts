@@ -53,6 +53,17 @@ export class SearchItemCommand
   ): Promise<InteractionReplyOptions | string> {
     const items = await this.jellyfinSearchService.search(dto.search);
 
+    if (items.length < 1) {
+      return {
+        embeds: [
+          this.discordMessageService.buildErrorMessage({
+            title: 'No results for your search query found',
+            description: `I was not able to find any matches for your query \`\`${dto.search}\`\`. Please check that I have access to the desired libraries and that your query is not misspelled`,
+          }),
+        ],
+      };
+    }
+
     const firstItems = items.slice(0, 10);
 
     const lines: string[] = firstItems.map(
