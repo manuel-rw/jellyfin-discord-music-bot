@@ -4,13 +4,13 @@ import {
   Command,
   DiscordCommand,
   InjectDiscordClient,
-  UsePipes,
+  UsePipes
 } from '@discord-nestjs/core';
 import {
   Client,
   CommandInteraction,
   InteractionReplyOptions,
-  Status,
+  Status
 } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';

@@ -23,7 +23,6 @@ import { DefaultJellyfinColor } from '../types/colors';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
-import { createAudioResource } from '@discordjs/voice';
 import { formatDuration, intervalToDuration } from 'date-fns';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
@@ -161,11 +160,23 @@ export class PlayItemCommand
     const artists = item.Artists.join(', ');
 
     const guildMember = interaction.member as GuildMember;
-    const bitrate = guildMember.voice.channel.bitrate;
 
-    this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
-      guildMember,
-    );
+    const tryResult =
+      this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
+        guildMember,
+      );
+
+    if (!tryResult.success) {
+      const replyOptions = tryResult.reply as InteractionReplyOptions;
+      await interaction.update({
+        embeds: replyOptions.embeds,
+        content: undefined,
+        components: [],
+      });
+      return;
+    }
+
+    const bitrate = guildMember.voice.channel.bitrate;
 
     const stream = await this.jellyfinStreamBuilder.buildStreamUrl(
       item.Id,
