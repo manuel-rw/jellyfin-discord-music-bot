@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { DiscordClientModule } from '../clients/discord/discord.module';
 import { JellyfinClientModule } from '../clients/jellyfin/jellyfin.module';
 import { PlaybackModule } from '../playback/playback.module';
-import { CurrentTrackCommand } from './current.command';
+import { PlaylistCommand } from './playlist.command';
 import { DisconnectCommand } from './disconnect.command';
 import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
@@ -26,7 +26,7 @@ import { SummonCommand } from './summon.command';
   providers: [
     HelpCommand,
     StatusCommand,
-    CurrentTrackCommand,
+    PlaylistCommand,
     DisconnectCommand,
     PausePlaybackCommand,
     SkipTrackCommand,

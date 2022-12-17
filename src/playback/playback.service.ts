@@ -74,6 +74,10 @@ export class PlaybackService {
       track: track,
     });
 
+    this.logger.debug(
+      `Added the track '${track.jellyfinId}' to the current playlist`,
+    );
+
     if (emptyBefore) {
       this.setActiveTrack(this.playlist.tracks.find((x) => x.id === uuid).id);
       this.controlAudioPlayer();

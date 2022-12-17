@@ -6,14 +6,15 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { GenericCustomReply } from '../models/generic-try-handler';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
+import { trimStringToFixedLength } from '../utils/stringUtils';
 import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 
 @Command({
-  name: 'current',
+  name: 'playlist',
   description: 'Print the current track information',
 })
 @UsePipes(TransformPipe)
-export class CurrentTrackCommand implements DiscordCommand {
+export class PlaylistCommand implements DiscordCommand {
   constructor(
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
@@ -36,15 +37,24 @@ export class CurrentTrackCommand implements DiscordCommand {
 
     const tracklist = playList.tracks
       .slice(0, 10)
-      .map((track) => {
+      .map((track, index) => {
         const isCurrent = track.id === playList.activeTrack;
-        return `${this.getListPoint(isCurrent)} ${
-          track.track.name
-        }\n${Constants.Design.InvisibleSpace.repeat(
-          3,
-        )}${formatMillisecondsAsHumanReadable(
+
+        let point = this.getListPoint(isCurrent, index);
+        point += `**${trimStringToFixedLength(track.track.name, 30)}**`;
+
+        if (isCurrent === true) {
+          point += ' :loud_sound:';
+        }
+
+        point += '\n';
+        point += Constants.Design.InvisibleSpace.repeat(2);
+        point += 'Duration: ';
+        point += formatMillisecondsAsHumanReadable(
           track.track.durationInMilliseconds,
-        )} ${isCurrent ? ' *(active track)*' : ''}`;
+        );
+
+        return point;
       })
       .join(',\n');
 
@@ -52,17 +62,17 @@ export class CurrentTrackCommand implements DiscordCommand {
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Your Playlist',
-          description: tracklist,
+          description: `${tracklist}\n\nUse the /skip and /previous command to select a track`,
         }),
       ],
     };
   }
 
-  private getListPoint(isCurrent: boolean) {
+  private getListPoint(isCurrent: boolean, index: number) {
     if (isCurrent) {
-      return ':black_small_square:';
+      return `${index + 1}. `;
     }
 
-    return ':white_small_square:';
+    return `${index + 1}. `;
   }
 }
