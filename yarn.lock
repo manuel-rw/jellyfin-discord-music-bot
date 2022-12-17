@@ -4437,13 +4437,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jellyfin-apiclient@npm:^1.10.0":
-  version: 1.10.0
-  resolution: "jellyfin-apiclient@npm:1.10.0"
-  checksum: 494161b3acf2e17db22c50fd13c637890985fa95aced5f4161045ae7a1eb80374625e83f2bd286a5a0f06847e06fab1f4dcc2d93f603bc1b033344adb12a7f7b
-  languageName: node
-  linkType: hard
-
 "jellyfin-discord-music-bot@workspace:.":
   version: 0.0.0-use.local
   resolution: "jellyfin-discord-music-bot@workspace:."
@@ -4472,7 +4465,6 @@ __metadata:
     eslint: ^8.0.1
     eslint-config-prettier: ^8.3.0
     eslint-plugin-prettier: ^4.0.0
-    jellyfin-apiclient: ^1.10.0
     jest: 28.1.3
     joi: ^17.7.0
     libsodium-wrappers: ^0.7.10

@@ -1,30 +1,18 @@
 import { TransformPipe } from '@discord-nestjs/common';
 
-import {
-  Command,
-  DiscordTransformedCommand,
-  TransformedCommandExecutionContext,
-  UsePipes,
-} from '@discord-nestjs/core';
+import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
 import { EmbedBuilder } from '@discordjs/builders';
-import { InteractionReplyOptions, MessagePayload } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import { DefaultJellyfinColor } from 'src/types/colors';
+import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'help',
   description: 'Get help if you&apos;re having problems with this bot',
 })
 @UsePipes(TransformPipe)
-export class HelpCommand implements DiscordTransformedCommand<unknown> {
-  handler(
-    dto: unknown,
-    executionContext: TransformedCommandExecutionContext<any>,
-  ):
-    | string
-    | void
-    | MessagePayload
-    | InteractionReplyOptions
-    | Promise<string | void | MessagePayload | InteractionReplyOptions> {
+export class HelpCommand implements DiscordCommand {
+  handler(commandInteraction: CommandInteraction): GenericCustomReply {
     return {
       embeds: [
         new EmbedBuilder()

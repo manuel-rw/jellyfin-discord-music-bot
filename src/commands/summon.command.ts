@@ -1,15 +1,11 @@
 import { TransformPipe } from '@discord-nestjs/common';
 
 import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
-import { joinVoiceChannel } from '@discordjs/voice';
 import { Logger } from '@nestjs/common';
-import {
-  CommandInteraction,
-  EmbedBuilder,
-  GuildMember,
-  InteractionReplyOptions,
-} from 'discord.js';
-import { DefaultJellyfinColor, ErrorJellyfinColor } from '../types/colors';
+import { CommandInteraction, GuildMember } from 'discord.js';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'summon',
@@ -19,45 +15,28 @@ import { DefaultJellyfinColor, ErrorJellyfinColor } from '../types/colors';
 export class SummonCommand implements DiscordCommand {
   private readonly logger = new Logger(SummonCommand.name);
 
-  handler(interaction: CommandInteraction): InteractionReplyOptions | string {
+  constructor(
+    private readonly discordVoiceService: DiscordVoiceService,
+    private readonly discordMessageService: DiscordMessageService,
+  ) {}
+
+  handler(interaction: CommandInteraction): GenericCustomReply {
     const guildMember = interaction.member as GuildMember;
 
-    if (guildMember.voice.channel === null) {
-      return {
-        embeds: [
-          new EmbedBuilder()
-            .setColor(ErrorJellyfinColor)
-            .setAuthor({
-              name: 'Unable to join your channel',
-              iconURL:
-                'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/alert-circle.png?raw=true',
-            })
-            .setDescription(
-              'You are in a channel, I am either unabelt to connect to or you aren&apost in a channel yet',
-            )
-            .toJSON(),
-        ],
-      };
+    const tryResult =
+      this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
+        guildMember,
+      );
+
+    if (!tryResult.success) {
+      return tryResult.reply;
     }
-
-    const channel = guildMember.voice.channel;
-
-    joinVoiceChannel({
-      channelId: channel.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
-      guildId: channel.guildId,
-    });
 
     return {
       embeds: [
-        new EmbedBuilder()
-          .setColor(DefaultJellyfinColor)
-          .setAuthor({
-            name: 'Joined your voicehannel',
-            iconURL:
-              'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/circle-check.png?raw=true&test=a',
-          })
-          .toJSON(),
+        this.discordMessageService.buildMessage({
+          title: 'Joined your voicehannel',
+        }),
       ],
     };
   }

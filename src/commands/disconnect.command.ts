@@ -1,13 +1,10 @@
 import { TransformPipe } from '@discord-nestjs/common';
 
 import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
-import {
-  CommandInteraction,
-  EmbedBuilder,
-  InteractionReplyOptions,
-} from 'discord.js';
-import { getVoiceConnection } from '@discordjs/voice';
-import { DefaultJellyfinColor, ErrorJellyfinColor } from '../types/colors';
+import { CommandInteraction } from 'discord.js';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'disconnect',
@@ -15,40 +12,23 @@ import { DefaultJellyfinColor, ErrorJellyfinColor } from '../types/colors';
 })
 @UsePipes(TransformPipe)
 export class DisconnectCommand implements DiscordCommand {
-  handler(interaction: CommandInteraction): InteractionReplyOptions | string {
-    const connection = getVoiceConnection(interaction.guildId);
+  constructor(
+    private readonly discordVoiceService: DiscordVoiceService,
+    private readonly discordMessageService: DiscordMessageService,
+  ) {}
 
-    if (!connection) {
-      return {
-        embeds: [
-          new EmbedBuilder()
-            .setColor(ErrorJellyfinColor)
-            .setAuthor({
-              name: 'Unable to disconnect from voice channel',
-              iconURL:
-                'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/alert-circle.png?raw=true',
-            })
-            .setDescription(
-              'I am currently not connected to any voice channels',
-            )
-            .toJSON(),
-        ],
-      };
-      return;
+  handler(interaction: CommandInteraction): GenericCustomReply {
+    const disconnect = this.discordVoiceService.disconnect();
+
+    if (!disconnect.success) {
+      return disconnect.reply;
     }
-
-    connection.destroy();
 
     return {
       embeds: [
-        new EmbedBuilder()
-          .setColor(DefaultJellyfinColor)
-          .setAuthor({
-            name: 'Disconnected from your channel',
-            iconURL:
-              'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/circle-check.png?raw=true',
-          })
-          .toJSON(),
+        this.discordMessageService.buildMessage({
+          title: 'Disconnected from your channel',
+        }),
       ],
     };
   }

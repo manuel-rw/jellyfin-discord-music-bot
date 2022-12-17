@@ -1,5 +1,7 @@
 import {
   AudioPlayer,
+  AudioPlayerPausedState,
+  AudioPlayerStatus,
   AudioResource,
   createAudioPlayer,
   getVoiceConnection,
@@ -68,12 +70,65 @@ export class DiscordVoiceService {
     this.createAndReturnOrGetAudioPlayer().play(resource);
   }
 
+  /**
+   * Pauses the current audio player
+   */
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
   }
 
+  /**
+   * Unpauses the current audio player
+   */
   unpause() {
     this.createAndReturnOrGetAudioPlayer().unpause();
+  }
+
+  /**
+   * Check if the current state is paused
+   * @returns The current pause state as a boolean
+   */
+  isPaused() {
+    return (
+      this.createAndReturnOrGetAudioPlayer().state.status ===
+      AudioPlayerStatus.Paused
+    );
+  }
+
+  /**
+   * Checks if the current state is paused or not and toggles the states to the opposite.
+   * @returns The new paused state - true: paused, false: unpaused
+   */
+  togglePaused(): boolean {
+    if (this.isPaused()) {
+      this.unpause();
+      return true;
+    }
+
+    this.pause();
+    return false;
+  }
+
+  disconnect(): GenericTryHandler {
+    if (this.voiceConnection === undefined) {
+      return {
+        success: false,
+        reply: {
+          embeds: [
+            this.discordMessageService.buildErrorMessage({
+              title: 'Unable to disconnect from voice channel',
+              description: 'I am currently not connected to any voice channels',
+            }),
+          ],
+        },
+      };
+    }
+
+    this.voiceConnection.destroy();
+    return {
+      success: true,
+      reply: {},
+    };
   }
 
   disconnectGracefully() {

@@ -33,7 +33,6 @@
     "@nestjs/platform-express": "^9.0.0",
     "date-fns": "^2.29.3",
     "discord.js": "^14.7.1",
-    "jellyfin-apiclient": "^1.10.0",
     "joi": "^17.7.0",
     "libsodium-wrappers": "^0.7.10",
     "reflect-metadata": "^0.1.13",
