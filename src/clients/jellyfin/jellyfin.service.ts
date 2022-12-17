@@ -2,12 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { Api, Jellyfin } from '@jellyfin/sdk';
 import { Constants } from '../../utils/constants';
+import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api';
+import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 
 @Injectable()
 export class JellyfinService {
   private readonly logger = new Logger(JellyfinService.name);
   private jellyfin: Jellyfin;
   private api: Api;
+  private systemApi: SystemApi;
+  private userId: string;
 
   init() {
     this.jellyfin = new Jellyfin({
@@ -42,6 +46,9 @@ export class JellyfinService {
         this.logger.debug(
           `Connected using user '${response.data.SessionInfo.UserId}'`,
         );
+        this.userId = response.data.SessionInfo.UserId;
+
+        this.systemApi = getSystemApi(this.api);
       })
       .catch((test) => {
         this.logger.error(test);
@@ -56,5 +63,21 @@ export class JellyfinService {
       return;
     }
     this.api.logout();
+  }
+
+  getApi() {
+    return this.api;
+  }
+
+  getJellyfin() {
+    return this.jellyfin;
+  }
+
+  getSystemApi() {
+    return this.systemApi;
+  }
+
+  getUserId() {
+    return this.userId;
   }
 }

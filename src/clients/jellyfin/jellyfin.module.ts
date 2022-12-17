@@ -1,16 +1,20 @@
-import { Module, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { JellyfinService } from "./jellyfin.service";
+import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { JellyfinSearchService } from './jellyfin.search.service';
+import { JellyfinService } from './jellyfin.service';
+import { JellyinWebsocketService } from './jellyfin.websocket.service';
 
 @Module({
   imports: [],
   controllers: [],
-  providers: [JellyfinService],
-  exports: [],
+  providers: [JellyfinService, JellyinWebsocketService, JellyfinSearchService],
+  exports: [JellyfinService, JellyfinSearchService],
 })
 export class JellyfinClientModule implements OnModuleInit, OnModuleDestroy {
-  
-  constructor(private jellyfinService: JellyfinService) {}
-  
+  constructor(
+    private jellyfinService: JellyfinService,
+    private readonly jellyfinWebsocketService: JellyinWebsocketService,
+  ) {}
+
   onModuleDestroy() {
     this.jellyfinService.destroy();
   }
@@ -18,5 +22,9 @@ export class JellyfinClientModule implements OnModuleInit, OnModuleDestroy {
   onModuleInit() {
     this.jellyfinService.init();
     this.jellyfinService.authenticate();
+
+    setTimeout(() => {
+      this.jellyfinWebsocketService.openSocket();
+    }, 5000);
   }
 }
