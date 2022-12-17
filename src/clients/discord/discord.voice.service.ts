@@ -170,27 +170,44 @@ export class DiscordVoiceService {
         `Initialized new instance of Audio Player because it has not been defined yet`,
       );
       this.audioPlayer = createAudioPlayer();
-      this.audioPlayer.on('debug', (message) => {
-        this.logger.debug(message);
-      });
-      this.audioPlayer.on('error', (message) => {
-        this.logger.error(message);
-      });
-      this.audioPlayer.on('stateChange', (statusChange) => {
-        if (statusChange.status !== AudioPlayerStatus.AutoPaused) {
-          return;
-        }
-
-        if (!this.playbackService.hasNextTrack()) {
-          return;
-        }
-
-        this.playbackService.nextTrack();
-      });
+      this.attachEventListenersToAudioPlayer();
       this.voiceConnection.subscribe(this.audioPlayer);
       return this.audioPlayer;
     }
 
     return this.audioPlayer;
+  }
+
+  private attachEventListenersToAudioPlayer() {
+    this.audioPlayer.on('debug', (message) => {
+      this.logger.debug(message);
+    });
+    this.audioPlayer.on('error', (message) => {
+      this.logger.error(message);
+    });
+    this.audioPlayer.on('stateChange', (previousState) => {
+      if (previousState.status !== AudioPlayerStatus.Playing) {
+        return;
+      }
+
+      if (this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
+        return;
+      }
+
+      const hasNextTrack = this.playbackService.hasNextTrack();
+
+      this.logger.debug(
+        `Deteced audio player status change from ${previousState.status} to ${
+          this.audioPlayer.state.status
+        }. Has next track: ${hasNextTrack ? 'yes' : 'no'}`,
+      );
+
+      if (!hasNextTrack) {
+        this.logger.debug(`Audio Player has reached the end of the playlist`);
+        return;
+      }
+
+      this.playbackService.nextTrack();
+    });
   }
 }

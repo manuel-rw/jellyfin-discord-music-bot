@@ -44,7 +44,7 @@ export class CurrentTrackCommand implements DiscordCommand {
           3,
         )}${formatMillisecondsAsHumanReadable(
           track.track.durationInMilliseconds,
-        )} ${isCurrent && ' *(active track)*'}`;
+        )} ${isCurrent ? ' *(active track)*' : ''}`;
       })
       .join(',\n');
 
