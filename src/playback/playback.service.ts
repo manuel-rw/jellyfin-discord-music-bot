@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Playlist } from '../types/playlist';
 import { Track } from '../types/track';
 
@@ -7,6 +7,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PlaybackService {
+  private readonly logger = new Logger(PlaybackService.name);
+
   private readonly playlist: Playlist = {
     tracks: [],
     activeTrack: null,
@@ -19,7 +21,6 @@ export class PlaybackService {
   }
 
   setActiveTrack(trackId: string) {
-    console.log(`getting track by id ${trackId}`);
     const track = this.getTrackById(trackId);
 
     if (!track) {
@@ -31,15 +32,12 @@ export class PlaybackService {
 
   nextTrack() {
     const keys = this.getTrackIds();
-    console.log('keys:');
-    console.log(keys);
-
     const index = this.getActiveIndex();
 
-    console.log(keys);
-    console.log(index);
-
     if (!this.hasActiveTrack() || index + 1 >= keys.length) {
+      this.logger.debug(
+        `Unable to go to next track, because playback has reached end of the playlist`,
+      );
       return false;
     }
 
@@ -53,6 +51,9 @@ export class PlaybackService {
     const index = this.getActiveIndex();
 
     if (!this.hasActiveTrack() || index < 1) {
+      this.logger.debug(
+        `Unable to go to previous track, because there is no previous track in the playlist`,
+      );
       return false;
     }
 
@@ -118,6 +119,9 @@ export class PlaybackService {
 
   private controlAudioPlayer() {
     const activeTrack = this.getActiveTrack();
+    this.logger.debug(
+      `A new track (${activeTrack.id}) was requested and will be emmitted as an event`,
+    );
     this.eventEmitter.emit('playback.newTrack', activeTrack.track);
   }
 }

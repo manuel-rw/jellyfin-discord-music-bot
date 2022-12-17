@@ -108,6 +108,14 @@ export class DiscordVoiceService {
   }
 
   /**
+   * Gets the current audio player status
+   * @returns The current audio player status
+   */
+  getPlayerStatus(): AudioPlayerStatus {
+    return this.createAndReturnOrGetAudioPlayer().state.status;
+  }
+
+  /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
