@@ -49,6 +49,11 @@ https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
 I'm open to any contributions to this project. You can start contributing using the following commands, after executing the installation commands:
 
 ## 👤 Credits
-- https://tabler-icons.io/ (MIT)
-- https://docs.nestjs.com/ (MIT)
-- https://discord.js.org/ (Apache 2.0)
+- https://tabler-icons.io/
+- https://docs.nestjs.com/
+- https://discord.js.org/
+- https://github.com/fjodor-rybakov/discord-nestjs
+- https://github.com/jellyfin/jellyfin-sdk-typescript
+- https://jellyfin.org/
+- https://github.com/KGT1/jellyfin-discord-music-bot
+- https://gitmoji.dev/
