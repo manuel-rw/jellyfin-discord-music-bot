@@ -11,6 +11,9 @@
   <small>Thanky you <a href="https://github.com/KGT1/jellyfin-discord-music-bot/">KGT1</a> for starting this project!<br/>This is a fork of their original repository and re-uses some of their code.</small>
 </p>
 
+<p align="center">
+  <a href="https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki/%F0%9F%9A%80-Installation"><img src="https://img.shields.io/badge/-Installation%20Guide-grey?style=for-the-badge&logo=discord" alt="badge" /></a>
+</p>
 
 <br/>
 <hr/>
