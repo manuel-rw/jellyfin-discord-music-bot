@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { JellyfinService } from './jellyfin.service';
 
-import { SearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  BaseItemDto,
+  BaseItemKind,
+  SearchHint,
+  SearchHintResult,
+} from '@jellyfin/sdk/lib/generated-client/models';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
 import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Logger } from '@nestjs/common/services';
-import { JellyfinAudioPlaylist } from '../../models/jellyfinAudioItems';
+import { JellyfinAudioPlaylist, JellyfinMusicAlbum } from '../../models/jellyfinAudioItems';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -25,8 +30,14 @@ export class JellyfinSearchService {
       status,
     } = await searchApi.get({
       searchTerm: searchTerm,
-      mediaTypes: ['Audio', 'MusicAlbum', 'Playlist'],
+      includeItemTypes: [
+        BaseItemKind.Audio,
+        BaseItemKind.MusicAlbum,
+        BaseItemKind.Playlist,
+      ],
     });
+
+    console.log(SearchHints);
 
     if (status !== 200) {
       this.logger.error(`Jellyfin Search failed with status code ${status}`);
@@ -48,11 +59,33 @@ export class JellyfinSearchService {
     });
 
     if (axiosResponse.status !== 200) {
-      this.logger.error(`Jellyfin Search failed with status code ${status}`);
+      this.logger.error(
+        `Jellyfin Search failed with status code ${axiosResponse.status}`,
+      );
       return new JellyfinAudioPlaylist();
     }
 
     return axiosResponse.data as JellyfinAudioPlaylist;
+  }
+
+  async getItemsByAlbum(albumId: string): Promise<JellyfinMusicAlbum> {
+    const api = this.jellyfinService.getApi();
+    const searchApi = getSearchApi(api);
+    const axiosResponse = await searchApi.get({
+      parentId: albumId,
+      userId: this.jellyfinService.getUserId(),
+      mediaTypes: [BaseItemKind[BaseItemKind.Audio]],
+      searchTerm: '%',
+    });
+
+    if (axiosResponse.status !== 200) {
+      this.logger.error(
+        `Jellyfin Search failed with status code ${axiosResponse.status}`,
+      );
+      return new JellyfinMusicAlbum();
+    }
+
+    return axiosResponse.data as JellyfinMusicAlbum;
   }
 
   async getById(id: string): Promise<SearchHint> {

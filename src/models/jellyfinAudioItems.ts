@@ -1,4 +1,7 @@
-import { SearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  BaseItemKind,
+  SearchHint,
+} from '@jellyfin/sdk/lib/generated-client/models';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { Track } from '../types/track';
 import { trimStringToFixedLength } from '../utils/stringUtils';
@@ -161,19 +164,67 @@ export class JellyfinAudioPlaylist implements BaseJellyfinAudioPlayable {
   TotalRecordCount: number;
 }
 
+export class JellyfinMusicAlbum implements BaseJellyfinAudioPlayable {
+  Id: string;
+  Name: string;
+  RunTimeTicks: number;
+  SearchHints: JellyfinAudioItem[];
+  TotalRecordCount: number;
+
+  async fromSearchHint(
+    jellyfinSearchService: JellyfinSearchService,
+    searchHint: SearchHint,
+  ): Promise<JellyfinMusicAlbum> {
+    this.Id = searchHint.Id;
+    this.Name = searchHint.Name;
+    this.RunTimeTicks = searchHint.RunTimeTicks;
+    const album = await jellyfinSearchService.getItemsByAlbum(searchHint.Id);
+    this.SearchHints = album.SearchHints;
+    this.TotalRecordCount = album.TotalRecordCount;
+    return this;
+  }
+  fetchTracks(
+    jellyfinStreamBuilder: JellyfinStreamBuilderService,
+    bitrate: number,
+  ): Track[] {
+    return this.SearchHints.flatMap((item) =>
+      item.fetchTracks(jellyfinStreamBuilder, bitrate),
+    );
+  }
+  prettyPrint(search: string): string {
+    return `${markSearchTermOverlap(this.Name, search)} (${
+      this.TotalRecordCount
+    } items) (Album)`;
+  }
+  getId(): string {
+    return this.Id;
+  }
+  getValueId(): string {
+    return `album_${this.getId()}`;
+  }
+  getEmoji(): string {
+    return '📀';
+  }
+}
+
 export const searchResultAsJellyfinAudio = async (
   logger: Logger,
   jellyfinSearchService: JellyfinSearchService,
   searchHint: SearchHint,
 ) => {
   switch (searchHint.Type) {
-    case 'Audio':
+    case BaseItemKind[BaseItemKind.Audio]:
       return await new JellyfinAudioItem().fromSearchHint(
         jellyfinSearchService,
         searchHint,
       );
-    case 'Playlist':
+    case BaseItemKind[BaseItemKind.Playlist]:
       return await new JellyfinAudioPlaylist().fromSearchHint(
+        jellyfinSearchService,
+        searchHint,
+      );
+    case BaseItemKind[BaseItemKind.MusicAlbum]:
+      return await new JellyfinMusicAlbum().fromSearchHint(
         jellyfinSearchService,
         searchHint,
       );

@@ -56,7 +56,7 @@ export class PlaylistCommand implements DiscordCommand {
 
         return point;
       })
-      .join(',\n');
+      .join('\n');
 
     return {
       embeds: [

@@ -190,6 +190,21 @@ export class PlayItemCommand
           components: [],
         });
         break;
+      case 'album':
+        const album = await this.jellyfinSearchService.getItemsByAlbum(id);
+        console.log(album);
+        album.SearchHints.forEach((item) => {
+          this.enqueueSingleTrack(item as BaseJellyfinAudioPlayable, bitrate);
+        });
+        interaction.update({
+          embeds: [
+            this.discordMessageService.buildMessage({
+              title: `Added ${album.TotalRecordCount} items from your album`,
+            }),
+          ],
+          components: [],
+        });
+        break;
       case 'playlist':
         const playlist = await this.jellyfinSearchService.getPlaylistById(id);
         playlist.Items.forEach((item) => {
@@ -209,7 +224,7 @@ export class PlayItemCommand
           embeds: [
             this.discordMessageService.buildErrorMessage({
               title: 'Unable to process your selection',
-              description: `Sorry. I don't know the type you selected: \`\`${type}\`\`. Please report this bug to the developers.\n\nDebug Information:\`\`${interaction.values.join(
+              description: `Sorry. I don't know the type you selected: \`\`${type}\`\`. Please report this bug to the developers.\n\nDebug Information: \`\`${interaction.values.join(
                 ', ',
               )}\`\``,
             }),
