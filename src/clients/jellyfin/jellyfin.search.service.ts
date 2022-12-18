@@ -37,8 +37,6 @@ export class JellyfinSearchService {
       ],
     });
 
-    console.log(SearchHints);
-
     if (status !== 200) {
       this.logger.error(`Jellyfin Search failed with status code ${status}`);
       return [];

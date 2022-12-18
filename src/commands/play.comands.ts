@@ -192,7 +192,6 @@ export class PlayItemCommand
         break;
       case 'album':
         const album = await this.jellyfinSearchService.getItemsByAlbum(id);
-        console.log(album);
         album.SearchHints.forEach((item) => {
           this.enqueueSingleTrack(item as BaseJellyfinAudioPlayable, bitrate);
         });
