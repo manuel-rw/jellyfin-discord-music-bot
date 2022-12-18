@@ -2,8 +2,8 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+  <br/>
+  <h1 align="center">Jellyfin Discord Bot</h1>
 
   <p align="center">A simple <a href="https://discord.com" target="_blank">Discord</a> bot that enables you to broadcast your <a href="https://jellyfin.org/" target="_blank">Jellyfin Media Server</a> music collection to voice channels.</p>
 
@@ -12,7 +12,6 @@
 </p>
 
 
-<br/>
 <br/>
 <hr/>
 <br/>
