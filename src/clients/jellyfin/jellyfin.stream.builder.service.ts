@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JellyfinService } from './jellyfin.service';
 
-import { getUniversalAudioApi } from '@jellyfin/sdk/lib/utils/api/universal-audio-api';
-
 @Injectable()
 export class JellyfinStreamBuilderService {
   private readonly logger = new Logger(JellyfinStreamBuilderService.name);
 
   constructor(private readonly jellyfinService: JellyfinService) {}
 
-  async buildStreamUrl(jellyfinItemId: string, bitrate: number) {
+  buildStreamUrl(jellyfinItemId: string, bitrate: number) {
     const api = this.jellyfinService.getApi();
 
     this.logger.debug(

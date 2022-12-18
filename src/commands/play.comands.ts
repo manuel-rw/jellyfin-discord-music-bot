@@ -21,12 +21,14 @@ import { TrackRequestDto } from '../models/track-request.dto';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
-import { formatDuration, intervalToDuration } from 'date-fns';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
+import {
+  BaseJellyfinAudioPlayable,
+  searchResultAsJellyfinAudio,
+} from '../models/jellyfinAudioItems';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
-import { trimStringToFixedLength } from '../utils/stringUtils';
 
 @Command({
   name: 'play',
@@ -51,8 +53,18 @@ export class PlayItemCommand
     executionContext: TransformedCommandExecutionContext<any>,
   ): Promise<InteractionReplyOptions | string> {
     const items = await this.jellyfinSearchService.search(dto.search);
+    const parsedItems = await Promise.all(
+      items.map(
+        async (item) =>
+          await searchResultAsJellyfinAudio(
+            this.logger,
+            this.jellyfinSearchService,
+            item,
+          ),
+      ),
+    );
 
-    if (items.length < 1) {
+    if (parsedItems.length < 1) {
       return {
         embeds: [
           this.discordMessageService.buildErrorMessage({
@@ -63,15 +75,13 @@ export class PlayItemCommand
       };
     }
 
-    const firstItems = items.slice(0, 10);
+    const firstItems = parsedItems.slice(0, 10);
 
-    const lines: string[] = firstItems.map(
-      (item) =>
-        `:white_small_square: ${trimStringToFixedLength(
-          this.markSearchTermOverlap(item.Name, dto.search),
-          30,
-        )} [${item.Artists.join(', ')}] *(${item.Type})*`,
-    );
+    const lines: string[] = firstItems.map((item, index) => {
+      let line = `${index + 1}. `;
+      line += item.prettyPrint(dto.search);
+      return line;
+    });
 
     let description =
       'I have found **' +
@@ -87,22 +97,11 @@ export class PlayItemCommand
 
     description += '\n\n' + lines.join('\n');
 
-    const emojiForType = (type: string) => {
-      switch (type) {
-        case 'Audio':
-          return '🎵';
-        case 'Playlist':
-          return '📚';
-        default:
-          return undefined;
-      }
-    };
-
     const selectOptions: { label: string; value: string; emoji?: string }[] =
       firstItems.map((item) => ({
-        label: `${item.Name} [${item.Artists.join(', ')}]`,
-        value: item.Id,
-        emoji: emojiForType(item.Type),
+        label: item.prettyPrint(dto.search),
+        value: item.getValueId(),
+        emoji: item.getEmoji(),
       }));
 
     return {
@@ -148,10 +147,6 @@ export class PlayItemCommand
       return;
     }
 
-    const item = await this.jellyfinSearchService.getById(
-      interaction.values[0],
-    );
-
     const guildMember = interaction.member as GuildMember;
 
     const tryResult =
@@ -174,51 +169,73 @@ export class PlayItemCommand
 
     const bitrate = guildMember.voice.channel.bitrate;
 
-    const stream = await this.jellyfinStreamBuilder.buildStreamUrl(
-      item.Id,
+    const valueParts = interaction.values[0].split('_');
+    const type = valueParts[0];
+    const id = valueParts[1];
+
+    switch (type) {
+      case 'track':
+        const item = await this.jellyfinSearchService.getById(id);
+        const addedIndex = this.enqueueSingleTrack(
+          item as BaseJellyfinAudioPlayable,
+          bitrate,
+        );
+        interaction.update({
+          embeds: [
+            this.discordMessageService.buildMessage({
+              title: item.Name,
+              description: `Your track was added to the position ${addedIndex} in the playlist`,
+            }),
+          ],
+          components: [],
+        });
+        break;
+      case 'playlist':
+        const playlist = await this.jellyfinSearchService.getPlaylistById(id);
+        playlist.Items.forEach((item) => {
+          this.enqueueSingleTrack(item as BaseJellyfinAudioPlayable, bitrate);
+        });
+        interaction.update({
+          embeds: [
+            this.discordMessageService.buildMessage({
+              title: `Added ${playlist.TotalRecordCount} items from your playlist`,
+            }),
+          ],
+          components: [],
+        });
+        break;
+      default:
+        interaction.update({
+          embeds: [
+            this.discordMessageService.buildErrorMessage({
+              title: 'Unable to process your selection',
+              description: `Sorry. I don't know the type you selected: \`\`${type}\`\`. Please report this bug to the developers.\n\nDebug Information:\`\`${interaction.values.join(
+                ', ',
+              )}\`\``,
+            }),
+          ],
+          components: [],
+        });
+        break;
+    }
+  }
+
+  private enqueueSingleTrack(
+    jellyfinPlayable: BaseJellyfinAudioPlayable,
+    bitrate: number,
+  ) {
+    const stream = this.jellyfinStreamBuilder.buildStreamUrl(
+      jellyfinPlayable.Id,
       bitrate,
     );
 
-    const milliseconds = item.RunTimeTicks / 10000;
+    const milliseconds = jellyfinPlayable.RunTimeTicks / 10000;
 
-    const duration = formatDuration(
-      intervalToDuration({
-        start: milliseconds,
-        end: 0,
-      }),
-    );
-
-    const addedIndex = this.playbackService.eneuqueTrack({
-      jellyfinId: item.Id,
-      name: item.Name,
+    return this.playbackService.eneuqueTrack({
+      jellyfinId: jellyfinPlayable.Id,
+      name: jellyfinPlayable.Name,
       durationInMilliseconds: milliseconds,
       streamUrl: stream,
     });
-
-    const artists = item.Artists.join(', ');
-
-    await interaction.update({
-      embeds: [
-        this.discordMessageService.buildMessage({
-          title: 'Jellyfin Search',
-          description: `**Duration**: ${duration}\n**Artists**: ${artists}\n\nTrack was added to the queue at position ${addedIndex}`,
-        }),
-      ],
-      components: [],
-    });
-  }
-
-  private markSearchTermOverlap(value: string, searchTerm: string) {
-    const startIndex = value.indexOf(searchTerm);
-    const actualValue = value.substring(
-      startIndex,
-      startIndex + 1 + searchTerm.length,
-    );
-    return `${value.substring(
-      0,
-      startIndex,
-    )}**${actualValue}**${value.substring(
-      startIndex + 1 + actualValue.length,
-    )}`;
   }
 }

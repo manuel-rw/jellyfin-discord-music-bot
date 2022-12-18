@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { JellyfinService } from './jellyfin.service';
 
 import { SearchHint } from '@jellyfin/sdk/lib/generated-client/models';
-import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
+import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
+import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Logger } from '@nestjs/common/services';
+import { JellyfinAudioPlaylist } from '../../models/jellyfinAudioItems';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -20,14 +22,37 @@ export class JellyfinSearchService {
     const searchApi = getSearchApi(api);
     const {
       data: { SearchHints, TotalRecordCount },
+      status,
     } = await searchApi.get({
       searchTerm: searchTerm,
-      mediaTypes: ['Audio', 'Album'],
+      mediaTypes: ['Audio', 'MusicAlbum', 'Playlist'],
     });
+
+    if (status !== 200) {
+      this.logger.error(`Jellyfin Search failed with status code ${status}`);
+      return [];
+    }
 
     this.logger.debug(`Found ${TotalRecordCount} results for '${searchTerm}'`);
 
     return SearchHints;
+  }
+
+  async getPlaylistById(id: string): Promise<JellyfinAudioPlaylist> {
+    const api = this.jellyfinService.getApi();
+    const searchApi = getPlaylistsApi(api);
+
+    const axiosResponse = await searchApi.getPlaylistItems({
+      userId: this.jellyfinService.getUserId(),
+      playlistId: id,
+    });
+
+    if (axiosResponse.status !== 200) {
+      this.logger.error(`Jellyfin Search failed with status code ${status}`);
+      return new JellyfinAudioPlaylist();
+    }
+
+    return axiosResponse.data as JellyfinAudioPlaylist;
   }
 
   async getById(id: string): Promise<SearchHint> {
