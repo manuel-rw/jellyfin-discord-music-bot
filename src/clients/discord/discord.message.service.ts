@@ -53,7 +53,7 @@ export class DiscordMessageService {
         text: `${date}`,
       });
 
-    if (description !== undefined && description.length > 0) {
+    if (!description && description.length >= 1) {
       embedBuilder = embedBuilder.setDescription(description);
     }
 

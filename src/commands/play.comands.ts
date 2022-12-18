@@ -64,7 +64,7 @@ export class PlayItemCommand
       ),
     );
 
-    if (parsedItems.length < 1) {
+    if (parsedItems.length === 0) {
       return {
         embeds: [
           this.discordMessageService.buildErrorMessage({

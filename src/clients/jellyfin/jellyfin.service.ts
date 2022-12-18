@@ -56,7 +56,7 @@ export class JellyfinService {
   }
 
   destroy() {
-    if (this.api === undefined) {
+    if (!this.api) {
       this.logger.warn(
         'Jellyfin Api Client was unexpectitly undefined. Graceful destroy has failed',
       );
