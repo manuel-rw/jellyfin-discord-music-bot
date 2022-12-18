@@ -70,7 +70,7 @@ export class PlayItemCommand
         `:white_small_square: ${trimStringToFixedLength(
           this.markSearchTermOverlap(item.Name, dto.search),
           30,
-        )} *(${item.Type})*`,
+        )} [${item.Artists.join(', ')}] *(${item.Type})*`,
     );
 
     let description =
@@ -100,7 +100,7 @@ export class PlayItemCommand
 
     const selectOptions: { label: string; value: string; emoji?: string }[] =
       firstItems.map((item) => ({
-        label: item.Name,
+        label: `${item.Name} [${item.Artists.join(', ')}]`,
         value: item.Id,
         emoji: emojiForType(item.Type),
       }));
