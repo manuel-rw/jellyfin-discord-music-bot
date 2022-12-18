@@ -5,12 +5,10 @@ import { DiscordModule } from '@discord-nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { DiscordConfigService } from './clients/discord/discord.config.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
-import { DiscordConfigService } from './clients/discord/discord.config.service';
 import { PlaybackModule } from './playback/playback.module';
 
 @Module({
@@ -33,7 +31,7 @@ import { PlaybackModule } from './playback/playback.module';
     JellyfinClientModule,
     PlaybackModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

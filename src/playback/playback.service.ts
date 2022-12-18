@@ -64,7 +64,7 @@ export class PlaybackService {
     return true;
   }
 
-  eneuqueTrack(track: Track) {
+  enqueueTrack(track: Track) {
     const uuid = uuidv4();
 
     const emptyBefore = this.playlist.tracks.length === 0;

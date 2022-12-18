@@ -19,22 +19,12 @@ export class PausePlaybackCommand implements DiscordCommand {
   handler(
     commandInteraction: CommandInteraction,
   ): string | InteractionReplyOptions {
-    const newStatus = this.discordVoiceService.togglePaused();
-
-    if (newStatus) {
-      return {
-        embeds: [
-          this.discordMessageService.buildMessage({
-            title: 'Paused',
-          }),
-        ],
-      };
-    }
+    const shouldBePaused = this.discordVoiceService.togglePaused();
 
     return {
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'Unpaused',
+          title: shouldBePaused ? 'Paused' : 'Unpaused',
         }),
       ],
     };

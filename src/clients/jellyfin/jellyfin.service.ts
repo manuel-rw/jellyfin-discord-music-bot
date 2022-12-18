@@ -4,6 +4,7 @@ import { Api, Jellyfin } from '@jellyfin/sdk';
 import { Constants } from '../../utils/constants';
 import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api';
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class JellyfinService {
@@ -13,6 +14,8 @@ export class JellyfinService {
   private systemApi: SystemApi;
   private userId: string;
 
+  constructor(private readonly eventEmitter: EventEmitter2) {}
+
   init() {
     this.jellyfin = new Jellyfin({
       clientInfo: {
@@ -20,8 +23,8 @@ export class JellyfinService {
         version: Constants.Metadata.Version,
       },
       deviceInfo: {
-        id: 'test',
-        name: 'test',
+        id: 'jellyfin-discord-bot',
+        name: 'Jellyfin Discord Bot',
       },
     });
 
@@ -49,6 +52,8 @@ export class JellyfinService {
         this.userId = response.data.SessionInfo.UserId;
 
         this.systemApi = getSystemApi(this.api);
+
+        this.eventEmitter.emit('clients.jellyfin.ready');
       })
       .catch((test) => {
         this.logger.error(test);

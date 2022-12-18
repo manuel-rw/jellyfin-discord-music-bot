@@ -43,7 +43,7 @@ export class PlaylistCommand implements DiscordCommand {
         let point = this.getListPoint(isCurrent, index);
         point += `**${trimStringToFixedLength(track.track.name, 30)}**`;
 
-        if (isCurrent === true) {
+        if (isCurrent) {
           point += ' :loud_sound:';
         }
 

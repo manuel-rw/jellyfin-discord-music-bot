@@ -20,10 +20,7 @@ import { JellyinWebsocketService } from './jellyfin.websocket.service';
   ],
 })
 export class JellyfinClientModule implements OnModuleInit, OnModuleDestroy {
-  constructor(
-    private jellyfinService: JellyfinService,
-    private readonly jellyfinWebsocketService: JellyinWebsocketService,
-  ) {}
+  constructor(private jellyfinService: JellyfinService) {}
 
   onModuleDestroy() {
     this.jellyfinService.destroy();
@@ -32,9 +29,5 @@ export class JellyfinClientModule implements OnModuleInit, OnModuleDestroy {
   onModuleInit() {
     this.jellyfinService.init();
     this.jellyfinService.authenticate();
-
-    setTimeout(() => {
-      this.jellyfinWebsocketService.openSocket();
-    }, 5000);
   }
 }

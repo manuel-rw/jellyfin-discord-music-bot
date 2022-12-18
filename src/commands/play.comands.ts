@@ -245,7 +245,7 @@ export class PlayItemCommand
 
     const milliseconds = jellyfinPlayable.RunTimeTicks / 10000;
 
-    return this.playbackService.eneuqueTrack({
+    return this.playbackService.enqueueTrack({
       jellyfinId: jellyfinPlayable.Id,
       name: jellyfinPlayable.Name,
       durationInMilliseconds: milliseconds,

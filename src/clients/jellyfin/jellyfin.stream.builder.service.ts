@@ -16,14 +16,20 @@ export class JellyfinStreamBuilderService {
 
     const accessToken = this.jellyfinService.getApi().accessToken;
 
-    const url = encodeURI(
-      `${
-        api.basePath
-      }/Audio/${jellyfinItemId}/universal?UserId=${this.jellyfinService.getUserId()}&DeviceId=${
-        this.jellyfinService.getJellyfin().clientInfo.name
-      }&MaxStreamingBitrate=${bitrate}&Container=ogg,opus&AudioCodec=opus&TranscodingContainer=ts&TranscodingProtocol=hls&api_key=${accessToken}`,
+    const uri = new URL(api.basePath);
+    uri.pathname = `/Audio/${jellyfinItemId}/universal`;
+    uri.searchParams.set('UserId', this.jellyfinService.getUserId());
+    uri.searchParams.set(
+      'DeviceId',
+      this.jellyfinService.getJellyfin().clientInfo.name,
     );
+    uri.searchParams.set('MaxStreamingBitrate', `${bitrate}`);
+    uri.searchParams.set('Container', 'ogg,opus');
+    uri.searchParams.set('AudioCodec', 'opus');
+    uri.searchParams.set('TranscodingContainer', 'ts');
+    uri.searchParams.set('TranscodingProtocol', 'hls');
+    uri.searchParams.set('api_key', accessToken);
 
-    return url;
+    return uri.toString();
   }
 }
