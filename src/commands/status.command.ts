@@ -1,0 +1,94 @@
+import { TransformPipe } from '@discord-nestjs/common';
+
+import {
+  Command,
+  DiscordCommand,
+  InjectDiscordClient,
+  UsePipes
+} from '@discord-nestjs/core';
+import {
+  Client,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Status
+} from 'discord.js';
+
+import { formatDuration, intervalToDuration } from 'date-fns';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
+import { Constants } from '../utils/constants';
+
+import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
+
+@Command({
+  name: 'status',
+  description: 'Display the current status for troubleshooting',
+})
+@UsePipes(TransformPipe)
+export class StatusCommand implements DiscordCommand {
+  constructor(
+    @InjectDiscordClient()
+    private readonly client: Client,
+    private readonly discordMessageService: DiscordMessageService,
+    private readonly jellyfinService: JellyfinService,
+  ) {}
+
+  async handler(
+    commandInteraction: CommandInteraction,
+  ): Promise<string | InteractionReplyOptions> {
+    const ping = this.client.ws.ping;
+    const status = Status[this.client.ws.status];
+
+    const interval = intervalToDuration({
+      start: this.client.uptime,
+      end: 0,
+    });
+    const formattedDuration = formatDuration(interval);
+
+    const jellyfinSystemApi = getSystemApi(this.jellyfinService.getApi());
+    const jellyfinSystemInformation = await jellyfinSystemApi.getSystemInfo();
+
+    return {
+      embeds: [
+        this.discordMessageService.buildMessage({
+          title: 'Discord Bot Status',
+          mixin(embedBuilder) {
+            return embedBuilder.addFields([
+              {
+                name: 'Bot Version',
+                value: Constants.Metadata.Version,
+                inline: true,
+              },
+              {
+                name: 'Discord Bot Ping',
+                value: `${ping}ms`,
+                inline: true,
+              },
+              {
+                name: 'Discord Bot Status',
+                value: `${status}`,
+                inline: true,
+              },
+              {
+                name: 'Discord Bot Uptime',
+                value: `${formattedDuration}`,
+                inline: false,
+              },
+              {
+                name: 'Jellyfin Server Version',
+                value: jellyfinSystemInformation.data.Version ?? 'unknown',
+                inline: true,
+              },
+              {
+                name: 'Jellyfin Server Operating System',
+                value:
+                  jellyfinSystemInformation.data.OperatingSystem ?? 'unknown',
+                inline: true,
+              },
+            ]);
+          },
+        }),
+      ],
+    };
+  }
+}
