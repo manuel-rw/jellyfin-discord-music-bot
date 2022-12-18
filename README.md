@@ -20,7 +20,7 @@
 ## ✨ Features
 
 - Leighweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
-- Easy ussage with Discord commands system (eg. ``/play``, ``/pause``, ...)
+- Easy usage with Discord command system (eg. ``/play``, ``/pause``, ...)
 - Fast configuration via environment variables
 - Typesafe for faster and easier development
 
