@@ -17,31 +17,25 @@ export class HelpCommand implements DiscordCommand {
     return {
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'a',
+          title: 'Jellyfin Discord Bot',
           description:
             'Jellyfin Discord Bot is an open source and self-hosted Discord bot, that integrates with your Jellyfin Media server and enables you to playback music from your libraries. You can use the Discord Slash Commands to invoke bot commands.',
+          authorUrl: 'https://github.com/manuel-rw/jellyfin-discord-music-bot',
           mixin(embedBuilder) {
-            return embedBuilder
-              .setAuthor({
-                name: 'Jellyfin Discord Bot',
-                iconURL:
-                  'https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true',
-                url: 'https://github.com/manuel-rw/jellyfin-discord-music-bot',
-              })
-              .addFields([
-                {
-                  name: 'Report an issue',
-                  value:
-                    'https://github.com/manuel-rw/jellyfin-discord-music-bot/issues/new/choose',
-                  inline: true,
-                },
-                {
-                  name: 'Source code',
-                  value:
-                    'https://github.com/manuel-rw/jellyfin-discord-music-bot',
-                  inline: true,
-                },
-              ]);
+            return embedBuilder.addFields([
+              {
+                name: 'Report an issue',
+                value:
+                  'https://github.com/manuel-rw/jellyfin-discord-music-bot/issues/new/choose',
+                inline: true,
+              },
+              {
+                name: 'Source code',
+                value:
+                  'https://github.com/manuel-rw/jellyfin-discord-music-bot',
+                inline: true,
+              },
+            ]);
           },
         }),
       ],

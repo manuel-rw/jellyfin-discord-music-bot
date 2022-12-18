@@ -2,16 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { JellyfinService } from './jellyfin.service';
 
 import {
-  BaseItemDto,
   BaseItemKind,
   SearchHint,
-  SearchHintResult,
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
 import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Logger } from '@nestjs/common/services';
-import { JellyfinAudioPlaylist, JellyfinMusicAlbum } from '../../models/jellyfinAudioItems';
+import {
+  JellyfinAudioPlaylist,
+  JellyfinMusicAlbum,
+} from '../../models/jellyfinAudioItems';
 
 @Injectable()
 export class JellyfinSearchService {

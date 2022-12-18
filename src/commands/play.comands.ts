@@ -28,7 +28,6 @@ import {
   searchResultAsJellyfinAudio,
 } from '../models/jellyfinAudioItems';
 import { PlaybackService } from '../playback/playback.service';
-import { Constants } from '../utils/constants';
 
 @Command({
   name: 'play',
@@ -99,7 +98,7 @@ export class PlayItemCommand
 
     const selectOptions: { label: string; value: string; emoji?: string }[] =
       firstItems.map((item) => ({
-        label: item.prettyPrint(dto.search),
+        label: item.prettyPrint(dto.search).replace(/\*/g, ''),
         value: item.getValueId(),
         emoji: item.getEmoji(),
       }));
@@ -107,14 +106,8 @@ export class PlayItemCommand
     return {
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'a',
+          title: 'Jellyfin Search Results',
           description: description,
-          mixin(embedBuilder) {
-            return embedBuilder.setAuthor({
-              name: 'Jellyfin Search Results',
-              iconURL: Constants.Design.Icons.JellyfinLogo,
-            });
-          },
         }),
       ],
       components: [

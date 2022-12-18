@@ -35,10 +35,12 @@ export class DiscordMessageService {
   buildMessage({
     title,
     description,
+    authorUrl,
     mixin = (builder) => builder,
   }: {
     title: string;
     description?: string;
+    authorUrl?: string;
     mixin?: (embedBuilder: EmbedBuilder) => EmbedBuilder;
   }): APIEmbed {
     const date = formatRFC7231(new Date());
@@ -48,6 +50,7 @@ export class DiscordMessageService {
       .setAuthor({
         name: title,
         iconURL: Constants.Design.Icons.JellyfinLogo,
+        url: authorUrl,
       })
       .setFooter({
         text: `${date}`,
