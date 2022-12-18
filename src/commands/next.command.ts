@@ -6,8 +6,8 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { PlaybackService } from '../playback/playback.service';
 
 @Command({
-  name: 'skip',
-  description: 'Skip the current track',
+  name: 'next',
+  description: 'Go to the next track in the playlist',
 })
 @UsePipes(TransformPipe)
 export class SkipTrackCommand implements DiscordCommand {

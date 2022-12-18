@@ -10,7 +10,7 @@ import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
 import { PlayItemCommand } from './play.comands';
 import { PreviousTrackCommand } from './previous.command';
-import { SkipTrackCommand } from './skip.command';
+import { SkipTrackCommand } from './next.command';
 import { StatusCommand } from './status.command';
 import { StopPlaybackCommand } from './stop.command';
 import { SummonCommand } from './summon.command';
