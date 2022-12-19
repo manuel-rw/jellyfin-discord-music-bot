@@ -56,7 +56,7 @@ export class StatusCommand implements DiscordCommand {
             return embedBuilder.addFields([
               {
                 name: 'Bot Version',
-                value: Constants.Metadata.Version,
+                value: Constants.Metadata.Version.All(),
                 inline: true,
               },
               {

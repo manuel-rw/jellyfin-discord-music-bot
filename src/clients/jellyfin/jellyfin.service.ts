@@ -20,7 +20,7 @@ export class JellyfinService {
     this.jellyfin = new Jellyfin({
       clientInfo: {
         name: Constants.Metadata.ApplicationName,
-        version: Constants.Metadata.Version,
+        version: Constants.Metadata.Version.All(),
       },
       deviceInfo: {
         id: 'jellyfin-discord-bot',

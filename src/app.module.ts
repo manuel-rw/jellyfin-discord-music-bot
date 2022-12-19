@@ -4,12 +4,14 @@ import * as Joi from 'joi';
 import { DiscordModule } from '@discord-nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { DiscordConfigService } from './clients/discord/discord.config.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
 import { PlaybackModule } from './playback/playback.module';
+import { UpdatesModule } from './updates/updates.module';
 
 @Module({
   imports: [
@@ -19,8 +21,10 @@ import { PlaybackModule } from './playback/playback.module';
         JELLYFIN_SERVER_ADDRESS: Joi.string().required(),
         JELLYFIN_AUTHENTICATION_USERNAME: Joi.string().required(),
         JELLYFIN_AUTHENTICATION_PASSWORD: Joi.string().required(),
+        UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),
       }),
     }),
+    ScheduleModule.forRoot(),
     DiscordModule.forRootAsync({
       useClass: DiscordConfigService,
     }),
@@ -30,6 +34,7 @@ import { PlaybackModule } from './playback/playback.module';
     DiscordClientModule,
     JellyfinClientModule,
     PlaybackModule,
+    UpdatesModule,
   ],
   controllers: [],
   providers: [],
