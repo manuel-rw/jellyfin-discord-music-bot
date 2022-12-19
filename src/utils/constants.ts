@@ -5,8 +5,13 @@ export const Constants = {
   },
   Links: {
     SourceCode: 'https://github.com/manuel-rw/jellyfin-discord-music-bot/',
+    Issues: 'https://github.com/manuel-rw/jellyfin-discord-music-bot/issues/',
     ReportIssue:
       'https://github.com/manuel-rw/jellyfin-discord-music-bot/issues/new/choose',
+    BugReport: (title) =>
+      new URL(
+        `https://github.com/manuel-rw/jellyfin-discord-music-bot/issues/new?assignees=&labels=&template=bug_report.md&title=${title}`,
+      ),
   },
   Design: {
     InvisibleSpace: '\u1CBC',
