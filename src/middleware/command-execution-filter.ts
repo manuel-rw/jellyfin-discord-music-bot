@@ -4,6 +4,7 @@ import {
   DiscordExceptionFilter,
   On,
 } from '@discord-nestjs/core';
+import { Logger } from '@nestjs/common';
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -18,20 +19,24 @@ import { Constants } from '../utils/constants';
 
 @Catch(Error)
 export class CommandExecutionError implements DiscordExceptionFilter {
+  private readonly logger = new Logger(CommandExecutionError.name);
+
   constructor(private readonly discordMessageService: DiscordMessageService) {}
 
   async catch(
     exception: Error,
     metadata: DiscordArgumentMetadata<string, any>,
   ): Promise<void> {
-    console.log(metadata);
     const interaction: CommandInteraction = metadata.eventArgs[0];
 
     if (!interaction.isCommand()) {
       return;
     }
 
-    console.log(exception);
+    this.logger.error(
+      `Exception catched during the execution of command '${interaction.commandName}': ${exception.message}`,
+      exception.stack,
+    );
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
