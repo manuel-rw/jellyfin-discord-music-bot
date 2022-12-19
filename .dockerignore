@@ -1,6 +1,16 @@
-docs
+src
 test
 images
+docs
 node_modules
 package-lock.json
+Dockerfile
 yarn.lock
+.yarn
+.vscode
+.github
+*.env
+*.gitignore
+.yarnrc.yml
+.nest-cli.json
+.dockerignore

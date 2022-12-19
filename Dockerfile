@@ -1,9 +1,8 @@
-FROM node:12.18.3-alpine
+FROM node:16.17.1-alpine
 RUN apk add ffmpeg
 
 COPY . /app
 WORKDIR /app
-RUN npm install --only=production
-RUN npm run postinstall
+RUN yarn install --production
 
-CMD node parseENV.js && npm run start
+CMD yarn start:prod
