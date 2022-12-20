@@ -20,6 +20,7 @@ export class PlaylistCommand implements DiscordCommand {
     private readonly playbackService: PlaybackService,
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(interaction: CommandInteraction): GenericCustomReply {
     const playList = this.playbackService.getPlaylist();
 

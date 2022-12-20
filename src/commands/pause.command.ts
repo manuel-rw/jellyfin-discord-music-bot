@@ -17,6 +17,7 @@ export class PausePlaybackCommand implements DiscordCommand {
   ) {}
 
   handler(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     commandInteraction: CommandInteraction,
   ): string | InteractionReplyOptions {
     const shouldBePaused = this.discordVoiceService.togglePaused();

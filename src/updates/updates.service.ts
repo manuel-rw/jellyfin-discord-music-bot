@@ -62,7 +62,7 @@ export class UpdatesService {
     const isoDate = parseISO(latestVersion.published_at);
     const relativeReadable = formatRelative(isoDate, new Date());
 
-    guilds.forEach(async (guild, key) => {
+    guilds.forEach(async (guild) => {
       const owner = await guild.fetchOwner();
 
       await owner.send({

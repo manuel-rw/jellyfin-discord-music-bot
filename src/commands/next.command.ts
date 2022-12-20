@@ -17,6 +17,7 @@ export class SkipTrackCommand implements DiscordCommand {
   ) {}
 
   handler(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interactionCommand: CommandInteraction,
   ): InteractionReplyOptions | string {
     if (!this.playbackService.nextTrack()) {

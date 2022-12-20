@@ -17,6 +17,7 @@ export class DisconnectCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(interaction: CommandInteraction): GenericCustomReply {
     const disconnect = this.discordVoiceService.disconnect();
 

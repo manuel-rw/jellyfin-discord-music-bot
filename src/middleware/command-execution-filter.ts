@@ -2,7 +2,6 @@ import {
   Catch,
   DiscordArgumentMetadata,
   DiscordExceptionFilter,
-  On,
 } from '@discord-nestjs/core';
 import { Logger } from '@nestjs/common';
 import {
@@ -10,9 +9,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  ComponentBuilder,
-  Events,
-  Interaction,
 } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { Constants } from '../utils/constants';

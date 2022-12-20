@@ -17,6 +17,7 @@ export class PreviousTrackCommand implements DiscordCommand {
   ) {}
 
   handler(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     dcommandInteraction: CommandInteraction,
   ): InteractionReplyOptions | string {
     if (!this.playbackService.previousTrack()) {

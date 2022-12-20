@@ -7,7 +7,6 @@ import { Track } from '../types/track';
 import { trimStringToFixedLength } from '../utils/stringUtils';
 
 import { Logger } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
 
 export interface BaseJellyfinAudioPlayable {

@@ -18,6 +18,7 @@ export class StopPlaybackCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
   ) {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(CommandInteraction: CommandInteraction): GenericCustomReply {
     this.playbackService.clear();
     this.discordVoiceService.stop(false);

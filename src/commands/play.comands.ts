@@ -49,6 +49,7 @@ export class PlayItemCommand
 
   async handler(
     @Payload() dto: TrackRequestDto,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     executionContext: TransformedCommandExecutionContext<any>,
   ): Promise<InteractionReplyOptions | string> {
     const items = await this.jellyfinSearchService.search(dto.search);

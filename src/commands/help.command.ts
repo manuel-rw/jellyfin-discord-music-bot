@@ -13,6 +13,7 @@ import { GenericCustomReply } from '../models/generic-try-handler';
 export class HelpCommand implements DiscordCommand {
   constructor(private readonly discordMessageService: DiscordMessageService) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(commandInteraction: CommandInteraction): GenericCustomReply {
     return {
       embeds: [
