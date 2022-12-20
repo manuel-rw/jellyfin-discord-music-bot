@@ -16,6 +16,7 @@ import { GuildMember } from 'discord.js';
 import { GenericTryHandler } from '../../models/generic-try-handler';
 import { PlaybackService } from '../../playback/playback.service';
 import { Track } from '../../types/track';
+import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 import { DiscordMessageService } from './discord.message.service';
 
 @Injectable()
@@ -27,6 +28,7 @@ export class DiscordVoiceService {
   constructor(
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
+    private readonly jellyfinWebSocketService: JellyfinWebSocketService,
   ) {}
 
   @OnEvent('playback.newTrack')
@@ -73,6 +75,8 @@ export class DiscordVoiceService {
       adapterCreator: channel.guild.voiceAdapterCreator,
       guildId: channel.guildId,
     });
+
+    this.jellyfinWebSocketService.initializeAndConnect();
 
     if (this.voiceConnection == undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);

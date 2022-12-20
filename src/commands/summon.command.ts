@@ -36,6 +36,8 @@ export class SummonCommand implements DiscordCommand {
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Joined your voicehannel',
+          description:
+            "I'm ready to play media. Use ``Cast to device`` in Jellyfin or the ``/play`` command to get started.",
         }),
       ],
     };
