@@ -3,6 +3,10 @@ RUN apk add ffmpeg
 
 COPY . /app
 WORKDIR /app
-RUN yarn install --production
+RUN yarn install --immutable
+RUN yarn build
 
-CMD yarn start:prod
+RUN ls -lha
+RUN ls dist -lha
+
+CMD ["yarn", "start:prod"]
