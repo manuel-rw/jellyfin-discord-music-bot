@@ -44,9 +44,6 @@ Please check out the Wiki section in the repository for installation instruction
 https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
 
 
-
-> Docker container comming soon
-
 ## 💻 Development
 
 I'm open to any contributions to this project. You can start contributing using the following commands, after executing the installation commands:
