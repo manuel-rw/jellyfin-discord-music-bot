@@ -22,6 +22,7 @@ import { UpdatesModule } from './updates/updates.module';
         JELLYFIN_AUTHENTICATION_USERNAME: Joi.string().required(),
         JELLYFIN_AUTHENTICATION_PASSWORD: Joi.string().required(),
         UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),
+        PORT: Joi.number().min(1),
       }),
     }),
     ScheduleModule.forRoot(),
