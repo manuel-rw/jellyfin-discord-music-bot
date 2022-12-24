@@ -39,6 +39,9 @@ export class DiscordVoiceService {
     member: GuildMember,
   ): GenericTryHandler {
     if (this.voiceConnection !== undefined) {
+      this.logger.debug(
+        'Avoided joining the voice channel because voice connection is already defined',
+      );
       return {
         success: true,
         reply: {},
@@ -155,6 +158,7 @@ export class DiscordVoiceService {
     }
 
     this.voiceConnection.destroy();
+    this.voiceConnection = undefined;
     return {
       success: true,
       reply: {},
