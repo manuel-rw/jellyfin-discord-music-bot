@@ -111,6 +111,7 @@ export class JellyfinAudioItem implements BaseJellyfinAudioPlayable {
         durationInMilliseconds: this.RunTimeTicks / 1000,
         jellyfinId: this.Id,
         streamUrl: jellyfinStreamBuilder.buildStreamUrl(this.Id, bitrate),
+        remoteImages: {},
       },
     ];
   }
