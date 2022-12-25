@@ -28,6 +28,9 @@ import {
   searchResultAsJellyfinAudio,
 } from '../models/jellyfinAudioItems';
 import { PlaybackService } from '../playback/playback.service';
+import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
+import { chooseSuitableRemoteImage } from '../utils/remoteImages';
+import { trimStringToFixedLength } from '../utils/stringUtils';
 
 @Command({
   name: 'play',
@@ -170,15 +173,28 @@ export class PlayItemCommand
     switch (type) {
       case 'track':
         const item = await this.jellyfinSearchService.getById(id);
+        const remoteImagesOfCurrentAlbum =
+          await this.jellyfinSearchService.getRemoteImageById(item.AlbumId);
+        const trackRemoteImage = chooseSuitableRemoteImage(
+          remoteImagesOfCurrentAlbum,
+        );
         const addedIndex = this.enqueueSingleTrack(
           item as BaseJellyfinAudioPlayable,
           bitrate,
+          remoteImagesOfCurrentAlbum,
         );
         interaction.update({
           embeds: [
             this.discordMessageService.buildMessage({
               title: item.Name,
               description: `Your track was added to the position ${addedIndex} in the playlist`,
+              mixin(embedBuilder) {
+                if (trackRemoteImage === undefined) {
+                  return embedBuilder;
+                }
+
+                return embedBuilder.setThumbnail(trackRemoteImage.Url);
+              },
             }),
           ],
           components: [],
@@ -186,13 +202,30 @@ export class PlayItemCommand
         break;
       case 'album':
         const album = await this.jellyfinSearchService.getItemsByAlbum(id);
+        const remoteImages =
+          await this.jellyfinSearchService.getRemoteImageById(id);
+        const albumRemoteImage = chooseSuitableRemoteImage(remoteImages);
         album.SearchHints.forEach((item) => {
-          this.enqueueSingleTrack(item as BaseJellyfinAudioPlayable, bitrate);
+          this.enqueueSingleTrack(
+            item as BaseJellyfinAudioPlayable,
+            bitrate,
+            remoteImages,
+          );
         });
         interaction.update({
           embeds: [
             this.discordMessageService.buildMessage({
               title: `Added ${album.TotalRecordCount} items from your album`,
+              description: `${album.SearchHints.map((item) =>
+                trimStringToFixedLength(item.Name, 20),
+              ).join(', ')}`,
+              mixin(embedBuilder) {
+                if (albumRemoteImage === undefined) {
+                  return embedBuilder;
+                }
+
+                return embedBuilder.setThumbnail(albumRemoteImage.Url);
+              },
             }),
           ],
           components: [],
@@ -200,13 +233,34 @@ export class PlayItemCommand
         break;
       case 'playlist':
         const playlist = await this.jellyfinSearchService.getPlaylistById(id);
-        playlist.Items.forEach((item) => {
-          this.enqueueSingleTrack(item as BaseJellyfinAudioPlayable, bitrate);
-        });
+        const addedRemoteImages: RemoteImageResult = {};
+        for (let index = 0; index < playlist.Items.length; index++) {
+          const item = playlist.Items[index];
+          const remoteImages =
+            await this.jellyfinSearchService.getRemoteImageById(id);
+          addedRemoteImages.Images.concat(remoteImages.Images);
+          this.enqueueSingleTrack(
+            item as BaseJellyfinAudioPlayable,
+            bitrate,
+            remoteImages,
+          );
+        }
+        const bestPlaylistRemoteImage =
+          chooseSuitableRemoteImage(addedRemoteImages);
         interaction.update({
           embeds: [
             this.discordMessageService.buildMessage({
               title: `Added ${playlist.TotalRecordCount} items from your playlist`,
+              description: `${playlist.Items.map((item) =>
+                trimStringToFixedLength(item.Name, 20),
+              ).join(', ')}`,
+              mixin(embedBuilder) {
+                if (bestPlaylistRemoteImage === undefined) {
+                  return embedBuilder;
+                }
+
+                return embedBuilder.setThumbnail(bestPlaylistRemoteImage.Url);
+              },
             }),
           ],
           components: [],
@@ -231,6 +285,7 @@ export class PlayItemCommand
   private enqueueSingleTrack(
     jellyfinPlayable: BaseJellyfinAudioPlayable,
     bitrate: number,
+    remoteImageResult: RemoteImageResult,
   ) {
     const stream = this.jellyfinStreamBuilder.buildStreamUrl(
       jellyfinPlayable.Id,
@@ -244,6 +299,7 @@ export class PlayItemCommand
       name: jellyfinPlayable.Name,
       durationInMilliseconds: milliseconds,
       streamUrl: stream,
+      remoteImages: remoteImageResult,
     });
   }
 }
