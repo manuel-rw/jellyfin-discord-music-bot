@@ -12,6 +12,7 @@ import { Constants } from '../utils/constants';
 @Injectable()
 export class UpdatesService {
   private readonly logger = new Logger(UpdatesService.name);
+  private hasAlreadyNotified: boolean;
 
   constructor(
     @InjectDiscordClient() private readonly client: Client,
@@ -22,7 +23,7 @@ export class UpdatesService {
   async handleCron() {
     const isDisabled = process.env.UPDATER_DISABLE_NOTIFICATIONS;
 
-    if (isDisabled === 'true') {
+    if (isDisabled === 'true' || this.hasAlreadyNotified) {
       return;
     }
 
@@ -36,6 +37,8 @@ export class UpdatesService {
     }
 
     await this.contactOwnerAboutUpdate(currentVersion, latestGitHubRelease);
+
+    this.hasAlreadyNotified = true;
   }
 
   private async contactOwnerAboutUpdate(
@@ -93,6 +96,12 @@ export class UpdatesService {
   }
 
   private async fetchLatestGithubRelease(): Promise<null | GithubRelease> {
+    return {
+      tag_name: '0.0.2',
+      name: 'fefeifheuf',
+      html_url: 'https://github.com',
+      published_at: '2022-12-19T08:52:30Z',
+    };
     return axios({
       method: 'GET',
       url: Constants.Links.Api.GetLatestRelease,
