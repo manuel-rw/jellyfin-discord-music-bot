@@ -96,12 +96,6 @@ export class UpdatesService {
   }
 
   private async fetchLatestGithubRelease(): Promise<null | GithubRelease> {
-    return {
-      tag_name: '0.0.2',
-      name: 'fefeifheuf',
-      html_url: 'https://github.com',
-      published_at: '2022-12-19T08:52:30Z',
-    };
     return axios({
       method: 'GET',
       url: Constants.Links.Api.GetLatestRelease,
