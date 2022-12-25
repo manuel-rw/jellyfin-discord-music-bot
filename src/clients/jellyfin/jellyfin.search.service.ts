@@ -3,10 +3,12 @@ import { JellyfinService } from './jellyfin.service';
 
 import {
   BaseItemKind,
+  RemoteImageResult,
   SearchHint,
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
+import { getRemoteImageApi } from '@jellyfin/sdk/lib/utils/api/remote-image-api';
 import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Logger } from '@nestjs/common/services';
 import {
@@ -101,5 +103,29 @@ export class JellyfinSearchService {
     }
 
     return data.Items[0];
+  }
+
+  async getRemoteImageById(id: string): Promise<RemoteImageResult> {
+    const api = this.jellyfinService.getApi();
+    const remoteImageApi = getRemoteImageApi(api);
+
+    const axiosReponse = await remoteImageApi.getRemoteImages({
+      itemId: id,
+      includeAllLanguages: true,
+      limit: 20,
+    });
+
+    if (axiosReponse.status !== 200) {
+      this.logger.warn(
+        `Failed to retrieve remote images. Response has status ${axiosReponse.status}`,
+      );
+      return {
+        Images: [],
+        Providers: [],
+        TotalRecordCount: 0,
+      };
+    }
+
+    return axiosReponse.data;
   }
 }

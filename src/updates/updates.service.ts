@@ -12,6 +12,7 @@ import { Constants } from '../utils/constants';
 @Injectable()
 export class UpdatesService {
   private readonly logger = new Logger(UpdatesService.name);
+  private hasAlreadyNotified: boolean;
 
   constructor(
     @InjectDiscordClient() private readonly client: Client,
@@ -22,7 +23,7 @@ export class UpdatesService {
   async handleCron() {
     const isDisabled = process.env.UPDATER_DISABLE_NOTIFICATIONS;
 
-    if (isDisabled === 'true') {
+    if (isDisabled === 'true' || this.hasAlreadyNotified) {
       return;
     }
 
@@ -36,6 +37,8 @@ export class UpdatesService {
     }
 
     await this.contactOwnerAboutUpdate(currentVersion, latestGitHubRelease);
+
+    this.hasAlreadyNotified = true;
   }
 
   private async contactOwnerAboutUpdate(
