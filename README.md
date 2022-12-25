@@ -34,7 +34,7 @@ This project was originally started by [KGT1 on Github](https://github.com/KGT1/
 ## ⛔ Limitations
 
 - Bot does not support shards. This means, you cannot use it in multiple servers concurrently.
-- Displaying media covers or images in Discord (Jellyfin is self hosted, and other users woudln't be able to see those images)
+- Album covers are not visible, unless they are remote (eg. provided by external metadata provider)
 - Streaming any video content in voice channels (See [this issue](https://github.com/discordjs/discord.js/issues/4116))
 
 ## 🚀 Installation

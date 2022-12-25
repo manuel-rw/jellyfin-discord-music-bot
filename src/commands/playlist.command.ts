@@ -6,6 +6,7 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { GenericCustomReply } from '../models/generic-try-handler';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
+import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils';
 import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 
@@ -59,11 +60,21 @@ export class PlaylistCommand implements DiscordCommand {
       })
       .join('\n');
 
+    const activeTrack = this.playbackService.getActiveTrack();
+    const remoteImage = chooseSuitableRemoteImageFromTrack(activeTrack.track);
+
     return {
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Your Playlist',
           description: `${tracklist}\n\nUse the /skip and /previous command to select a track`,
+          mixin(embedBuilder) {
+            if (remoteImage === undefined) {
+              return embedBuilder;
+            }
+
+            return embedBuilder.setThumbnail(remoteImage.Url);
+          },
         }),
       ],
     };
