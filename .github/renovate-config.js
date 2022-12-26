@@ -5,6 +5,7 @@ module.exports = {
   onboarding: true,
   platform: 'github',
   includeForks: false,
+  baseBranches: ['dev'],
   repositories: [
     'manuel-rw/jellyfin-discord-music-bot',
   ],
