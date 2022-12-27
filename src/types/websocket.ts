@@ -1,3 +1,5 @@
+import { PlaystateCommand } from '@jellyfin/sdk/lib/generated-client/models';
+
 export class PlayNowCommand {
   /**
    * A list of all items available in the parent element.
@@ -34,4 +36,25 @@ export class PlayNowCommand {
 
     return this.ItemIds;
   }
+}
+
+export interface SessionApiSendPlaystateCommandRequest {
+  /**
+   * The MediaBrowser.Model.Session.PlaystateCommand.
+   * @type {PlaystateCommand}
+   * @memberof SessionApiSendPlaystateCommand
+   */
+  readonly Command: PlaystateCommand;
+  /**
+   * The optional position ticks.
+   * @type {number}
+   * @memberof SessionApiSendPlaystateCommand
+   */
+  readonly SeekPositionTicks?: number;
+  /**
+   * The optional controlling user id.
+   * @type {string}
+   * @memberof SessionApiSendPlaystateCommand
+   */
+  readonly ControllingUserId?: string;
 }

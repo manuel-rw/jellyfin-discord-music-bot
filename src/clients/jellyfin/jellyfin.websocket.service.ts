@@ -2,13 +2,17 @@ import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { JellyfinService } from './jellyfin.service';
 
-import { SessionMessageType } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  PlaystateCommand,
+  SessionMessageType,
+} from '@jellyfin/sdk/lib/generated-client/models';
 import { WebSocket } from 'ws';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinSearchService } from './jellyfin.search.service';
 import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
 import { Track } from '../../types/track';
-import { PlayNowCommand } from '../../types/websocket';
+import { PlayNowCommand, SessionApiSendPlaystateCommandRequest } from '../../types/websocket';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -21,6 +25,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     private readonly jellyfinSearchService: JellyfinSearchService,
     private readonly playbackService: PlaybackService,
     private readonly jellyfinStreamBuilderService: JellyfinStreamBuilderService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @Cron('*/30 * * * * *')
@@ -130,9 +135,35 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
             });
         });
         break;
+      case SessionMessageType[SessionMessageType.Playstate]:
+        const sendPlaystateCommandRequest =
+          msg.Data as SessionApiSendPlaystateCommandRequest;
+        this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
+        break;
       default:
         this.logger.warn(
           `Received a package from the socket of unknown type: ${msg.MessageType}`,
+        );
+        break;
+    }
+  }
+
+  private async handleSendPlaystateCommandRequest(
+    request: SessionApiSendPlaystateCommandRequest,
+  ) {
+    switch (request.Command) {
+      case PlaystateCommand.PlayPause:
+        this.eventEmitter.emitAsync('playback.control.togglePause');
+        break;
+      case PlaystateCommand.Pause:
+        this.eventEmitter.emitAsync('playback.control.pause');
+        break;
+      case PlaystateCommand.Stop:
+        this.eventEmitter.emitAsync('playback.control.stop');
+        break;
+      default:
+        this.logger.warn(
+          `Unable to process incoming playstate command request: ${request.Command}`,
         );
         break;
     }
