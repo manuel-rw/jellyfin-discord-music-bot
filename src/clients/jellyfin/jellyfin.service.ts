@@ -14,6 +14,7 @@ export class JellyfinService {
   private api: Api;
   private systemApi: SystemApi;
   private userId: string;
+  private connected = false;
 
   constructor(
     private eventEmitter: EventEmitter2,
@@ -56,11 +57,13 @@ export class JellyfinService {
         this.userId = response.data.SessionInfo.UserId;
 
         this.systemApi = getSystemApi(this.api);
+        this.connected = true;
 
         await this.jellyfinPlayState.initializePlayState(this.api);
       })
       .catch((test) => {
         this.logger.error(test);
+        this.connected = false;
       });
   }
 
@@ -72,6 +75,7 @@ export class JellyfinService {
       return;
     }
     this.api.logout();
+    this.connected = false;
   }
 
   getApi() {
@@ -88,5 +92,9 @@ export class JellyfinService {
 
   getUserId() {
     return this.userId;
+  }
+
+  isConnected() {
+    return this.connected;
   }
 }
