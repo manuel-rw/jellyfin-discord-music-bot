@@ -6,6 +6,7 @@ module.exports = {
   platform: 'github',
   includeForks: false,
   baseBranches: ['dev'],
+  ignoreDeps: ['jest', 'ts-jest', 'node'],
   repositories: [
     'manuel-rw/jellyfin-discord-music-bot',
   ],
