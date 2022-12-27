@@ -8,6 +8,7 @@ import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinSearchService } from './jellyfin.search.service';
 import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
 import { Track } from '../../types/track';
+import { PlayNowCommand } from '../../types/websocket';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -87,28 +88,47 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         );
         break;
       case SessionMessageType[SessionMessageType.Play]:
-        const data = msg.Data as { ItemIds: string[]; StartIndex: number };
-        const ids = data.ItemIds;
+        const data = msg.Data as PlayNowCommand;
+        data.hasSelection = PlayNowCommand.prototype.hasSelection;
+        data.getSelection = PlayNowCommand.prototype.getSelection;
+        const ids = data.getSelection();
 
-        this.jellyfinSearchService
-          .getById(ids[data.StartIndex])
-          .then((response) => {
-            const track: Track = {
-              name: response.Name,
-              durationInMilliseconds: response.RunTimeTicks / 1000,
-              jellyfinId: response.Id,
-              streamUrl: this.jellyfinStreamBuilderService.buildStreamUrl(
-                response.Id,
-                96000,
-              ),
-              remoteImages: {
-                Images: [],
-                Providers: [],
-                TotalRecordCount: 0,
-              },
-            };
-            this.playbackService.enqueTrackAndInstantyPlay(track);
-          });
+        this.logger.debug(
+          `Adding ${ids.length} ids to the queue using controls from the websocket`,
+        );
+
+        ids.forEach((id, index) => {
+          this.jellyfinSearchService
+            .getById(id)
+            .then((response) => {
+              const track: Track = {
+                name: response.Name,
+                durationInMilliseconds: response.RunTimeTicks / 10000,
+                jellyfinId: response.Id,
+                streamUrl: this.jellyfinStreamBuilderService.buildStreamUrl(
+                  response.Id,
+                  96000,
+                ),
+                remoteImages: {
+                  Images: [],
+                  Providers: [],
+                  TotalRecordCount: 0,
+                },
+              };
+
+              const trackId = this.playbackService.enqueueTrack(track);
+
+              if (index !== 0) {
+                return;
+              }
+
+              this.playbackService.setActiveTrack(trackId);
+              this.playbackService.getActiveTrackAndEmitEvent();
+            })
+            .catch((err) => {
+              this.logger.error(err);
+            });
+        });
         break;
       default:
         this.logger.warn(

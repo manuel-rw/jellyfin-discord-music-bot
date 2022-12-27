@@ -43,7 +43,7 @@ export class PlaybackService {
 
     const newKey = keys[index + 1];
     this.setActiveTrack(newKey);
-    this.controlAudioPlayer();
+    this.getActiveTrackAndEmitEvent();
     return true;
   }
 
@@ -60,7 +60,7 @@ export class PlaybackService {
     const keys = this.getTrackIds();
     const newKey = keys[index - 1];
     this.setActiveTrack(newKey);
-    this.controlAudioPlayer();
+    this.getActiveTrackAndEmitEvent();
     return true;
   }
 
@@ -80,10 +80,10 @@ export class PlaybackService {
 
     if (emptyBefore) {
       this.setActiveTrack(this.playlist.tracks.find((x) => x.id === uuid).id);
-      this.controlAudioPlayer();
+      this.getActiveTrackAndEmitEvent();
     }
 
-    return this.playlist.tracks.findIndex((x) => x.id === uuid);
+    return uuid;
   }
 
   enqueTrackAndInstantyPlay(track: Track) {
@@ -95,7 +95,7 @@ export class PlaybackService {
     });
 
     this.setActiveTrack(uuid);
-    this.controlAudioPlayer();
+    this.getActiveTrackAndEmitEvent();
   }
 
   set(tracks: Track[]) {
@@ -133,7 +133,7 @@ export class PlaybackService {
     return this.getTrackIds().indexOf(this.playlist.activeTrack);
   }
 
-  private controlAudioPlayer() {
+  getActiveTrackAndEmitEvent() {
     const activeTrack = this.getActiveTrack();
     this.logger.debug(
       `A new track (${activeTrack.id}) was requested and will be emmitted as an event`,
