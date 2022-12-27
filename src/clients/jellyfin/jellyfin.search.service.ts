@@ -95,6 +95,7 @@ export class JellyfinSearchService {
     const searchApi = getItemsApi(api);
     const { data } = await searchApi.getItems({
       ids: [id],
+      userId: this.jellyfinService.getUserId(),
     });
 
     if (data.Items.length !== 1) {
