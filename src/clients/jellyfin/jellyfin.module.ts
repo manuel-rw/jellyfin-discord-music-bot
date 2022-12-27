@@ -2,14 +2,17 @@ import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { JellyfinSearchService } from './jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
 import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
-import { JellyinWebsocketService } from './jellyfin.websocket.service';
+import { JellyinPlaystateService } from './jellyfin.playstate.service';
+import { JellyfinWebSocketService } from './jellyfin.websocket.service';
+import { PlaybackModule } from './../../playback/playback.module';
 
 @Module({
-  imports: [],
+  imports: [PlaybackModule],
   controllers: [],
   providers: [
     JellyfinService,
-    JellyinWebsocketService,
+    JellyinPlaystateService,
+    JellyfinWebSocketService,
     JellyfinSearchService,
     JellyfinStreamBuilderService,
   ],
@@ -17,6 +20,7 @@ import { JellyinWebsocketService } from './jellyfin.websocket.service';
     JellyfinService,
     JellyfinSearchService,
     JellyfinStreamBuilderService,
+    JellyfinWebSocketService,
   ],
 })
 export class JellyfinClientModule implements OnModuleInit, OnModuleDestroy {

@@ -86,6 +86,18 @@ export class PlaybackService {
     return this.playlist.tracks.findIndex((x) => x.id === uuid);
   }
 
+  enqueTrackAndInstantyPlay(track: Track) {
+    const uuid = uuidv4();
+
+    this.playlist.tracks.push({
+      id: uuid,
+      track: track,
+    });
+
+    this.setActiveTrack(uuid);
+    this.controlAudioPlayer();
+  }
+
   set(tracks: Track[]) {
     this.playlist.tracks = tracks.map((t) => ({
       id: uuidv4(),
