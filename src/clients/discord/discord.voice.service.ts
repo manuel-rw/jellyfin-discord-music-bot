@@ -11,7 +11,7 @@ import {
 } from '@discordjs/voice';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
-import { OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { GuildMember } from 'discord.js';
 import { GenericTryHandler } from '../../models/generic-try-handler';
 import { PlaybackService } from '../../playback/playback.service';
@@ -29,6 +29,7 @@ export class DiscordVoiceService {
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @OnEvent('playback.newTrack')
@@ -95,15 +96,20 @@ export class DiscordVoiceService {
   /**
    * Pauses the current audio player
    */
+  @OnEvent('playback.control.pause')
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
+    this.eventEmitter.emit('playback.state.pause', true);
   }
 
   /**
    * Stops the audio player
    */
+  @OnEvent('playback.control.stop')
   stop(force: boolean): boolean {
-    return this.createAndReturnOrGetAudioPlayer().stop(force);
+    const stopped = this.createAndReturnOrGetAudioPlayer().stop(force);
+    this.eventEmitter.emit('playback.state.stop');
+    return stopped;
   }
 
   /**
@@ -111,6 +117,7 @@ export class DiscordVoiceService {
    */
   unpause() {
     this.createAndReturnOrGetAudioPlayer().unpause();
+    this.eventEmitter.emit('playback.state.pause', false);
   }
 
   /**
@@ -136,6 +143,7 @@ export class DiscordVoiceService {
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
+  @OnEvent('playback.control.togglePause')
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();

@@ -10,11 +10,9 @@ import { DiscordConfigService } from './clients/discord/discord.config.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
+import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
-import { HealthController } from './health/health.controller';
-import { HealthModule } from './health/health.module';
-import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
