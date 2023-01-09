@@ -10,6 +10,7 @@ import { DiscordConfigService } from './clients/discord/discord.config.service';
 import { DiscordClientModule } from './clients/discord/discord.module';
 import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
+import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
 
@@ -36,6 +37,7 @@ import { UpdatesModule } from './updates/updates.module';
     JellyfinClientModule,
     PlaybackModule,
     UpdatesModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [],
