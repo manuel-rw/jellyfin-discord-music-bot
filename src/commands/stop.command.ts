@@ -20,7 +20,7 @@ export class StopPlaybackCommand implements DiscordCommand {
   ) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(CommandInteraction: CommandInteraction): GenericCustomReply {
-    if (this.playbackService.hasActiveTrack() === true) {
+    if (this.playbackService.hasActiveTrack()) {
       this.playbackService.clear();
       this.discordVoiceService.stop(false);
 
@@ -36,7 +36,7 @@ export class StopPlaybackCommand implements DiscordCommand {
     } else {
       return {
         embeds: [
-          this.discordMessageService.buildMessage({
+          this.discordMessageService.buildErrorMessage({
             title: 'Command failed to execute',
             description:
               'Can not stop playing as no active track is present.',
