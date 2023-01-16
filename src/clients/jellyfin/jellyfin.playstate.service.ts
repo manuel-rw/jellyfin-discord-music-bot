@@ -58,6 +58,10 @@ export class JellyinPlaystateService {
   private async onPlaybackPaused(isPaused: boolean) {
     const activeTrack = this.playbackService.getActiveTrack();
 
+    if (!activeTrack) {
+      return;
+    }
+
     await this.playstateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         ItemId: activeTrack.track.jellyfinId,
@@ -69,6 +73,10 @@ export class JellyinPlaystateService {
   @OnEvent('playback.state.stop')
   private async onPlaybackStopped() {
     const activeTrack = this.playbackService.getActiveTrack();
+    
+    if (!activeTrack) {
+      return;
+    }
 
     await this.playstateApi.reportPlaybackStopped({
       playbackStopInfo: {
