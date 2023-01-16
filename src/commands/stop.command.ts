@@ -20,29 +20,21 @@ export class StopPlaybackCommand implements DiscordCommand {
   ) {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler(CommandInteraction: CommandInteraction): GenericCustomReply {
-    if (this.playbackService.hasActiveTrack()) {
+    const hasActiveTrack = this.playbackService.hasActiveTrack()
+    const title = hasActiveTrack ? 'Playback stopped successfully' : 'Playback failed to stop'
+    const description = hasActiveTrack ? 'In addition, your playlist has been cleared' : 'There is no active track in the queue'
+    if (hasActiveTrack) {
       this.playbackService.clear();
       this.discordVoiceService.stop(false);
-
-      return {
-        embeds: [
-          this.discordMessageService.buildMessage({
-            title: 'Playlist cleared',
-            description:
-              'Playback was stopped and your playlist has been cleared',
-          }),
-        ],
-      };
-    } else {
-      return {
-        embeds: [
-          this.discordMessageService.buildErrorMessage({
-            title: 'Command failed to execute',
-            description:
-              'Can not stop playing as no active track is present.',
-          }),
-        ],
-      };
     }
+
+    return {
+      embeds: [
+        this.discordMessageService[hasActiveTrack ? 'buildMessage' : 'buildErrorMessage']({
+          title: title,
+          description: description,
+        }),
+      ],
+    };
   }
 }
