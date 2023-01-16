@@ -29,7 +29,7 @@ import {
 } from '../models/jellyfinAudioItems';
 import { PlaybackService } from '../playback/playback.service';
 import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
-import { chooseSuitableRemoteImage } from '../utils/remoteImages';
+import { chooseSuitableRemoteImage } from '../utils/remoteImages/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils';
 
 @Command({

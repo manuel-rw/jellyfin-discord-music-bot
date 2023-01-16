@@ -5,7 +5,7 @@ import {
 } from '@nestjs/terminus';
 import { HealthCheckExecutor } from '@nestjs/terminus/dist/health-check/health-check-executor.service';
 import { Test } from '@nestjs/testing';
-import { useDefaultMockerToken } from '../utils/tests';
+import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { HealthController } from './health.controller';
 import { DiscordHealthIndicator } from './indicators/discord.indicator';
 import { JellyfinHealthIndicator } from './indicators/jellyfin.indicator';
