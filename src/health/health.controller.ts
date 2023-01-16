@@ -14,7 +14,7 @@ export class HealthController {
 
   @Get()
   @HealthCheck()
-  healthCheck() {
+  async healthCheck() {
     return this.health.check([
       () => this.discordIndicator.isHealthy('discord'),
       () => this.jellyfinHealthIndicator.isHealthy('jellyfin'),
