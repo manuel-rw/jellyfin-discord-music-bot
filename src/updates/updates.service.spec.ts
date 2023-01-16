@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Client, GuildMember } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/github-release';
-import { useDefaultMockerToken } from '../utils/tests';
+import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { UpdatesService } from './updates.service';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900

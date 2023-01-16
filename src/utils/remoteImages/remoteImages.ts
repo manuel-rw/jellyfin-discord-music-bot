@@ -3,7 +3,7 @@ import {
   RemoteImageInfo,
   RemoteImageResult,
 } from '@jellyfin/sdk/lib/generated-client/models';
-import { Track } from '../types/track';
+import { Track } from '../../types/track';
 
 export const chooseSuitableRemoteImage = (
   remoteImageResult: RemoteImageResult,
