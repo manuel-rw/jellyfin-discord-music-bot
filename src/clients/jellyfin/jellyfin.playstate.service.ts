@@ -57,23 +57,27 @@ export class JellyinPlaystateService {
   @OnEvent('playback.state.pause')
   private async onPlaybackPaused(isPaused: boolean) {
     const activeTrack = this.playbackService.getActiveTrack();
-
-    await this.playstateApi.reportPlaybackProgress({
-      playbackProgressInfo: {
-        ItemId: activeTrack.track.jellyfinId,
-        IsPaused: isPaused,
-      },
-    });
+    
+    if (activeTrack) {
+      await this.playstateApi.reportPlaybackProgress({
+        playbackProgressInfo: {
+          ItemId: activeTrack.track.jellyfinId,
+          IsPaused: isPaused,
+        },
+      });
+    }
   }
 
   @OnEvent('playback.state.stop')
   private async onPlaybackStopped() {
     const activeTrack = this.playbackService.getActiveTrack();
-
-    await this.playstateApi.reportPlaybackStopped({
-      playbackStopInfo: {
-        ItemId: activeTrack.track.jellyfinId,
-      },
-    });
+    
+    if (activeTrack) {
+      await this.playstateApi.reportPlaybackStopped({
+        playbackStopInfo: {
+          ItemId: activeTrack.track.jellyfinId,
+        },
+      });
+    }
   }
 }
