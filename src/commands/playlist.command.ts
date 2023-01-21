@@ -7,7 +7,7 @@ import { GenericCustomReply } from '../models/generic-try-handler';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
 import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages/remoteImages';
-import { trimStringToFixedLength } from '../utils/stringUtils';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 
 @Command({

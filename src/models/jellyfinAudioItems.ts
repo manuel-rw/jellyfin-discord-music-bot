@@ -4,7 +4,7 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { Track } from '../types/track';
-import { trimStringToFixedLength } from '../utils/stringUtils';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
 import { Logger } from '@nestjs/common';
 import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';

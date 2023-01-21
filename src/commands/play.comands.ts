@@ -30,7 +30,7 @@ import {
 import { PlaybackService } from '../playback/playback.service';
 import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 import { chooseSuitableRemoteImage } from '../utils/remoteImages/remoteImages';
-import { trimStringToFixedLength } from '../utils/stringUtils';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
 @Command({
   name: 'play',
