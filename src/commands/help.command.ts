@@ -3,7 +3,6 @@ import { TransformPipe } from '@discord-nestjs/common';
 import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
 import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'help',
@@ -13,9 +12,8 @@ import { GenericCustomReply } from '../models/generic-try-handler';
 export class HelpCommand implements DiscordCommand {
   constructor(private readonly discordMessageService: DiscordMessageService) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handler(commandInteraction: CommandInteraction): GenericCustomReply {
-    return {
+  async handler(interaction: CommandInteraction): Promise<void> {
+    await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Jellyfin Discord Bot',
@@ -40,6 +38,6 @@ export class HelpCommand implements DiscordCommand {
           },
         }),
       ],
-    };
+    });
   }
 }

@@ -4,7 +4,6 @@ import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
 import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'disconnect',
@@ -17,20 +16,28 @@ export class DisconnectCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handler(interaction: CommandInteraction): GenericCustomReply {
+  async handler(interaction: CommandInteraction): Promise<void> {
+    await interaction.reply({
+      embeds: [
+        this.discordMessageService.buildMessage({
+          title: 'Disconnecting...',
+        }),
+      ],
+    });
+
     const disconnect = this.discordVoiceService.disconnect();
 
     if (!disconnect.success) {
-      return disconnect.reply;
+      await interaction.editReply(disconnect.reply);
+      return;
     }
 
-    return {
+    await interaction.editReply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Disconnected from your channel',
         }),
       ],
-    };
+    });
   }
 }

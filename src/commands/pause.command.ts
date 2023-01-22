@@ -16,18 +16,15 @@ export class PausePlaybackCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  handler(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    commandInteraction: CommandInteraction,
-  ): string | InteractionReplyOptions {
+  async handler(interaction: CommandInteraction): Promise<void> {
     const shouldBePaused = this.discordVoiceService.togglePaused();
 
-    return {
+    await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: shouldBePaused ? 'Paused' : 'Unpaused',
         }),
       ],
-    };
+    });
   }
 }
