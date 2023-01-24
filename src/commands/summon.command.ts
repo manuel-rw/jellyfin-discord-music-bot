@@ -20,13 +20,7 @@ export class SummonCommand implements DiscordCommand {
   ) {}
 
   async handler(interaction: CommandInteraction): Promise<void> {
-    await interaction.reply({
-      embeds: [
-        this.discordMessageService.buildMessage({
-          title: 'Joining your voice channel...',
-        }),
-      ],
-    });
+    await interaction.deferReply();
 
     const guildMember = interaction.member as GuildMember;
 
@@ -36,7 +30,7 @@ export class SummonCommand implements DiscordCommand {
       );
 
     if (!tryResult.success) {
-      interaction.editReply(tryResult.reply);
+      await interaction.editReply(tryResult.reply);
       return;
     }
 
