@@ -461,13 +461,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@discord-nestjs/common@npm:^4.0.8":
-  version: 4.0.8
-  resolution: "@discord-nestjs/common@npm:4.0.8"
+"@discord-nestjs/common@npm:^5.1.5":
+  version: 5.1.5
+  resolution: "@discord-nestjs/common@npm:5.1.5"
   dependencies:
     "@nestjs/mapped-types": 1.2.0
     class-transformer: 0.5.1
-    class-validator: 0.13.2
+    class-validator: 0.14.0
   peerDependencies:
     "@discord-nestjs/core": "*"
     "@nestjs/common": 8.* || 9.*
@@ -475,7 +475,7 @@ __metadata:
     discord.js: 14.*
     reflect-metadata: ^0.1.13
     rxjs: ^7.*
-  checksum: 254f740d6762f3cfe827500b7c0b0a1357c631032a95fe82a1425dbbebe97e442add85a5d85dfaf333a53cb16caea293a8345bb8e17832f8f67c605676bca69f
+  checksum: 5b9c9c64febd2b0749feff58ab6b58ee97c7da2f2494900f68adc7e95d087c778fe38a90575923a4d42a56a69670dae0836b97ac84defdfacdb57caa0493f465
   languageName: node
   linkType: hard
 
@@ -1676,6 +1676,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/validator@npm:^13.7.10":
+  version: 13.7.12
+  resolution: "@types/validator@npm:13.7.12"
+  checksum: 98fc9cb0e0af31a8cf7f3234dbd8391a937b1596cdfea16f21f4228f46d70eea2ebc1128ff6c4041ec7db2d94f093eeb441e66ce1eb9902157b6c44d01066fe2
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.3":
   version: 8.5.4
   resolution: "@types/ws@npm:8.5.4"
@@ -2741,13 +2748,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"class-validator@npm:0.13.2":
-  version: 0.13.2
-  resolution: "class-validator@npm:0.13.2"
+"class-validator@npm:0.14.0":
+  version: 0.14.0
+  resolution: "class-validator@npm:0.14.0"
   dependencies:
-    libphonenumber-js: ^1.9.43
+    "@types/validator": ^13.7.10
+    libphonenumber-js: ^1.10.14
     validator: ^13.7.0
-  checksum: 0deb4c29faa18345f6989fd7eaaaa07b05caae5298603fcd6485531c6daad503e5d2b24cc1342e4fc88ae5ba0acffdc24d0fc333110ef3f21a667cd8a79e1258
+  checksum: f62e4a0ad24cee68f4b2bc70d32b96de90cb598f96bde362b4dbf4234151af8eb6ae225458312a38fc49fa3959844cf61c60e731a8205e9a570454cff8de2710
   languageName: node
   linkType: hard
 
@@ -4592,7 +4600,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jellyfin-discord-music-bot@workspace:."
   dependencies:
-    "@discord-nestjs/common": ^4.0.8
+    "@discord-nestjs/common": ^5.1.5
     "@discord-nestjs/core": ^4.3.1
     "@discordjs/opus": ^0.9.0
     "@discordjs/voice": ^0.14.0
@@ -5228,10 +5236,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libphonenumber-js@npm:^1.9.43":
-  version: 1.10.17
-  resolution: "libphonenumber-js@npm:1.10.17"
-  checksum: a6eca041c1d5be776b1999f0f040a01a1f499d2ffec03824853bdd5dee0f42d7c8f99cd637e74627e8a7ff32e315665d33223514fa9d1134373afb649f7ff959
+"libphonenumber-js@npm:^1.10.14":
+  version: 1.10.19
+  resolution: "libphonenumber-js@npm:1.10.19"
+  checksum: 8408056a375b36728b83daa2048a9157abe21596b042307487c64a648aa31319ace77f04c59331710b30d7fc79466fc5ad978fddb74b6e4a0a21463b7e6bd535
   languageName: node
   linkType: hard
 
