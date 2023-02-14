@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
       - run: yarn build
+      - run: yarn test
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
