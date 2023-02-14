@@ -19,7 +19,7 @@ import { UpdatesModule } from './updates/updates.module';
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         DISCORD_CLIENT_TOKEN: Joi.string().required(),
-        JELLYFIN_SERVER_ADDRESS: Joi.string().required(),
+        JELLYFIN_SERVER_ADDRESS: Joi.string().uri().required(),
         JELLYFIN_AUTHENTICATION_USERNAME: Joi.string().required(),
         JELLYFIN_AUTHENTICATION_PASSWORD: Joi.string().required(),
         UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),

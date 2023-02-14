@@ -5,7 +5,6 @@ import { Logger } from '@nestjs/common';
 import { CommandInteraction, GuildMember } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { GenericCustomReply } from '../models/generic-try-handler';
 
 @Command({
   name: 'summon',
@@ -20,7 +19,9 @@ export class SummonCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  handler(interaction: CommandInteraction): GenericCustomReply {
+  async handler(interaction: CommandInteraction): Promise<void> {
+    await interaction.deferReply();
+
     const guildMember = interaction.member as GuildMember;
 
     const tryResult =
@@ -29,10 +30,11 @@ export class SummonCommand implements DiscordCommand {
       );
 
     if (!tryResult.success) {
-      return tryResult.reply;
+      await interaction.editReply(tryResult.reply);
+      return;
     }
 
-    return {
+    await interaction.editReply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Joined your voicehannel',
@@ -40,6 +42,6 @@ export class SummonCommand implements DiscordCommand {
             "I'm ready to play media. Use ``Cast to device`` in Jellyfin or the ``/play`` command to get started.",
         }),
       ],
-    };
+    });
   }
 }

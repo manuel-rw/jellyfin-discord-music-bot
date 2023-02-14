@@ -1,7 +1,7 @@
 import { HealthIndicatorResult } from '@nestjs/terminus';
 import { Test } from '@nestjs/testing';
 import { JellyfinService } from '../../clients/jellyfin/jellyfin.service';
-import { useDefaultMockerToken } from '../../utils/tests';
+import { useDefaultMockerToken } from '../../utils/tests/defaultMockerToken';
 import { JellyfinHealthIndicator } from './jellyfin.indicator';
 
 describe('JellyfinHealthIndicator', () => {

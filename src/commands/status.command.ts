@@ -6,12 +6,7 @@ import {
   InjectDiscordClient,
   UsePipes,
 } from '@discord-nestjs/core';
-import {
-  Client,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Status,
-} from 'discord.js';
+import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
@@ -33,10 +28,15 @@ export class StatusCommand implements DiscordCommand {
     private readonly jellyfinService: JellyfinService,
   ) {}
 
-  async handler(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    commandInteraction: CommandInteraction,
-  ): Promise<string | InteractionReplyOptions> {
+  async handler(interaction: CommandInteraction): Promise<void> {
+    await interaction.reply({
+      embeds: [
+        this.discordMessageService.buildMessage({
+          title: 'Retrieving status information...',
+        }),
+      ],
+    });
+
     const ping = this.client.ws.ping;
     const status = Status[this.client.ws.status];
 
@@ -49,7 +49,7 @@ export class StatusCommand implements DiscordCommand {
     const jellyfinSystemApi = getSystemApi(this.jellyfinService.getApi());
     const jellyfinSystemInformation = await jellyfinSystemApi.getSystemInfo();
 
-    return {
+    await interaction.editReply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Discord Bot Status',
@@ -90,6 +90,6 @@ export class StatusCommand implements DiscordCommand {
           },
         }),
       ],
-    };
+    });
   }
 }

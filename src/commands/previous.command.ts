@@ -1,7 +1,7 @@
 import { TransformPipe } from '@discord-nestjs/common';
 
 import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
-import { CommandInteraction, InteractionReplyOptions } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { PlaybackService } from '../playback/playback.service';
 
@@ -16,26 +16,23 @@ export class PreviousTrackCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  handler(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    dcommandInteraction: CommandInteraction,
-  ): InteractionReplyOptions | string {
+  async handler(interaction: CommandInteraction): Promise<void> {
     if (!this.playbackService.previousTrack()) {
-      return {
+      await interaction.reply({
         embeds: [
           this.discordMessageService.buildErrorMessage({
             title: 'There is no previous track',
           }),
         ],
-      };
+      });
     }
 
-    return {
+    await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Went to previous track',
         }),
       ],
-    };
+    });
   }
 }

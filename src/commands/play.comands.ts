@@ -21,6 +21,7 @@ import { TrackRequestDto } from '../models/track-request.dto';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
+import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import {
@@ -28,9 +29,8 @@ import {
   searchResultAsJellyfinAudio,
 } from '../models/jellyfinAudioItems';
 import { PlaybackService } from '../playback/playback.service';
-import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
-import { chooseSuitableRemoteImage } from '../utils/remoteImages';
-import { trimStringToFixedLength } from '../utils/stringUtils';
+import { chooseSuitableRemoteImage } from '../utils/remoteImages/remoteImages';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
 @Command({
   name: 'play',
@@ -52,9 +52,10 @@ export class PlayItemCommand
 
   async handler(
     @Payload() dto: TrackRequestDto,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     executionContext: TransformedCommandExecutionContext<any>,
   ): Promise<InteractionReplyOptions | string> {
+    await executionContext.interaction.deferReply();
+
     const items = await this.jellyfinSearchService.search(dto.search);
     const parsedItems = await Promise.all(
       items.map(
@@ -68,14 +69,15 @@ export class PlayItemCommand
     );
 
     if (parsedItems.length === 0) {
-      return {
+      await executionContext.interaction.followUp({
         embeds: [
           this.discordMessageService.buildErrorMessage({
             title: 'No results for your search query found',
             description: `I was not able to find any matches for your query \`\`${dto.search}\`\`. Please check that I have access to the desired libraries and that your query is not misspelled`,
           }),
         ],
-      };
+      });
+      return;
     }
 
     const firstItems = parsedItems.slice(0, 10);
@@ -107,7 +109,7 @@ export class PlayItemCommand
         emoji: item.getEmoji(),
       }));
 
-    return {
+    await executionContext.interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Jellyfin Search Results',
@@ -126,7 +128,7 @@ export class PlayItemCommand
           ],
         },
       ],
-    };
+    });
   }
 
   @On(Events.InteractionCreate)
@@ -144,6 +146,18 @@ export class PlayItemCommand
       return;
     }
 
+    await interaction.deferUpdate();
+
+    await interaction.editReply({
+      embeds: [
+        this.discordMessageService.buildMessage({
+          title: 'Applying your selection to the queue...',
+          description: `This may take a moment. Please wait`,
+        }),
+      ],
+      components: [],
+    });
+
     const guildMember = interaction.member as GuildMember;
 
     const tryResult =
@@ -156,7 +170,7 @@ export class PlayItemCommand
         `Unable to process select result because the member was not in a voice channcel`,
       );
       const replyOptions = tryResult.reply as InteractionReplyOptions;
-      await interaction.update({
+      await interaction.editReply({
         embeds: replyOptions.embeds,
         content: undefined,
         components: [],
@@ -183,7 +197,7 @@ export class PlayItemCommand
           bitrate,
           remoteImagesOfCurrentAlbum,
         );
-        interaction.update({
+        await interaction.editReply({
           embeds: [
             this.discordMessageService.buildMessage({
               title: item.Name,
@@ -212,7 +226,7 @@ export class PlayItemCommand
             remoteImages,
           );
         });
-        interaction.update({
+        await interaction.editReply({
           embeds: [
             this.discordMessageService.buildMessage({
               title: `Added ${album.TotalRecordCount} items from your album`,
@@ -247,7 +261,7 @@ export class PlayItemCommand
         }
         const bestPlaylistRemoteImage =
           chooseSuitableRemoteImage(addedRemoteImages);
-        interaction.update({
+        await interaction.editReply({
           embeds: [
             this.discordMessageService.buildMessage({
               title: `Added ${playlist.TotalRecordCount} items from your playlist`,
@@ -267,7 +281,7 @@ export class PlayItemCommand
         });
         break;
       default:
-        interaction.update({
+        await interaction.editReply({
           embeds: [
             this.discordMessageService.buildErrorMessage({
               title: 'Unable to process your selection',

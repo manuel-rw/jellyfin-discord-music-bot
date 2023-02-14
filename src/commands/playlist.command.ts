@@ -3,11 +3,10 @@ import { TransformPipe } from '@discord-nestjs/common';
 import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
 import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { GenericCustomReply } from '../models/generic-try-handler';
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
-import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages';
-import { trimStringToFixedLength } from '../utils/stringUtils';
+import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages/remoteImages';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 
 @Command({
@@ -21,12 +20,11 @@ export class PlaylistCommand implements DiscordCommand {
     private readonly playbackService: PlaybackService,
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handler(interaction: CommandInteraction): GenericCustomReply {
+  async handler(interaction: CommandInteraction): Promise<void> {
     const playList = this.playbackService.getPlaylist();
 
     if (playList.tracks.length === 0) {
-      return {
+      await interaction.reply({
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'Your Playlist',
@@ -34,7 +32,7 @@ export class PlaylistCommand implements DiscordCommand {
               'You do not have any tracks in your playlist.\nUse the play command to add new tracks to your playlist',
           }),
         ],
-      };
+      });
     }
 
     const tracklist = playList.tracks
@@ -63,7 +61,7 @@ export class PlaylistCommand implements DiscordCommand {
     const activeTrack = this.playbackService.getActiveTrack();
     const remoteImage = chooseSuitableRemoteImageFromTrack(activeTrack.track);
 
-    return {
+    await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Your Playlist',
@@ -77,7 +75,7 @@ export class PlaylistCommand implements DiscordCommand {
           },
         }),
       ],
-    };
+    });
   }
 
   private getListPoint(isCurrent: boolean, index: number) {
