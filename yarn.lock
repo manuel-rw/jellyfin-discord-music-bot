@@ -3363,7 +3363,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:^8.3.0":
+"eslint-config-prettier@npm:^8.6.0":
   version: 8.6.0
   resolution: "eslint-config-prettier@npm:8.6.0"
   peerDependencies:
@@ -4617,7 +4617,7 @@ __metadata:
     date-fns: ^2.29.3
     discord.js: ^14.7.1
     eslint: ^8.32.0
-    eslint-config-prettier: ^8.3.0
+    eslint-config-prettier: ^8.6.0
     eslint-plugin-prettier: ^4.0.0
     jest: 28.1.3
     joi: ^17.7.0
