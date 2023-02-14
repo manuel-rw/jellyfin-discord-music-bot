@@ -4,20 +4,26 @@ import { Track } from '../types/track';
 
 import { v4 as uuidv4 } from 'uuid';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { GenericPlaylist } from '../models/shared/GenericPlaylist';
+import { Guild } from 'discord.js';
 
 @Injectable()
 export class PlaybackService {
   private readonly logger = new Logger(PlaybackService.name);
-
-  private readonly playlist: Playlist = {
-    tracks: [],
-    activeTrack: null,
-  };
+  private readonly playlists: Map<string, GenericPlaylist> = new Map();
 
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  getActiveTrack() {
-    return this.getTrackById(this.playlist.activeTrack);
+  /**
+   * Gets the current playlist for a specific guild
+   * @param guildId The current guild id
+   * @returns The playlist as a @see GenericPlaylist or undefined if there's none
+   */
+  getPlaylist(guildId: string): GenericPlaylist | undefined {
+    if (!this.playlists.has(guildId)) {
+      return undefined;
+    }
+    return this.playlists.get(guildId);
   }
 
   setActiveTrack(trackId: string) {
@@ -115,10 +121,6 @@ export class PlaybackService {
 
   hasActiveTrack() {
     return this.playlist.activeTrack !== null;
-  }
-
-  getPlaylist(): Playlist {
-    return this.playlist;
   }
 
   private getTrackById(id: string) {
