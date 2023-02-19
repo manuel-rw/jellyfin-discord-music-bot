@@ -1,18 +1,19 @@
-import { Module } from '@nestjs/common';
-import * as Joi from 'joi';
-
 import { DiscordModule } from '@discord-nestjs/core';
+
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 
-import { DiscordConfigService } from './clients/discord/discord.config.service';
-import { DiscordClientModule } from './clients/discord/discord.module';
-import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
+import * as Joi from 'joi';
+
 import { CommandModule } from './commands/command.module';
 import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
+import { DiscordConfigService } from './clients/discord/discord.config.service';
+import { DiscordClientModule } from './clients/discord/discord.module';
+import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 
 @Module({
   imports: [
