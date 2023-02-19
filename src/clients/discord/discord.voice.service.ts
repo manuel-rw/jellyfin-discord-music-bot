@@ -16,10 +16,11 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { GuildMember } from 'discord.js';
 
+import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 import { GenericTryHandler } from '../../models/generic-try-handler';
 import { PlaybackService } from '../../playback/playback.service';
-import { Track } from '../../types/track';
+import { GenericTrack } from '../../models/shared/GenericTrack';
 
 import { DiscordMessageService } from './discord.message.service';
 
@@ -33,12 +34,15 @@ export class DiscordVoiceService {
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
+    private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent('playback.newTrack')
-  handleOnNewTrack(newTrack: Track) {
-    const resource = createAudioResource(newTrack.streamUrl);
+  @OnEvent('internal.audio.announce')
+  handleOnNewTrack(track: GenericTrack) {
+    const resource = createAudioResource(
+      track.getStreamUrl(this.jellyfinStreamBuilder),
+    );
     this.playResource(resource);
   }
 
@@ -100,7 +104,6 @@ export class DiscordVoiceService {
   /**
    * Pauses the current audio player
    */
-  @OnEvent('playback.control.pause')
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     this.eventEmitter.emit('playback.state.pause', true);
@@ -109,7 +112,6 @@ export class DiscordVoiceService {
   /**
    * Stops the audio player
    */
-  @OnEvent('playback.control.stop')
   stop(force: boolean): boolean {
     const stopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     this.eventEmitter.emit('playback.state.stop');
@@ -147,7 +149,6 @@ export class DiscordVoiceService {
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
-  @OnEvent('playback.control.togglePause')
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();
@@ -197,7 +198,7 @@ export class DiscordVoiceService {
   private createAndReturnOrGetAudioPlayer() {
     if (this.audioPlayer === undefined) {
       this.logger.debug(
-        `Initialized new instance of Audio Player because it has not been defined yet`,
+        `Initialized new instance of AudioPlayer because it has not been defined yet`,
       );
       this.audioPlayer = createAudioPlayer();
       this.attachEventListenersToAudioPlayer();
@@ -235,7 +236,7 @@ export class DiscordVoiceService {
       );
 
       if (!hasNextTrack) {
-        this.logger.debug(`Audio Player has reached the end of the playlist`);
+        this.logger.debug(`Reached the end of the playlist`);
         return;
       }
 

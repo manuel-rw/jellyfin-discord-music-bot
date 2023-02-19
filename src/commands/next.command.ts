@@ -28,6 +28,7 @@ export class SkipTrackCommand {
           }),
         ],
       });
+      return;
     }
 
     this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();

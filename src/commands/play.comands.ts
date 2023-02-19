@@ -1,5 +1,11 @@
 import { SlashCommandPipe } from '@discord-nestjs/common';
-import { AppliedCollectors, Command, Handler, IA, InteractionEvent, On } from '@discord-nestjs/core';
+import {
+  Command,
+  Handler,
+  IA,
+  InteractionEvent,
+  On,
+} from '@discord-nestjs/core';
 
 import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 
@@ -12,7 +18,6 @@ import {
   Events,
   GuildMember,
   Interaction,
-  InteractionCollector,
   InteractionReplyOptions,
 } from 'discord.js';
 
@@ -181,8 +186,6 @@ export class PlayItemCommand {
 
     this.logger.debug('Successfully joined the voice channel');
 
-    const bitrate = guildMember.voice.channel.bitrate;
-
     const valueParts = interaction.values[0].split('_');
     const type = valueParts[0];
     const id = valueParts[1];
@@ -203,9 +206,7 @@ export class PlayItemCommand {
         );
         const addedIndex = this.enqueueSingleTrack(
           item as BaseJellyfinAudioPlayable,
-          bitrate,
           remoteImagesOfCurrentAlbum,
-          interaction.guildId,
         );
         await interaction.editReply({
           embeds: [
@@ -232,9 +233,7 @@ export class PlayItemCommand {
         album.SearchHints.forEach((item) => {
           this.enqueueSingleTrack(
             item as BaseJellyfinAudioPlayable,
-            bitrate,
             remoteImages,
-            interaction.guildId,
           );
         });
         await interaction.editReply({
@@ -266,9 +265,7 @@ export class PlayItemCommand {
           addedRemoteImages.Images.concat(remoteImages.Images);
           this.enqueueSingleTrack(
             item as BaseJellyfinAudioPlayable,
-            bitrate,
             remoteImages,
-            interaction.guildId,
           );
         }
         const bestPlaylistRemoteImage =
@@ -310,19 +307,15 @@ export class PlayItemCommand {
 
   private enqueueSingleTrack(
     jellyfinPlayable: BaseJellyfinAudioPlayable,
-    bitrate: number,
     remoteImageResult: RemoteImageResult,
-    guildId: string,
   ) {
-    const stream = this.jellyfinStreamBuilder.buildStreamUrl(
-      jellyfinPlayable.Id,
-      bitrate,
-    );
-
-    const milliseconds = jellyfinPlayable.RunTimeTicks / 10000;
-
     return this.playbackService
       .getPlaylistOrDefault()
-      .enqueueTracks([new GenericTrack(jellyfinPlayable.Name, milliseconds)]);
+      .enqueueTracks([
+        GenericTrack.constructFromJellyfinPlayable(
+          jellyfinPlayable,
+          remoteImageResult,
+        ),
+      ]);
   }
 }

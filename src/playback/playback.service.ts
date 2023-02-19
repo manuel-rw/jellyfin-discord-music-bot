@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { GenericPlaylist } from '../models/shared/GenericPlaylist';
 
@@ -15,7 +15,7 @@ export class PlaybackService {
       return this.playlist;
     }
 
-    this.playlist = new GenericPlaylist();
+    this.playlist = new GenericPlaylist(this.eventEmitter);
     return this.playlist;
   }
 }

@@ -1,10 +1,12 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import { GenericTrack } from './GenericTrack';
 
 export class GenericPlaylist {
   tracks: GenericTrack[];
   activeTrackIndex?: number;
 
-  constructor() {
+  constructor(private readonly eventEmitter: EventEmitter2) {
     this.tracks = [];
   }
 
@@ -29,7 +31,9 @@ export class GenericPlaylist {
   }
 
   hasActiveTrack(): boolean {
-    return this.activeTrackIndex && !this.isActiveTrackOutOfSync();
+    return (
+      this.activeTrackIndex !== undefined && !this.isActiveTrackOutOfSync()
+    );
   }
 
   /**
@@ -42,6 +46,10 @@ export class GenericPlaylist {
     }
 
     this.activeTrackIndex++;
+    this.eventEmitter.emit('controls.playlist.tracks.next', {
+      newActive: this.activeTrackIndex,
+    });
+    this.announceTrackChange();
     return true;
   }
 
@@ -55,6 +63,10 @@ export class GenericPlaylist {
     }
 
     this.activeTrackIndex--;
+    this.eventEmitter.emit('controls.playlist.tracks.previous', {
+      newActive: this.activeTrackIndex,
+    });
+    this.announceTrackChange();
     return true;
   }
 
@@ -64,7 +76,13 @@ export class GenericPlaylist {
    * @returns the new lendth of the tracks in the playlist
    */
   enqueueTracks(tracks: GenericTrack[]) {
-    return this.tracks.push(...tracks);
+    this.eventEmitter.emit('controls.playlist.tracks.enqueued', {
+      count: tracks.length,
+      activeTrack: this.activeTrackIndex,
+    });
+    const length = this.tracks.push(...tracks);
+    this.announceTrackChange();
+    return length;
   }
 
   /**
@@ -84,8 +102,17 @@ export class GenericPlaylist {
   }
 
   clear() {
+    this.eventEmitter.emit('controls.playlist.tracks.clear');
     this.tracks = [];
     this.activeTrackIndex = undefined;
+  }
+
+  private announceTrackChange() {
+    if (!this.activeTrackIndex) {
+      this.activeTrackIndex = 0;
+    }
+
+    this.eventEmitter.emit('internal.audio.announce', this.getActiveTrack());
   }
 
   private isActiveTrackOutOfSync(): boolean {

@@ -28,6 +28,7 @@ export class PreviousTrackCommand {
           }),
         ],
       });
+      return;
     }
 
     this.playbackService.getPlaylistOrDefault().setPreviousTrackAsActiveTrack();
