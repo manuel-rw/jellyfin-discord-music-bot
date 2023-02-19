@@ -1,4 +1,4 @@
-import { Command, DiscordCommand } from '@discord-nestjs/core';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -12,14 +12,15 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
   description: 'Go to the next track in the playlist',
 })
 @Injectable()
-export class SkipTrackCommand implements DiscordCommand {
+export class SkipTrackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
-    if (!this.playbackService.nextTrack()) {
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
+    if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.reply({
         embeds: [
           this.discordMessageService.buildErrorMessage({
@@ -29,6 +30,7 @@ export class SkipTrackCommand implements DiscordCommand {
       });
     }
 
+    this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({

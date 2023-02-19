@@ -9,14 +9,18 @@ import {
   joinVoiceChannel,
   VoiceConnection,
 } from '@discordjs/voice';
+
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+
 import { GuildMember } from 'discord.js';
+
+import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 import { GenericTryHandler } from '../../models/generic-try-handler';
 import { PlaybackService } from '../../playback/playback.service';
 import { Track } from '../../types/track';
-import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
+
 import { DiscordMessageService } from './discord.message.service';
 
 @Injectable()
@@ -220,7 +224,9 @@ export class DiscordVoiceService {
         return;
       }
 
-      const hasNextTrack = this.playbackService.hasNextTrack();
+      const hasNextTrack = this.playbackService
+        .getPlaylistOrDefault()
+        .hasNextTrackInPlaylist();
 
       this.logger.debug(
         `Deteced audio player status change from ${previousState.status} to ${
@@ -233,7 +239,7 @@ export class DiscordVoiceService {
         return;
       }
 
-      this.playbackService.nextTrack();
+      this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     });
   }
 }

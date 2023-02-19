@@ -1,4 +1,4 @@
-import { Command, DiscordCommand } from '@discord-nestjs/core';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -7,12 +7,12 @@ import { CommandInteraction, GuildMember } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 
+@Injectable()
 @Command({
   name: 'summon',
   description: 'Join your current voice channel',
 })
-@Injectable()
-export class SummonCommand implements DiscordCommand {
+export class SummonCommand {
   private readonly logger = new Logger(SummonCommand.name);
 
   constructor(
@@ -20,7 +20,8 @@ export class SummonCommand implements DiscordCommand {
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.deferReply();
 
     const guildMember = interaction.member as GuildMember;
