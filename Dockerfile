@@ -6,7 +6,4 @@ WORKDIR /app
 
 EXPOSE 3000
 
-RUN ls -lha
-RUN ls dist -lha
-
 CMD ["yarn", "start:prod"]
