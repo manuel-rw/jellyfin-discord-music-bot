@@ -1,14 +1,16 @@
-import { TransformPipe } from '@discord-nestjs/common';
-
 import {
   Command,
   DiscordTransformedCommand,
   On,
   Payload,
   TransformedCommandExecutionContext,
-  UsePipes,
 } from '@discord-nestjs/core';
+
+import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
+
 import { Logger } from '@nestjs/common/services';
+import { Injectable } from '@nestjs/common';
+
 import {
   ComponentType,
   Events,
@@ -16,19 +18,17 @@ import {
   Interaction,
   InteractionReplyOptions,
 } from 'discord.js';
-import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
-import { TrackRequestDto } from '../models/track-request.dto';
 
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
-
-import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
-import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import {
   BaseJellyfinAudioPlayable,
   searchResultAsJellyfinAudio,
 } from '../models/jellyfinAudioItems';
+import { TrackRequestDto } from '../models/track-request.dto';
 import { PlaybackService } from '../playback/playback.service';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
+import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 import { chooseSuitableRemoteImage } from '../utils/remoteImages/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
@@ -36,7 +36,7 @@ import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class PlayItemCommand
   implements DiscordTransformedCommand<TrackRequestDto>
 {
@@ -160,6 +160,10 @@ export class PlayItemCommand
 
     const guildMember = interaction.member as GuildMember;
 
+    this.logger.debug(
+      `Trying to join the voice channel of ${guildMember.displayName}`,
+    );
+
     const tryResult =
       this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
         guildMember,
@@ -178,11 +182,19 @@ export class PlayItemCommand
       return;
     }
 
+    this.logger.debug('Successfully joined the voice channel');
+
     const bitrate = guildMember.voice.channel.bitrate;
 
     const valueParts = interaction.values[0].split('_');
     const type = valueParts[0];
     const id = valueParts[1];
+
+    this.logger.debug(
+      `Searching for the content using the values [${interaction.values.join(
+        ', ',
+      )}]`,
+    );
 
     switch (type) {
       case 'track':

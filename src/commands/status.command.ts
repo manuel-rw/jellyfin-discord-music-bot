@@ -1,25 +1,26 @@
-import { TransformPipe } from '@discord-nestjs/common';
-
 import {
   Command,
   DiscordCommand,
   InjectDiscordClient,
-  UsePipes,
 } from '@discord-nestjs/core';
+
+import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
+
+import { Injectable } from '@nestjs/common';
+
 import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
+
+import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
-import { Constants } from '../utils/constants';
-
-import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 
 @Command({
   name: 'status',
   description: 'Display the current status for troubleshooting',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class StatusCommand implements DiscordCommand {
   constructor(
     @InjectDiscordClient()

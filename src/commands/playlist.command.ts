@@ -1,19 +1,21 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common';
+
 import { CommandInteraction } from 'discord.js';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+
 import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
+import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
-import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class PlaylistCommand implements DiscordCommand {
   constructor(
     private readonly discordMessageService: DiscordMessageService,

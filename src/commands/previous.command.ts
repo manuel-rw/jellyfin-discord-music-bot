@@ -1,15 +1,17 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common/decorators';
+
 import { CommandInteraction } from 'discord.js';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+
 import { PlaybackService } from '../playback/playback.service';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
 @Command({
   name: 'previous',
   description: 'Go to the previous track',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class PreviousTrackCommand implements DiscordCommand {
   constructor(
     private readonly playbackService: PlaybackService,
