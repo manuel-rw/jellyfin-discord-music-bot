@@ -1,16 +1,15 @@
-import { TransformPipe } from '@discord-nestjs/common';
 import {
   Command,
   DiscordTransformedCommand,
   On,
   Payload,
   TransformedCommandExecutionContext,
-  UsePipes,
 } from '@discord-nestjs/core';
 
 import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 
 import { Logger } from '@nestjs/common/services';
+import { Injectable } from '@nestjs/common';
 
 import {
   ComponentType,
@@ -37,7 +36,7 @@ import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class PlayItemCommand
   implements DiscordTransformedCommand<TrackRequestDto>
 {

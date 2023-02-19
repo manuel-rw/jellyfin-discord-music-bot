@@ -1,14 +1,16 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common';
+
 import { CommandInteraction } from 'discord.js';
+
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
 @Command({
   name: 'help',
   description: 'Get help if you&apos;re having problems with this bot',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class HelpCommand implements DiscordCommand {
   constructor(private readonly discordMessageService: DiscordMessageService) {}
 

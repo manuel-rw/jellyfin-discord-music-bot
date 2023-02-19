@@ -1,8 +1,9 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+
 import { CommandInteraction, GuildMember } from 'discord.js';
+
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 
@@ -10,7 +11,7 @@ import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
   name: 'summon',
   description: 'Join your current voice channel',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class SummonCommand implements DiscordCommand {
   private readonly logger = new Logger(SummonCommand.name);
 

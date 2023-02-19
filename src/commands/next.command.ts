@@ -1,15 +1,17 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common';
+
 import { CommandInteraction } from 'discord.js';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+
 import { PlaybackService } from '../playback/playback.service';
+import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
 @Command({
   name: 'next',
   description: 'Go to the next track in the playlist',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class SkipTrackCommand implements DiscordCommand {
   constructor(
     private readonly playbackService: PlaybackService,

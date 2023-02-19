@@ -1,16 +1,18 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, DiscordCommand } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common';
+
 import { CommandInteraction } from 'discord.js';
+
+import { PlaybackService } from '../playback/playback.service';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { PlaybackService } from '../playback/playback.service';
 
 @Command({
   name: 'stop',
   description: 'Stop playback entirely and clear the current playlist',
 })
-@UsePipes(TransformPipe)
+@Injectable()
 export class StopPlaybackCommand implements DiscordCommand {
   constructor(
     private readonly playbackService: PlaybackService,
