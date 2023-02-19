@@ -1,11 +1,11 @@
-name: Container image - Production
+name: Container image - Development
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
 on:
   push:
-    branches: [master]
+    branches: [dev]
     paths-ignore:
       - '.github/**'
       - 'images/'
@@ -23,7 +23,7 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
+      packages: writement work
       contents: read
     steps:
       - name: Setup
@@ -42,7 +42,6 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
       - run: yarn build
-      - run: yarn test
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -51,7 +50,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=raw,value=latest
+            type=raw,value=dev
             type=pep440,pattern={{version}}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
