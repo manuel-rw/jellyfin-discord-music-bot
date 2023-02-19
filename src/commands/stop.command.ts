@@ -1,4 +1,4 @@
-import { Command, DiscordCommand } from '@discord-nestjs/core';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -13,15 +13,16 @@ import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
   description: 'Stop playback entirely and clear the current playlist',
 })
 @Injectable()
-export class StopPlaybackCommand implements DiscordCommand {
+export class StopPlaybackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
   ) {}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handler(interaction: CommandInteraction): Promise<void> {
-    const hasActiveTrack = this.playbackService.hasActiveTrack();
+
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
+    const hasActiveTrack = this.playbackService.getPlaylistOrDefault();
     const title = hasActiveTrack
       ? 'Playback stopped successfully'
       : 'Playback failed to stop';
@@ -29,7 +30,7 @@ export class StopPlaybackCommand implements DiscordCommand {
       ? 'In addition, your playlist has been cleared'
       : 'There is no active track in the queue';
     if (hasActiveTrack) {
-      this.playbackService.clear();
+      this.playbackService.getPlaylistOrDefault().clear();
       this.discordVoiceService.stop(false);
     }
 

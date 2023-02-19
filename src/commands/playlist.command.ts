@@ -1,4 +1,4 @@
-import { Command, DiscordCommand } from '@discord-nestjs/core';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -8,24 +8,24 @@ import { PlaybackService } from '../playback/playback.service';
 import { Constants } from '../utils/constants';
 import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { chooseSuitableRemoteImageFromTrack } from '../utils/remoteImages/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
+@Injectable()
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
 })
-@Injectable()
-export class PlaylistCommand implements DiscordCommand {
+export class PlaylistCommand {
   constructor(
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
   ) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
-    const playList = this.playbackService.getPlaylist();
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
+    const playlist = this.playbackService.getPlaylistOrDefault();
 
-    if (playList.tracks.length === 0) {
+    if (!playlist || playlist.tracks.length === 0) {
       await interaction.reply({
         embeds: [
           this.discordMessageService.buildMessage({
@@ -35,15 +35,16 @@ export class PlaylistCommand implements DiscordCommand {
           }),
         ],
       });
+      return;
     }
 
-    const tracklist = playList.tracks
+    const tracklist = playlist.tracks
       .slice(0, 10)
       .map((track, index) => {
-        const isCurrent = track.id === playList.activeTrack;
+        const isCurrent = track === playlist.getActiveTrack();
 
         let point = this.getListPoint(isCurrent, index);
-        point += `**${trimStringToFixedLength(track.track.name, 30)}**`;
+        point += `**${trimStringToFixedLength(track.name, 30)}**`;
 
         if (isCurrent) {
           point += ' :loud_sound:';
@@ -52,16 +53,13 @@ export class PlaylistCommand implements DiscordCommand {
         point += '\n';
         point += Constants.Design.InvisibleSpace.repeat(2);
         point += 'Duration: ';
-        point += formatMillisecondsAsHumanReadable(
-          track.track.durationInMilliseconds,
-        );
+        point += formatMillisecondsAsHumanReadable(track.getDuration());
 
         return point;
       })
       .join('\n');
-
-    const activeTrack = this.playbackService.getActiveTrack();
-    const remoteImage = chooseSuitableRemoteImageFromTrack(activeTrack.track);
+    // const remoteImage = chooseSuitableRemoteImageFromTrack(playlist.getActiveTrack());
+    const remoteImage = undefined;
 
     await interaction.reply({
       embeds: [

@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { JellyfinService } from './jellyfin.service';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class JellyfinStreamBuilderService {
     const api = this.jellyfinService.getApi();
 
     this.logger.debug(
-      `Attempting to build stream resource for item ${jellyfinItemId} with bitrate ${bitrate}`,
+      `Building stream for '${jellyfinItemId}' with bitrate ${bitrate}`,
     );
 
     const accessToken = this.jellyfinService.getApi().accessToken;

@@ -1,17 +1,19 @@
+import { SlashCommandPipe } from '@discord-nestjs/common';
 import {
   Command,
-  DiscordTransformedCommand,
+  Handler,
+  IA,
+  InteractionEvent,
   On,
-  Payload,
-  TransformedCommandExecutionContext,
 } from '@discord-nestjs/core';
 
 import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { Logger } from '@nestjs/common/services';
 import { Injectable } from '@nestjs/common';
+import { Logger } from '@nestjs/common/services';
 
 import {
+  CommandInteraction,
   ComponentType,
   Events,
   GuildMember,
@@ -29,17 +31,16 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
 import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
+import { GenericTrack } from '../models/shared/GenericTrack';
 import { chooseSuitableRemoteImage } from '../utils/remoteImages/remoteImages';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
+@Injectable()
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
 })
-@Injectable()
-export class PlayItemCommand
-  implements DiscordTransformedCommand<TrackRequestDto>
-{
+export class PlayItemCommand {
   private readonly logger: Logger = new Logger(PlayItemCommand.name);
 
   constructor(
@@ -50,11 +51,12 @@ export class PlayItemCommand
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
   ) {}
 
+  @Handler()
   async handler(
-    @Payload() dto: TrackRequestDto,
-    executionContext: TransformedCommandExecutionContext<any>,
+    @InteractionEvent(SlashCommandPipe) dto: TrackRequestDto,
+    @IA() interaction: CommandInteraction,
   ): Promise<InteractionReplyOptions | string> {
-    await executionContext.interaction.deferReply();
+    await interaction.deferReply();
 
     const items = await this.jellyfinSearchService.search(dto.search);
     const parsedItems = await Promise.all(
@@ -69,7 +71,7 @@ export class PlayItemCommand
     );
 
     if (parsedItems.length === 0) {
-      await executionContext.interaction.followUp({
+      await interaction.followUp({
         embeds: [
           this.discordMessageService.buildErrorMessage({
             title: 'No results for your search query found',
@@ -109,7 +111,7 @@ export class PlayItemCommand
         emoji: item.getEmoji(),
       }));
 
-    await executionContext.interaction.followUp({
+    await interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
           title: 'Jellyfin Search Results',
@@ -184,8 +186,6 @@ export class PlayItemCommand
 
     this.logger.debug('Successfully joined the voice channel');
 
-    const bitrate = guildMember.voice.channel.bitrate;
-
     const valueParts = interaction.values[0].split('_');
     const type = valueParts[0];
     const id = valueParts[1];
@@ -206,7 +206,6 @@ export class PlayItemCommand
         );
         const addedIndex = this.enqueueSingleTrack(
           item as BaseJellyfinAudioPlayable,
-          bitrate,
           remoteImagesOfCurrentAlbum,
         );
         await interaction.editReply({
@@ -234,7 +233,6 @@ export class PlayItemCommand
         album.SearchHints.forEach((item) => {
           this.enqueueSingleTrack(
             item as BaseJellyfinAudioPlayable,
-            bitrate,
             remoteImages,
           );
         });
@@ -267,7 +265,6 @@ export class PlayItemCommand
           addedRemoteImages.Images.concat(remoteImages.Images);
           this.enqueueSingleTrack(
             item as BaseJellyfinAudioPlayable,
-            bitrate,
             remoteImages,
           );
         }
@@ -310,22 +307,15 @@ export class PlayItemCommand
 
   private enqueueSingleTrack(
     jellyfinPlayable: BaseJellyfinAudioPlayable,
-    bitrate: number,
     remoteImageResult: RemoteImageResult,
   ) {
-    const stream = this.jellyfinStreamBuilder.buildStreamUrl(
-      jellyfinPlayable.Id,
-      bitrate,
-    );
-
-    const milliseconds = jellyfinPlayable.RunTimeTicks / 10000;
-
-    return this.playbackService.enqueueTrack({
-      jellyfinId: jellyfinPlayable.Id,
-      name: jellyfinPlayable.Name,
-      durationInMilliseconds: milliseconds,
-      streamUrl: stream,
-      remoteImages: remoteImageResult,
-    });
+    return this.playbackService
+      .getPlaylistOrDefault()
+      .enqueueTracks([
+        GenericTrack.constructFromJellyfinPlayable(
+          jellyfinPlayable,
+          remoteImageResult,
+        ),
+      ]);
   }
 }

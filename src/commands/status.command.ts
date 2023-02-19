@@ -1,8 +1,4 @@
-import {
-  Command,
-  DiscordCommand,
-  InjectDiscordClient,
-} from '@discord-nestjs/core';
+import { Command, Handler, IA, InjectDiscordClient } from '@discord-nestjs/core';
 
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 
@@ -21,7 +17,7 @@ import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
   description: 'Display the current status for troubleshooting',
 })
 @Injectable()
-export class StatusCommand implements DiscordCommand {
+export class StatusCommand {
   constructor(
     @InjectDiscordClient()
     private readonly client: Client,
@@ -29,7 +25,8 @@ export class StatusCommand implements DiscordCommand {
     private readonly jellyfinService: JellyfinService,
   ) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({

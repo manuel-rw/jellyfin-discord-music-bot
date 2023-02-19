@@ -1,4 +1,4 @@
-import { Command, DiscordCommand } from '@discord-nestjs/core';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
 import { Injectable } from '@nestjs/common/decorators';
 
@@ -7,18 +7,19 @@ import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 
+@Injectable()
 @Command({
   name: 'disconnect',
   description: 'Join your current voice channel',
 })
-@Injectable()
-export class DisconnectCommand implements DiscordCommand {
+export class DisconnectCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly discordMessageService: DiscordMessageService,
   ) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
