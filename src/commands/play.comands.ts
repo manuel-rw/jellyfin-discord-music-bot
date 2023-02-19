@@ -187,6 +187,14 @@ export class PlayItemCommand {
     this.logger.debug('Successfully joined the voice channel');
 
     const valueParts = interaction.values[0].split('_');
+
+    if (valueParts.length !== 2) {
+      this.logger.error(
+        `Failed to extract interaction values from [${valueParts.join(',')}]`,
+      );
+      return;
+    }
+
     const type = valueParts[0];
     const id = valueParts[1];
 
