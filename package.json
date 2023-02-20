@@ -35,7 +35,7 @@
     "@nestjs/terminus": "^9.1.4",
     "date-fns": "^2.29.3",
     "discord.js": "^14.7.1",
-    "joi": "^17.7.0",
+    "joi": "^17.8.1",
     "libsodium-wrappers": "^0.7.10",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^4.1.2",
