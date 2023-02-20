@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { JellyfinService } from './jellyfin.service';
-
 import {
   BaseItemKind,
   RemoteImageResult,
@@ -10,11 +7,16 @@ import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
 import { getRemoteImageApi } from '@jellyfin/sdk/lib/utils/api/remote-image-api';
 import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
+
+import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
+
 import {
   JellyfinAudioPlaylist,
   JellyfinMusicAlbum,
 } from '../../models/jellyfinAudioItems';
+
+import { JellyfinService } from './jellyfin.service';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -110,23 +112,31 @@ export class JellyfinSearchService {
     const api = this.jellyfinService.getApi();
     const remoteImageApi = getRemoteImageApi(api);
 
-    const axiosReponse = await remoteImageApi.getRemoteImages({
-      itemId: id,
-      includeAllLanguages: true,
-      limit: 20,
-    });
+    try {
+      const axiosReponse = await remoteImageApi.getRemoteImages({
+        itemId: id,
+        includeAllLanguages: true,
+        limit: 20,
+      });
 
-    if (axiosReponse.status !== 200) {
-      this.logger.warn(
-        `Failed to retrieve remote images. Response has status ${axiosReponse.status}`,
-      );
+      if (axiosReponse.status !== 200) {
+        this.logger.warn(
+          `Failed to retrieve remote images. Response has status ${axiosReponse.status}`,
+        );
+        return {
+          Images: [],
+          Providers: [],
+          TotalRecordCount: 0,
+        };
+      }
+      return axiosReponse.data;
+    } catch (err) {
+      this.logger.error(`Failed to retrieve remote images: ${err}`);
       return {
         Images: [],
         Providers: [],
         TotalRecordCount: 0,
       };
     }
-
-    return axiosReponse.data;
   }
 }

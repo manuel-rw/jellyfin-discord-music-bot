@@ -198,6 +198,13 @@ export class PlayItemCommand {
     const type = valueParts[0];
     const id = valueParts[1];
 
+    if (!id) {
+      this.logger.warn(
+        `Failed because ID could not be extracted from interaction`,
+      );
+      return;
+    }
+
     this.logger.debug(
       `Searching for the content using the values [${interaction.values.join(
         ', ',
