@@ -359,12 +359,12 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@discord-nestjs/common@^5.1.5":
-  version "5.1.5"
-  resolved "https://registry.yarnpkg.com/@discord-nestjs/common/-/common-5.1.5.tgz#b7246430d8df7be265df74fb2d00881eb5a8b011"
-  integrity sha512-Tuk1l8ypJd7euqeV9U+u/OaVrqFi3vdwDlYVi0k4IurUlxGBpAl1r9tJXL2ouWPAmPA6+ZgQCGro9/m91YmBcQ==
+"@discord-nestjs/common@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@discord-nestjs/common/-/common-5.2.0.tgz#3bdf25eadf8372d81110e2aeefbb31e707e75554"
+  integrity sha512-aXp6P7XyDk/Zoz9zpe5DLqGFBfZrz1fu6Vc8oMz2RggVxBm8k8P5bH5iOcIvI0jWsjbZ3pVCVB3SmCpjBFItRA==
   dependencies:
-    "@nestjs/mapped-types" "1.2.0"
+    "@nestjs/mapped-types" "1.2.2"
     class-transformer "0.5.1"
     class-validator "0.14.0"
 
@@ -857,10 +857,10 @@
   dependencies:
     eventemitter2 "6.4.9"
 
-"@nestjs/mapped-types@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/mapped-types/-/mapped-types-1.2.0.tgz#1bbdbb5c956f0adb3fd76add929137bc6ad3183f"
-  integrity sha512-NTFwPZkQWsArQH8QSyFWGZvJ08gR+R4TofglqZoihn/vU+ktHEJjMqsIsADwb7XD97DhiD+TVv5ac+jG33BHrg==
+"@nestjs/mapped-types@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/mapped-types/-/mapped-types-1.2.2.tgz#d9ddb143776e309dbc1a518ac1607fddac1e140e"
+  integrity sha512-3dHxLXs3M0GPiriAcCFFJQHoDFUuzTD5w6JDhE7TyfT89YKpe6tcCCIqOZWdXmt9AZjjK30RkHRSFF+QEnWFQg==
 
 "@nestjs/platform-express@^9.0.0":
   version "9.3.9"
