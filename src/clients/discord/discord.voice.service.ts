@@ -7,6 +7,7 @@ import {
   getVoiceConnection,
   getVoiceConnections,
   joinVoiceChannel,
+  NoSubscriberBehavior,
   VoiceConnection,
 } from '@discordjs/voice';
 
@@ -200,7 +201,12 @@ export class DiscordVoiceService {
       this.logger.debug(
         `Initialized new instance of AudioPlayer because it has not been defined yet`,
       );
-      this.audioPlayer = createAudioPlayer();
+      this.audioPlayer = createAudioPlayer({
+        debug: process.env.DEBUG?.toLowerCase() === 'true',
+        behaviors: {
+          noSubscriber: NoSubscriberBehavior.Play,
+        },
+      });
       this.attachEventListenersToAudioPlayer();
       this.voiceConnection.subscribe(this.audioPlayer);
       return this.audioPlayer;
@@ -217,6 +223,10 @@ export class DiscordVoiceService {
       this.logger.error(message);
     });
     this.audioPlayer.on('stateChange', (previousState) => {
+      this.logger.debug(
+        `Audio player changed state from ${previousState.status} to ${this.audioPlayer.state.status}`,
+      );
+
       if (previousState.status !== AudioPlayerStatus.Playing) {
         return;
       }
@@ -225,14 +235,14 @@ export class DiscordVoiceService {
         return;
       }
 
+      this.logger.debug(`Audio player finished playing old resource`);
+
       const hasNextTrack = this.playbackService
         .getPlaylistOrDefault()
         .hasNextTrackInPlaylist();
 
       this.logger.debug(
-        `Deteced audio player status change from ${previousState.status} to ${
-          this.audioPlayer.state.status
-        }. Has next track: ${hasNextTrack ? 'yes' : 'no'}`,
+        `Playlist has next track: ${hasNextTrack ? 'yes' : 'no'}`,
       );
 
       if (!hasNextTrack) {
