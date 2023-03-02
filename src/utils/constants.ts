@@ -33,11 +33,11 @@ export const Constants = {
     InvisibleSpace: '\u1CBC',
     Icons: {
       JellyfinLogo:
-        'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/jellyfin-icon-squared.png?raw=true',
+        'https://raw.githubusercontent.com/manuel-rw/jellyfin-discord-music-bot/master/images/icons/jellyfin-icon-squared.png',
       SuccessIcon:
-        'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/circle-check.png?raw=true',
+        'https://raw.githubusercontent.com/manuel-rw/jellyfin-discord-music-bot/master/images/icons/circle-check.png',
       ErrorIcon:
-        'https://github.com/manuel-rw/jellyfin-discord-music-bot/blob/nestjs-migration/images/icons/alert-circle.png?raw=true',
+        'https://raw.githubusercontent.com/manuel-rw/jellyfin-discord-music-bot/master/images/icons/alert-circle.png',
     },
   },
 };

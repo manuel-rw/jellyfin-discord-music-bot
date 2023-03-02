@@ -90,7 +90,7 @@ export class GenericPlaylist {
    * @returns if there is a track next in the playlist
    */
   hasNextTrackInPlaylist() {
-    return this.activeTrackIndex < this.tracks.length;
+    return this.activeTrackIndex + 1 < this.tracks.length;
   }
 
   /**
