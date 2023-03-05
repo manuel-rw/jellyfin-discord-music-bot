@@ -1,6 +1,5 @@
-import { RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
+import { RemoteImageInfo, RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { BaseJellyfinAudioPlayable } from '../jellyfinAudioItems';
 import { JellyfinStreamBuilderService } from '../../clients/jellyfin/jellyfin.stream.builder.service';
 
 export class GenericTrack {
@@ -45,15 +44,7 @@ export class GenericTrack {
     return streamBuilder.buildStreamUrl(this.id, 96000);
   }
 
-  static constructFromJellyfinPlayable(
-    playable: BaseJellyfinAudioPlayable,
-    remoteImages: RemoteImageResult | undefined,
-  ): GenericTrack {
-    return new GenericTrack(
-      playable.Id,
-      playable.Name,
-      playable.RunTimeTicks / 1000,
-      remoteImages,
-    );
+  getRemoteImage(): RemoteImageInfo | undefined {
+    return this.remoteImages.Images.find((x) => true);
   }
 }

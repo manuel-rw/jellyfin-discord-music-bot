@@ -104,26 +104,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         data.getSelection = PlayNowCommand.prototype.getSelection;
         const ids = data.getSelection();
 
-        this.logger.debug(
-          `Adding ${ids.length} ids to the queue using controls from the websocket`,
-        );
-
-        const tracks = ids.map(async (id) => {
-          try {
-            const hint = await this.jellyfinSearchService.getById(id);
-            return {
-              id: id,
-              name: hint.Name,
-              duration: hint.RunTimeTicks / 10000,
-              remoteImages: {},
-            } as GenericTrack;
-          } catch (err) {
-            this.logger.error('TODO');
-          }
-        });
-        const resolvedTracks = await Promise.all(tracks);
-        const playlist = this.playbackService.getPlaylistOrDefault();
-        playlist.enqueueTracks(resolvedTracks);
+        // TODO: Implement this again
         break;
       case SessionMessageType[SessionMessageType.Playstate]:
         const sendPlaystateCommandRequest =

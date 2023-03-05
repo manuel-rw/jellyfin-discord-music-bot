@@ -100,6 +100,7 @@ export class DiscordVoiceService {
   }
 
   playResource(resource: AudioResource<unknown>) {
+    this.logger.debug(`Playing audio resource with volume ${resource.volume}`);
     this.createAndReturnOrGetAudioPlayer().play(resource);
   }
 
@@ -198,6 +199,12 @@ export class DiscordVoiceService {
   }
 
   private createAndReturnOrGetAudioPlayer() {
+    if (this.voiceConnection === undefined) {
+      throw new Error(
+        'Voice connection has not been initialized and audio player can\t be created',
+      );
+    }
+
     if (this.audioPlayer === undefined) {
       this.logger.debug(
         `Initialized new instance of AudioPlayer because it has not been defined yet`,

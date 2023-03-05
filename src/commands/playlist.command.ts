@@ -25,21 +25,21 @@ export class PlaylistCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     const playlist = this.playbackService.getPlaylistOrDefault();
 
-    if (!playlist || playlist.tracks.length === 0) {
+    if (playlist.isEmpty()) {
       await interaction.reply({
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'Your Playlist',
             description:
-              'You do not have any tracks in your playlist.\nUse the play command to add new tracks to your playlist',
+              'You do not have any tracks in your playlist.\nUse the ``/play`` command to add new tracks to your playlist',
           }),
         ],
+        ephemeral: true,
       });
       return;
     }
 
     const tracklist = playlist.tracks
-      .slice(0, 10)
       .map((track, index) => {
         const isCurrent = track === playlist.getActiveTrack();
 
@@ -52,13 +52,12 @@ export class PlaylistCommand {
 
         point += '\n';
         point += Constants.Design.InvisibleSpace.repeat(2);
-        point += 'Duration: ';
         point += formatMillisecondsAsHumanReadable(track.getDuration());
 
         return point;
       })
+      .slice(0, 10)
       .join('\n');
-    // const remoteImage = chooseSuitableRemoteImageFromTrack(playlist.getActiveTrack());
     const remoteImage = undefined;
 
     await interaction.reply({
@@ -75,6 +74,7 @@ export class PlaylistCommand {
           },
         }),
       ],
+      ephemeral: true,
     });
   }
 
