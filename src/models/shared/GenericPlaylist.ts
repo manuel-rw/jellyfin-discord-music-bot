@@ -30,6 +30,10 @@ export class GenericPlaylist {
     return this.tracks[this.activeTrackIndex];
   }
 
+  isEmpty(): boolean {
+    return this.tracks.length === 0;
+  }
+
   hasActiveTrack(): boolean {
     return (
       this.activeTrackIndex !== undefined && !this.isActiveTrackOutOfSync()
