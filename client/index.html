@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-100 dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="assets/css/index.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              clifford: '#da373d',
+            },
+          },
+        },
+      };
+    </script>
+
+    <title>🎉 Jellyfin Discord Bot</title>
+  </head>
+  <body class="h-full">
+    <div class="min-h-full bg-zinc-900">
+      <nav class="bg-zinc-800">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <img
+                  class="h-8 w-8"
+                  src="https://raw.githubusercontent.com/manuel-rw/jellyfin-discord-music-bot/master/images/icons/jellyfin-icon-squared.png"
+                  alt="Jellyfin logo"
+                />
+              </div>
+              <span class="ml-5 text-gray-300 text-lg">Discord Bot</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-100 text-center">
+          Jellyfin Discord Bot
+        </h1>
+        <h3 class="text-2xl text-gray-300 text-center">
+          Congratulations, your bot is up and running!
+        </h3>
+      </div>
+    </div>
+  </body>
+</html>

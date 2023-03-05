@@ -7,13 +7,15 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import * as Joi from 'joi';
 
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { DiscordConfigService } from './clients/discord/discord.config.service';
+import { DiscordClientModule } from './clients/discord/discord.module';
+import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 import { CommandModule } from './commands/command.module';
 import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
-import { DiscordConfigService } from './clients/discord/discord.config.service';
-import { DiscordClientModule } from './clients/discord/discord.module';
-import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
 
 @Module({
   imports: [
@@ -26,6 +28,9 @@ import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
         UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),
         PORT: Joi.number().min(1),
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
     }),
     ScheduleModule.forRoot(),
     DiscordModule.forRootAsync({
