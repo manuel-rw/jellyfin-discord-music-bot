@@ -48,7 +48,7 @@ export class PlayItemCommand {
     @InteractionEvent(SlashCommandPipe) dto: TrackRequestDto,
     @IA() interaction: CommandInteraction,
   ): Promise<InteractionReplyOptions | string> {
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const baseItems = TrackRequestDto.getBaseItemKinds(dto.type);
 
@@ -72,6 +72,7 @@ export class PlayItemCommand {
             description: `- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters`,
           }),
         ],
+        ephemeral: true,
       });
       return;
     }
@@ -96,20 +97,18 @@ export class PlayItemCommand {
       (sum, item) => sum + item.duration,
       0,
     );
-    const enqueuedCount = this.playbackService
-      .getPlaylistOrDefault()
-      .enqueueTracks(tracks);
-
-    console.log(tracks);
+    this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
     const remoteImage: RemoteImageInfo | undefined = tracks
-      .map((x) => x.getRemoteImage())
+      .flatMap((x) => x.getRemoteImages())
       .find((x) => true);
 
     await interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: `Added ${enqueuedCount} tracks to your playlist (${formatMillisecondsAsHumanReadable(
+          title: `Added ${this.playbackService
+            .getPlaylistOrDefault()
+            .getLength()} tracks to your playlist (${formatMillisecondsAsHumanReadable(
             reducedDuration,
           )})`,
           mixin(embedBuilder) {
@@ -120,6 +119,7 @@ export class PlayItemCommand {
           },
         }),
       ],
+      ephemeral: true,
     });
   }
 

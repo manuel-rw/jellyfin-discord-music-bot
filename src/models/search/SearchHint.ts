@@ -1,6 +1,6 @@
 import { SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { GenericTrack } from '../shared/GenericTrack';
+import { Track } from '../shared/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
 export class SearchHint {
@@ -14,17 +14,10 @@ export class SearchHint {
     return `🎵 ${this.name}`;
   }
 
-  async toTracks(
-    searchService: JellyfinSearchService,
-  ): Promise<GenericTrack[]> {
+  async toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
     const remoteImages = await searchService.getRemoteImageById(this.id);
     return [
-      new GenericTrack(
-        this.id,
-        this.name,
-        this.runtimeInMilliseconds,
-        remoteImages,
-      ),
+      new Track(this.id, this.name, this.runtimeInMilliseconds, remoteImages),
     ];
   }
 

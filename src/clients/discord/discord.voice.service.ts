@@ -22,7 +22,7 @@ import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builde
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 import { GenericTryHandler } from '../../models/generic-try-handler';
 import { PlaybackService } from '../../playback/playback.service';
-import { GenericTrack } from '../../models/shared/GenericTrack';
+import { Track } from '../../models/shared/Track';
 
 import { DiscordMessageService } from './discord.message.service';
 
@@ -41,7 +41,7 @@ export class DiscordVoiceService {
   ) {}
 
   @OnEvent('internal.audio.announce')
-  handleOnNewTrack(track: GenericTrack) {
+  handleOnNewTrack(track: Track) {
     const resource = createAudioResource(
       track.getStreamUrl(this.jellyfinStreamBuilder),
     );
@@ -69,7 +69,7 @@ export class DiscordVoiceService {
         success: false,
         reply: {
           embeds: [
-            this.discordMessageService.buildErrorMessage({
+            this.discordMessageService.buildMessage({
               title: 'Unable to join your channel',
               description:
                 "I am unable to join your channel, because you don't seem to be in a voice channel. Connect to a channel first to use this command",

@@ -1,21 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { GenericPlaylist } from '../models/shared/GenericPlaylist';
+import { Playlist } from '../models/shared/Playlist';
 
 @Injectable()
 export class PlaybackService {
   private readonly logger = new Logger(PlaybackService.name);
-  private playlist: GenericPlaylist | undefined = undefined;
+  private playlist: Playlist | undefined = undefined;
 
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  getPlaylistOrDefault(): GenericPlaylist {
+  getPlaylistOrDefault(): Playlist {
     if (this.playlist) {
       return this.playlist;
     }
 
-    this.playlist = new GenericPlaylist(this.eventEmitter);
+    this.playlist = new Playlist(this.eventEmitter);
     return this.playlist;
   }
 }
