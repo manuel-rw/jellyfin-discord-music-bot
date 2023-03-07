@@ -134,6 +134,10 @@ export class JellyfinSearchService {
     const api = this.jellyfinService.getApi();
     const remoteImageApi = getRemoteImageApi(api);
 
+    this.logger.verbose(
+      `Searching for remote images of item '${id}' with limit of ${limit}`,
+    );
+
     try {
       const axiosReponse = await remoteImageApi.getRemoteImages({
         itemId: id,
@@ -151,6 +155,10 @@ export class JellyfinSearchService {
           TotalRecordCount: 0,
         };
       }
+
+      this.logger.verbose(
+        `Retrieved ${axiosReponse.data.TotalRecordCount} remote images from Jellyfin`,
+      );
       return axiosReponse.data;
     } catch (err) {
       this.logger.error(`Failed to retrieve remote images: ${err}`);

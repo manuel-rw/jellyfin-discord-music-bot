@@ -24,6 +24,9 @@ import { JellyfinClientModule } from './clients/jellyfin/jellyfin.module';
         JELLYFIN_AUTHENTICATION_USERNAME: Joi.string().required(),
         JELLYFIN_AUTHENTICATION_PASSWORD: Joi.string().required(),
         UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),
+        LOG_LEVEL: Joi.string()
+          .valid('error', 'warn', 'log', 'debug', 'verbose')
+          .default('log'),
         PORT: Joi.number().min(1),
       }),
     }),

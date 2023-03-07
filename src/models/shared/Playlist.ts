@@ -1,9 +1,9 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { GenericTrack } from './GenericTrack';
+import { Track } from './Track';
 
-export class GenericPlaylist {
-  tracks: GenericTrack[];
+export class Playlist {
+  tracks: Track[];
   activeTrackIndex?: number;
 
   constructor(private readonly eventEmitter: EventEmitter2) {
@@ -23,7 +23,7 @@ export class GenericPlaylist {
    * Checks if the active track is out of bounds
    * @returns active track or undefined if there's none
    */
-  getActiveTrack(): GenericTrack | undefined {
+  getActiveTrack(): Track | undefined {
     if (this.isActiveTrackOutOfSync()) {
       return undefined;
     }
@@ -38,6 +38,10 @@ export class GenericPlaylist {
     return (
       this.activeTrackIndex !== undefined && !this.isActiveTrackOutOfSync()
     );
+  }
+
+  getLength() {
+    return this.tracks.length;
   }
 
   /**
@@ -79,13 +83,18 @@ export class GenericPlaylist {
    * @param tracks the tracks that should be added
    * @returns the new lendth of the tracks in the playlist
    */
-  enqueueTracks(tracks: GenericTrack[]) {
+  enqueueTracks(tracks: Track[]) {
     this.eventEmitter.emit('controls.playlist.tracks.enqueued', {
       count: tracks.length,
       activeTrack: this.activeTrackIndex,
     });
     const length = this.tracks.push(...tracks);
-    this.announceTrackChange();
+
+    // emit a track change if there is no item
+    if (!this.activeTrackIndex) {
+      this.announceTrackChange();
+    }
+
     return length;
   }
 

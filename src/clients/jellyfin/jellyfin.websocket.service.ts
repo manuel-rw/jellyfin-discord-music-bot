@@ -14,7 +14,7 @@ import {
   PlayNowCommand,
   SessionApiSendPlaystateCommandRequest,
 } from '../../types/websocket';
-import { GenericTrack } from '../../models/shared/GenericTrack';
+import { Track } from '../../models/shared/Track';
 
 import { JellyfinSearchService } from './jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';

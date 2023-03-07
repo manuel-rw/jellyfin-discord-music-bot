@@ -1,8 +1,11 @@
-import { RemoteImageInfo, RemoteImageResult } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  RemoteImageInfo,
+  RemoteImageResult,
+} from '@jellyfin/sdk/lib/generated-client/models';
 
 import { JellyfinStreamBuilderService } from '../../clients/jellyfin/jellyfin.stream.builder.service';
 
-export class GenericTrack {
+export class Track {
   /**
    * The identifier of this track, structured as a UID.
    * This id can be used to build a stream url and send more API requests to Jellyfin
@@ -44,7 +47,7 @@ export class GenericTrack {
     return streamBuilder.buildStreamUrl(this.id, 96000);
   }
 
-  getRemoteImage(): RemoteImageInfo | undefined {
-    return this.remoteImages.Images.find((x) => true);
+  getRemoteImages(): RemoteImageInfo[] {
+    return this.remoteImages.Images;
   }
 }
