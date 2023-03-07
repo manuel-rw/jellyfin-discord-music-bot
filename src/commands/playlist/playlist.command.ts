@@ -10,7 +10,7 @@ import {
   UseCollectors,
 } from '@discord-nestjs/core';
 
-import { Injectable, UseInterceptors } from '@nestjs/common';
+import { Injectable, Logger, UseInterceptors } from '@nestjs/common';
 
 import {
   ActionRowBuilder,
@@ -24,13 +24,14 @@ import {
   InteractionUpdateOptions,
 } from 'discord.js';
 
-import { DiscordMessageService } from '../../clients/discord/discord.message.service';
-import { Track } from '../../models/shared/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
 import { Constants } from '../../utils/constants';
-import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
+import { DiscordMessageService } from '../../clients/discord/discord.message.service';
+import { Track } from '../../models/shared/Track';
+import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
+
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 
 class PlaylistCommandDto {
@@ -50,6 +51,9 @@ class PlaylistCommandDto {
 @UseInterceptors(CollectorInterceptor)
 @UseCollectors(PlaylistInteractionCollector)
 export class PlaylistCommand {
+  public pageData: Map<string, number> = new Map();
+  private readonly logger = new Logger(PlaylistCommand.name);
+
   constructor(
     private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
@@ -63,8 +67,13 @@ export class PlaylistCommand {
   ): Promise<void> {
     const page = dto.page ?? 0;
 
-    await interaction.reply(
+    const response = await interaction.reply(
       this.getReplyForPage(page) as InteractionReplyOptions,
+    );
+
+    this.pageData.set(response.id, page);
+    this.logger.debug(
+      `Added '${interaction.id}' as a message id for page storage`,
     );
   }
 
@@ -78,7 +87,7 @@ export class PlaylistCommand {
   ): InteractionReplyOptions | InteractionUpdateOptions {
     const chunks = this.getChunks();
 
-    if (page + 1 >= chunks.length) {
+    if (page >= chunks.length) {
       return {
         embeds: [
           this.discordMessageService.buildMessage({
