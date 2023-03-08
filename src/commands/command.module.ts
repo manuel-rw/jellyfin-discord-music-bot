@@ -8,7 +8,7 @@ import { PlaylistCommand } from './playlist/playlist.command';
 import { DisconnectCommand } from './disconnect.command';
 import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
-import { PlayItemCommand } from './play.comands';
+import { PlayItemCommand } from './play/play.comands';
 import { PreviousTrackCommand } from './previous.command';
 import { SkipTrackCommand } from './next.command';
 import { StatusCommand } from './status.command';

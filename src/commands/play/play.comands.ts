@@ -20,13 +20,14 @@ import {
   InteractionReplyOptions,
 } from 'discord.js';
 
-import { SearchType, TrackRequestDto } from '../models/track-request.dto';
-import { PlaybackService } from '../playback/playback.service';
-import { formatMillisecondsAsHumanReadable } from '../utils/timeUtils';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { JellyfinSearchService } from '../clients/jellyfin/jellyfin.search.service';
-import { SearchHint } from '../models/search/SearchHint';
+import { PlaybackService } from '../../playback/playback.service';
+import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
+import { DiscordMessageService } from '../../clients/discord/discord.message.service';
+import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
+import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
+import { SearchHint } from '../../models/search/SearchHint';
+
+import { SearchType, PlayCommandParams } from './play.params.ts';
 
 @Injectable()
 @Command({
@@ -45,12 +46,12 @@ export class PlayItemCommand {
 
   @Handler()
   async handler(
-    @InteractionEvent(SlashCommandPipe) dto: TrackRequestDto,
+    @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
   ): Promise<InteractionReplyOptions | string> {
     await interaction.deferReply({ ephemeral: true });
 
-    const baseItems = TrackRequestDto.getBaseItemKinds(dto.type);
+    const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
     let item: SearchHint;
     if (dto.name.startsWith('native-')) {
@@ -149,7 +150,7 @@ export class PlayItemCommand {
     const hints = await this.jellyfinSearchService.searchItem(
       searchQuery,
       20,
-      TrackRequestDto.getBaseItemKinds(type),
+      PlayCommandParams.getBaseItemKinds(type),
     );
 
     if (hints.length === 0) {

@@ -5,8 +5,6 @@ import {
   Handler,
   IA,
   InteractionEvent,
-  Param,
-  ParamType,
   UseCollectors,
 } from '@discord-nestjs/core';
 
@@ -33,15 +31,7 @@ import { Track } from '../../models/shared/Track';
 import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
-
-class PlaylistCommandDto {
-  @Param({
-    required: false,
-    description: 'The page',
-    type: ParamType.INTEGER,
-  })
-  page: number;
-}
+import { PlaylistCommandParams } from './playlist.params';
 
 @Injectable()
 @Command({
@@ -61,7 +51,7 @@ export class PlaylistCommand {
 
   @Handler()
   async handler(
-    @InteractionEvent(SlashCommandPipe) dto: PlaylistCommandDto,
+    @InteractionEvent(SlashCommandPipe) dto: PlaylistCommandParams,
     @IA() interaction: CommandInteraction,
     @AppliedCollectors(0) collector: InteractionCollector<ButtonInteraction>,
   ): Promise<void> {

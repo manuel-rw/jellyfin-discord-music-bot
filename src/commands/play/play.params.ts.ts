@@ -8,7 +8,7 @@ export enum SearchType {
   Playlist = 2,
 }
 
-export class TrackRequestDto {
+export class PlayCommandParams {
   @Param({
     required: true,
     description: 'Item name on Jellyfin',
