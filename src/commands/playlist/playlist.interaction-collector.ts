@@ -17,7 +17,7 @@ import {
 import { PlaylistCommand } from './playlist.command';
 
 @Injectable({ scope: Scope.REQUEST })
-@InteractionEventCollector({ time: 15 * 1000 })
+@InteractionEventCollector({ time: 60 * 1000 })
 export class PlaylistInteractionCollector {
   private readonly logger = new Logger(PlaylistInteractionCollector.name);
 

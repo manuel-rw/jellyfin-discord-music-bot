@@ -75,6 +75,15 @@ export class PlaylistCommand {
     this.logger.debug(
       `Added '${interaction.id}' as a message id for page storage`,
     );
+
+    setTimeout(async () => {
+      this.logger.log(
+        `Removed the components of message from interaction '${interaction.id}' because the event collector has reachted the timeout`,
+      );
+      await interaction.editReply({
+        components: [],
+      });
+    }, 60 * 1000);
   }
 
   private getChunks() {
@@ -86,6 +95,19 @@ export class PlaylistCommand {
     page: number,
   ): InteractionReplyOptions | InteractionUpdateOptions {
     const chunks = this.getChunks();
+
+    if (chunks.length === 0) {
+      return {
+        embeds: [
+          this.discordMessageService.buildMessage({
+            title: 'There are no items in your playlist',
+            description:
+              'Use the ``/play`` command to add new items to your playlist',
+          }),
+        ],
+        ephemeral: true,
+      };
+    }
 
     if (page >= chunks.length) {
       return {
@@ -136,6 +158,7 @@ export class PlaylistCommand {
       embeds: [contentForPage.toJSON()],
       ephemeral: true,
       components: [rowBuilder],
+      fetchReply: true,
     };
   }
 
@@ -149,11 +172,14 @@ export class PlaylistCommand {
       return undefined;
     }
 
+    const offset = page * 10;
+
     const content = chunks[page]
       .map((track, index) => {
         const isCurrent = track === playlist.getActiveTrack();
 
-        let point = this.getListPoint(isCurrent, index);
+        // use the offset for the page, add the current index and offset by one because the array index is used
+        let point = `${offset + index + 1}. `;
         point += `**${trimStringToFixedLength(track.name, 30)}**`;
 
         if (isCurrent) {
@@ -169,13 +195,5 @@ export class PlaylistCommand {
       .join('\n');
 
     return new EmbedBuilder().setTitle('Your playlist').setDescription(content);
-  }
-
-  private getListPoint(isCurrent: boolean, index: number) {
-    if (isCurrent) {
-      return `${index + 1}. `;
-    }
-
-    return `${index + 1}. `;
   }
 }
