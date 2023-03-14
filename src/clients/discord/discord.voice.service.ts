@@ -234,23 +234,6 @@ export class DiscordVoiceService {
       this.logger.error(`Voice connection error: ${err}`);
     });
 
-    // Tempoary keep alive fix for servers, see https://github.com/discordjs/discord.js/issues/9185
-    this.voiceConnection.on('stateChange', (oldState, newState) => {
-      const oldNetworking = Reflect.get(oldState, 'networking');
-      const newNetworking = Reflect.get(newState, 'networking');
-
-      const networkStateChangeHandler = (
-        oldNetworkState: any,
-        newNetworkState: any,
-      ) => {
-        const newUdp = Reflect.get(newNetworkState, 'udp');
-        clearInterval(newUdp?.keepAliveInterval);
-      };
-
-      oldNetworking?.off('stateChange', networkStateChangeHandler);
-      newNetworking?.on('stateChange', networkStateChangeHandler);
-    });
-
     this.audioPlayer.on('debug', (message) => {
       this.logger.debug(message);
     });
