@@ -91,7 +91,7 @@ export class Playlist {
     const length = this.tracks.push(...tracks);
 
     // emit a track change if there is no item
-    if (!this.activeTrackIndex) {
+    if (this.activeTrackIndex === undefined) {
       this.announceTrackChange();
     }
 
