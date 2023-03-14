@@ -1,18 +1,24 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-import { JellyfinService } from './jellyfin.service';
-
 import {
   PlaystateCommand,
   SessionMessageType,
 } from '@jellyfin/sdk/lib/generated-client/models';
-import { WebSocket } from 'ws';
-import { PlaybackService } from '../../playback/playback.service';
-import { JellyfinSearchService } from './jellyfin.search.service';
-import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
-import { Track } from '../../types/track';
-import { PlayNowCommand, SessionApiSendPlaystateCommandRequest } from '../../types/websocket';
+
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
+import { WebSocket } from 'ws';
+
+import { PlaybackService } from '../../playback/playback.service';
+import {
+  PlayNowCommand,
+  SessionApiSendPlaystateCommandRequest,
+} from '../../types/websocket';
+import { Track } from '../../models/shared/Track';
+
+import { JellyfinSearchService } from './jellyfin.search.service';
+import { JellyfinService } from './jellyfin.service';
+import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -82,7 +88,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     return this.webSocket.readyState;
   }
 
-  protected messageHandler(data: any) {
+  protected async messageHandler(data: any) {
     const msg: JellyMessage<unknown> = JSON.parse(data);
 
     switch (msg.MessageType) {
@@ -98,42 +104,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         data.getSelection = PlayNowCommand.prototype.getSelection;
         const ids = data.getSelection();
 
-        this.logger.debug(
-          `Adding ${ids.length} ids to the queue using controls from the websocket`,
-        );
-
-        ids.forEach((id, index) => {
-          this.jellyfinSearchService
-            .getById(id)
-            .then((response) => {
-              const track: Track = {
-                name: response.Name,
-                durationInMilliseconds: response.RunTimeTicks / 10000,
-                jellyfinId: response.Id,
-                streamUrl: this.jellyfinStreamBuilderService.buildStreamUrl(
-                  response.Id,
-                  96000,
-                ),
-                remoteImages: {
-                  Images: [],
-                  Providers: [],
-                  TotalRecordCount: 0,
-                },
-              };
-
-              const trackId = this.playbackService.enqueueTrack(track);
-
-              if (index !== 0) {
-                return;
-              }
-
-              this.playbackService.setActiveTrack(trackId);
-              this.playbackService.getActiveTrackAndEmitEvent();
-            })
-            .catch((err) => {
-              this.logger.error(err);
-            });
-        });
+        // TODO: Implement this again
         break;
       case SessionMessageType[SessionMessageType.Playstate]:
         const sendPlaystateCommandRequest =

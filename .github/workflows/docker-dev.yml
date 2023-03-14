@@ -23,7 +23,7 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
-      packages: writement work
+      packages: write
       contents: read
     steps:
       - name: Setup
@@ -41,6 +41,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
+      - run: yarn test
       - run: yarn build
       - name: Docker meta
         id: meta

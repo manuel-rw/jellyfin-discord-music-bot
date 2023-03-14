@@ -1,5 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common';
-
 import { Api } from '@jellyfin/sdk';
 import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api';
 import { SessionApi } from '@jellyfin/sdk/lib/generated-client/api/session-api';
@@ -9,9 +7,12 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api';
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
+
+import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Track } from '../../types/track';
+
 import { PlaybackService } from '../../playback/playback.service';
+import { Track } from '../../types/track';
 
 @Injectable()
 export class JellyinPlaystateService {
@@ -50,37 +51,6 @@ export class JellyinPlaystateService {
     await this.playstateApi.reportPlaybackStart({
       playbackStartInfo: {
         ItemId: track.jellyfinId,
-      },
-    });
-  }
-
-  @OnEvent('playback.state.pause')
-  private async onPlaybackPaused(isPaused: boolean) {
-    const activeTrack = this.playbackService.getActiveTrack();
-
-    if (!activeTrack) {
-      return;
-    }
-
-    await this.playstateApi.reportPlaybackProgress({
-      playbackProgressInfo: {
-        ItemId: activeTrack.track.jellyfinId,
-        IsPaused: isPaused,
-      },
-    });
-  }
-
-  @OnEvent('playback.state.stop')
-  private async onPlaybackStopped() {
-    const activeTrack = this.playbackService.getActiveTrack();
-    
-    if (!activeTrack) {
-      return;
-    }
-
-    await this.playstateApi.reportPlaybackStopped({
-      playbackStopInfo: {
-        ItemId: activeTrack.track.jellyfinId,
       },
     });
   }

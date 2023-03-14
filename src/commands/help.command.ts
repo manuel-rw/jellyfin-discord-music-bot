@@ -1,18 +1,21 @@
-import { TransformPipe } from '@discord-nestjs/common';
+import { Command, Handler, IA } from '@discord-nestjs/core';
 
-import { Command, DiscordCommand, UsePipes } from '@discord-nestjs/core';
+import { Injectable } from '@nestjs/common';
+
 import { CommandInteraction } from 'discord.js';
+
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 
+@Injectable()
 @Command({
   name: 'help',
   description: 'Get help if you&apos;re having problems with this bot',
 })
-@UsePipes(TransformPipe)
-export class HelpCommand implements DiscordCommand {
+export class HelpCommand {
   constructor(private readonly discordMessageService: DiscordMessageService) {}
 
-  async handler(interaction: CommandInteraction): Promise<void> {
+  @Handler()
+  async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
