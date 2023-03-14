@@ -57,11 +57,11 @@ export class PlaylistCommand {
   ): Promise<void> {
     const page = dto.page ?? 0;
 
-    const response = await interaction.reply(
+    await interaction.reply(
       this.getReplyForPage(page) as InteractionReplyOptions,
     );
 
-    this.pageData.set(response.id, page);
+    this.pageData.set(interaction.id, page);
     this.logger.debug(
       `Added '${interaction.id}' as a message id for page storage`,
     );
@@ -70,6 +70,7 @@ export class PlaylistCommand {
       this.logger.log(
         `Removed the components of message from interaction '${interaction.id}' because the event collector has reachted the timeout`,
       );
+      this.pageData.delete(interaction.id);
       await interaction.editReply({
         components: [],
       });
@@ -156,15 +157,26 @@ export class PlaylistCommand {
     chunks: Track[][],
     page: number,
   ): EmbedBuilder | undefined {
+    this.logger.verbose(
+      `Received request for page ${page} of playlist page chunks`,
+    );
     const playlist = this.playbackService.getPlaylistOrDefault();
 
     if (page >= chunks.length || page < 0) {
+      this.logger.warn(`Request for page chunks was out of range: ${page}`);
       return undefined;
     }
 
     const offset = page * 10;
+    const chunk = chunks[page];
 
-    const content = chunks[page]
+    if (!chunk) {
+      this.logger.error(
+        `Failed to extract chunk from playlist chunks array with page ${page}`,
+      );
+    }
+
+    const content = chunk
       .map((track, index) => {
         const isCurrent = track === playlist.getActiveTrack();
 

@@ -36,6 +36,9 @@ export class PlaylistInteractionCollector {
   @On('collect')
   async onCollect(interaction: ButtonInteraction): Promise<void> {
     const targetPage = this.getInteraction(interaction);
+    this.logger.verbose(
+      `Extracted the target page ${targetPage} from the button interaction`,
+    );
 
     if (targetPage === undefined) {
       await interaction.update({
@@ -54,6 +57,13 @@ export class PlaylistInteractionCollector {
 
   private getInteraction(interaction: ButtonInteraction): number | null {
     const current = this.playlistCommand.pageData.get(this.causeInteraction.id);
+
+    if (current === undefined) {
+      this.logger.warn(
+        `Unable to extract the current page from the cause interaction '${this.causeInteraction.id}'`,
+      );
+      return undefined;
+    }
 
     this.logger.debug(
       `Retrieved current page from command using id '${
