@@ -18,10 +18,7 @@ export class SearchHint {
   }
 
   async toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
-    const remoteImages = await searchService.getRemoteImageById(this.id);
-    return [
-      new Track(this.id, this.name, this.runtimeInMilliseconds, remoteImages),
-    ];
+    return [new Track(this.id, this.name, this.runtimeInMilliseconds, {})];
   }
 
   getId(): string {
