@@ -1,7 +1,10 @@
-import { SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  BaseItemDto,
+  SearchHint as JellyfinSearchHint,
+} from '@jellyfin/sdk/lib/generated-client/models';
 
-import { Track } from '../shared/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
+import { Track } from '../shared/Track';
 
 export class SearchHint {
   constructor(
@@ -27,5 +30,13 @@ export class SearchHint {
 
   static constructFromHint(hint: JellyfinSearchHint) {
     return new SearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
+  }
+
+  static constructFromBaseItem(baseItem: BaseItemDto) {
+    return new SearchHint(
+      baseItem.Id,
+      baseItem.Name,
+      baseItem.RunTimeTicks / 10000,
+    );
   }
 }
