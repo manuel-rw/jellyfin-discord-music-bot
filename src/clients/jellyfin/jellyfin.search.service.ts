@@ -170,6 +170,30 @@ export class JellyfinSearchService {
     }
   }
 
+  async getRandomTracks(limit: number) {
+    const api = this.jellyfinService.getApi();
+    const searchApi = getItemsApi(api);
+
+    try {
+      const response = await searchApi.getItems({
+        includeItemTypes: [BaseItemKind.Audio],
+        limit: limit,
+        sortBy: ['random'],
+        userId: this.jellyfinService.getUserId(),
+        recursive: true,
+      });
+
+      return response.data.Items.map((item) => {
+        return SearchHint.constructFromBaseItem(item);
+      });
+    } catch (err) {
+      this.logger.error(
+        `Unabele to retrieve random items from Jellyfin: ${err}`,
+      );
+      return [];
+    }
+  }
+
   private transformToSearchHint(jellyifnHint: JellyfinSearchHint) {
     switch (jellyifnHint.Type) {
       case BaseItemKind[BaseItemKind.Audio]:

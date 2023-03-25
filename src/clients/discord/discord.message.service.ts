@@ -39,7 +39,7 @@ export class DiscordMessageService {
   }: {
     title: string;
     description?: string;
-    authorUrl?: string;
+    authorUrl?: string | undefined;
     mixin?: (embedBuilder: EmbedBuilder) => EmbedBuilder;
   }): APIEmbed {
     let embedBuilder = new EmbedBuilder()
