@@ -94,9 +94,13 @@ export class PlayItemCommand {
     }
 
     const tracks = await item.toTracks(this.jellyfinSearchService);
+    this.logger.debug(`Extracted ${tracks.length} tracks from the search item`);
     const reducedDuration = tracks.reduce(
       (sum, item) => sum + item.duration,
       0,
+    );
+    this.logger.debug(
+      `Adding ${tracks.length} tracks with a duration of ${reducedDuration} ticks`,
     );
     this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
