@@ -45,7 +45,7 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.2.0",
+    "@nestjs/cli": "^9.3.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.3.10",
     "@types/cron": "^2.0.0",
