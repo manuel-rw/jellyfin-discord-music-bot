@@ -84,6 +84,10 @@ export class Playlist {
    * @returns the new lendth of the tracks in the playlist
    */
   enqueueTracks(tracks: Track[]) {
+    if (tracks.length === 0) {
+      return 0;
+    }
+
     this.eventEmitter.emit('controls.playlist.tracks.enqueued', {
       count: tracks.length,
       activeTrack: this.activeTrackIndex,
