@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import axios from 'axios';
 import { Client, GuildMember } from 'discord.js';
+import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/github-release';
 import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
@@ -14,7 +15,6 @@ describe('UpdatesService', () => {
   const OLD_ENV = process.env;
 
   let updatesService: UpdatesService;
-  let discordClient: Client;
   let discordMessageService: DiscordMessageService;
 
   beforeEach(async () => {
@@ -54,7 +54,6 @@ describe('UpdatesService', () => {
       .compile();
 
     updatesService = moduleRef.get<UpdatesService>(UpdatesService);
-    discordClient = moduleRef.get<Client>('__inject_discord_client__');
     discordMessageService = moduleRef.get<DiscordMessageService>(
       DiscordMessageService,
     );
@@ -88,6 +87,12 @@ describe('UpdatesService', () => {
 
   it('handleCronShouldNotifyWhenNewRelease', async () => {
     process.env.UPDATER_DISABLE_NOTIFICATIONS = 'false';
+    Constants.Metadata.Version = {
+      All: () => '0.0.5',
+      Major: 0,
+      Minor: 0,
+      Patch: 5,
+    };
 
     mockedAxios.mockResolvedValue({
       data: {
