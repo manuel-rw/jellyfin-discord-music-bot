@@ -43,6 +43,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup
+        uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn install --immutable
+      - run: yarn test:cov
       - name: Analyze with SonarCloud
 
         # You can pin the exact commit or the version.
@@ -58,6 +74,7 @@ jobs:
             # mandatory
             -Dsonar.projectKey=manuel-rw_jellyfin-discord-music-bot
             -Dsonar.organization=manuel-rw
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             # Comma-separated paths to directories containing main source files.
             #-Dsonar.sources= # optional, default is project base directory
             # When you need the analysis to take place in a directory other than the one from which it was launched
