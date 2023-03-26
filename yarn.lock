@@ -424,13 +424,6 @@
     "@discordjs/node-pre-gyp" "^0.4.5"
     node-addon-api "^5.0.0"
 
-"@discordjs/opus@discordjs/opus":
-  version "0.9.0"
-  resolved "https://codeload.github.com/discordjs/opus/tar.gz/814e500c2785c5207ace19650192629beba2728b"
-  dependencies:
-    "@discordjs/node-pre-gyp" "^0.4.5"
-    node-addon-api "^5.0.0"
-
 "@discordjs/rest@^1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@discordjs/rest/-/rest-1.6.0.tgz#d77c9b5533f6d2079468d4fd497d3fabeb529c20"
@@ -4161,6 +4154,11 @@ optionator@^0.9.1:
     prelude-ls "^1.2.1"
     type-check "^0.4.0"
     word-wrap "^1.2.3"
+
+opusscript@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/opusscript/-/opusscript-0.0.8.tgz#00b49e81281b4d99092d013b1812af8654bd0a87"
+  integrity sha512-VSTi1aWFuCkRCVq+tx/BQ5q9fMnQ9pVZ3JU4UHKqTkf0ED3fKEPdr+gKAAl3IA2hj9rrP6iyq3hlcJq3HELtNQ==
 
 ora@5.4.1, ora@^5.4.1:
   version "5.4.1"
