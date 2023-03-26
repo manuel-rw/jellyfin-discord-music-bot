@@ -10,7 +10,6 @@ import { DiscordMessageService } from 'src/clients/discord/discord.message.servi
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
 import { SearchHint } from 'src/models/search/SearchHint';
-import { Track } from 'src/models/shared/Track';
 import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
 

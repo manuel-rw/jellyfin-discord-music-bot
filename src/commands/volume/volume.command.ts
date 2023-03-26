@@ -5,7 +5,6 @@ import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 
 import { CommandInteraction } from 'discord.js';
-import e from 'express';
 import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { PlaybackService } from 'src/playback/playback.service';
