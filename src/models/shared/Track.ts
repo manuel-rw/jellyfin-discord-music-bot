@@ -25,7 +25,7 @@ export class Track {
   /**
    * A result object that contains a collection of images that are available outside the current network.
    */
-  readonly remoteImages?: RemoteImageResult;
+  remoteImages?: RemoteImageResult;
 
   constructor(
     id: string,

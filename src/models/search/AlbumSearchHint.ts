@@ -17,10 +17,17 @@ export class AlbumSearchHint extends SearchHint {
   override async toTracks(
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
+    const remoteImages = await searchService.getRemoteImageById(this.id);
+
     const albumItems = await searchService.getAlbumItems(this.id);
-    const tracks = albumItems.map(async (x) =>
-      (await x.toTracks(searchService)).find((x) => x !== null),
+    const tracks = await Promise.all(
+      albumItems.map(async (x) =>
+        (await x.toTracks(searchService)).find((x) => x !== null),
+      ),
     );
-    return await Promise.all(tracks);
+    return tracks.map((track): Track => {
+      track.remoteImages = remoteImages;
+      return track;
+    });
   }
 }

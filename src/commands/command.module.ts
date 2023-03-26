@@ -15,6 +15,8 @@ import { StatusCommand } from './status.command';
 import { StopPlaybackCommand } from './stop.command';
 import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
+import { EnqueueRandomItemsCommand } from './random/random.command';
+import { VolumeCommand } from './volume/volume.command';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { PlaylistInteractionCollector } from './playlist/playlist.interaction-co
     PlaylistInteractionCollector,
     HelpCommand,
     StatusCommand,
+    EnqueueRandomItemsCommand,
     PlaylistCommand,
     DisconnectCommand,
     PausePlaybackCommand,
@@ -36,6 +39,7 @@ import { PlaylistInteractionCollector } from './playlist/playlist.interaction-co
     SummonCommand,
     PlayItemCommand,
     PreviousTrackCommand,
+    VolumeCommand,
   ],
   exports: [],
 })
