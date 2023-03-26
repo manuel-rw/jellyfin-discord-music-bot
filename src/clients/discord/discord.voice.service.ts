@@ -29,8 +29,9 @@ import { DiscordMessageService } from './discord.message.service';
 @Injectable()
 export class DiscordVoiceService {
   private readonly logger = new Logger(DiscordVoiceService.name);
-  private audioPlayer: AudioPlayer;
-  private voiceConnection: VoiceConnection;
+  private audioPlayer: AudioPlayer | undefined;
+  private voiceConnection: VoiceConnection | undefined;
+  private audioResource: AudioResource | undefined;
 
   constructor(
     private readonly discordMessageService: DiscordMessageService,
@@ -44,6 +45,9 @@ export class DiscordVoiceService {
   handleOnNewTrack(track: Track) {
     const resource = createAudioResource(
       track.getStreamUrl(this.jellyfinStreamBuilder),
+      {
+        inlineVolume: true,
+      },
     );
     this.playResource(resource);
   }
@@ -99,9 +103,14 @@ export class DiscordVoiceService {
     };
   }
 
+  changeVolume(volume: number) {
+    this.audioResource.volume.setVolume(volume);
+  }
+
   playResource(resource: AudioResource<unknown>) {
     this.logger.debug(`Playing audio resource with volume ${resource.volume}`);
     this.createAndReturnOrGetAudioPlayer().play(resource);
+    this.audioResource = resource;
   }
 
   /**
