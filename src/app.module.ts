@@ -28,6 +28,7 @@ import { UpdatesModule } from './updates/updates.module';
         UPDATER_DISABLE_NOTIFICATIONS: Joi.boolean(),
         LOG_LEVEL: Joi.string()
           .valid('error', 'warn', 'log', 'debug', 'verbose')
+          .insensitive()
           .default('log'),
         PORT: Joi.number().min(1),
       }),
