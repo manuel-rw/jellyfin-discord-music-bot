@@ -266,6 +266,7 @@ export class DiscordVoiceService {
 
       const playlist = this.playbackService.getPlaylistOrDefault();
       const finishedTrack = playlist.getActiveTrack();
+      finishedTrack.playing = false;
 
       this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
 
