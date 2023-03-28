@@ -10,9 +10,9 @@ import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { Track } from 'src/models/shared/Track';
 
 import { PlaybackService } from '../../playback/playback.service';
-import { Track } from '../../types/track';
 
 @Injectable()
 export class JellyinPlaystateService {
@@ -46,11 +46,28 @@ export class JellyinPlaystateService {
     this.logger.debug('Reported playback capabilities sucessfully');
   }
 
-  @OnEvent('playback.newTrack')
+  @OnEvent('internal.audio.track.announce')
   private async onPlaybackNewTrack(track: Track) {
+    this.logger.debug(`Reporting playback start on track '${track.id}'`);
     await this.playstateApi.reportPlaybackStart({
       playbackStartInfo: {
-        ItemId: track.jellyfinId,
+        ItemId: track.id,
+      },
+    });
+  }
+
+  @OnEvent('internal.audio.track.finish')
+  private async onPlaybackFinished(track: Track) {
+    if (!track) {
+      this.logger.error(
+        `Unable to report playback because finished track was undefined`,
+      );
+      return;
+    }
+    this.logger.debug(`Reporting playback finish on track '${track.id}'`);
+    await this.playstateApi.reportPlaybackStopped({
+      playbackStopInfo: {
+        ItemId: track.id,
       },
     });
   }
