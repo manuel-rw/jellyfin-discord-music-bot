@@ -129,7 +129,9 @@ export class Playlist {
       this.activeTrackIndex = 0;
     }
 
-    this.eventEmitter.emit('internal.audio.announce', this.getActiveTrack());
+    const activeTrack = this.getActiveTrack();
+    activeTrack.playing = true;
+    this.eventEmitter.emit('internal.audio.announce', activeTrack);
   }
 
   private isActiveTrackOutOfSync(): boolean {

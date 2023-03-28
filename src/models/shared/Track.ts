@@ -27,6 +27,8 @@ export class Track {
    */
   remoteImages?: RemoteImageResult;
 
+  playing: boolean;
+
   constructor(
     id: string,
     name: string,
