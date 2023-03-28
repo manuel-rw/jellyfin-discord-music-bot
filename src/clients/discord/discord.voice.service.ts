@@ -41,7 +41,7 @@ export class DiscordVoiceService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent('internal.audio.announce')
+  @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
     const resource = createAudioResource(
       track.getStreamUrl(this.jellyfinStreamBuilder),
@@ -264,9 +264,12 @@ export class DiscordVoiceService {
 
       this.logger.debug(`Audio player finished playing old resource`);
 
-      const hasNextTrack = this.playbackService
-        .getPlaylistOrDefault()
-        .hasNextTrackInPlaylist();
+      const playlist = this.playbackService.getPlaylistOrDefault();
+      const finishedTrack = playlist.getActiveTrack();
+
+      this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
+
+      const hasNextTrack = playlist.hasNextTrackInPlaylist();
 
       this.logger.debug(
         `Playlist has next track: ${hasNextTrack ? 'yes' : 'no'}`,

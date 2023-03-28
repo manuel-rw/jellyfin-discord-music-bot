@@ -49,6 +49,8 @@ export class Playlist {
    * @returns if the track has been changed successfully
    */
   setNextTrackAsActiveTrack(): boolean {
+    this.announceTrackFinishIfSet();
+
     if (this.activeTrackIndex >= this.tracks.length) {
       return false;
     }
@@ -66,6 +68,8 @@ export class Playlist {
    * @returns if the track has been changed successfully
    */
   setPreviousTrackAsActiveTrack(): boolean {
+    this.announceTrackFinishIfSet();
+
     if (this.activeTrackIndex <= 0) {
       return false;
     }
@@ -124,12 +128,24 @@ export class Playlist {
     this.activeTrackIndex = undefined;
   }
 
+  private announceTrackFinishIfSet() {
+    if (this.activeTrackIndex === undefined) {
+      return;
+    }
+
+    const currentTrack = this.getActiveTrack();
+    this.eventEmitter.emit('internal.audio.track.finish', currentTrack);
+  }
+
   private announceTrackChange() {
     if (!this.activeTrackIndex) {
       this.activeTrackIndex = 0;
     }
 
-    this.eventEmitter.emit('internal.audio.announce', this.getActiveTrack());
+    this.eventEmitter.emit(
+      'internal.audio.track.announce',
+      this.getActiveTrack(),
+    );
   }
 
   private isActiveTrackOutOfSync(): boolean {
