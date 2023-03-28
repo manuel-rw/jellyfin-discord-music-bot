@@ -92,11 +92,20 @@ export class Playlist {
       return 0;
     }
 
+    const previousTrackLength = this.tracks.length;
+
     this.eventEmitter.emit('controls.playlist.tracks.enqueued', {
       count: tracks.length,
       activeTrack: this.activeTrackIndex,
     });
     const length = this.tracks.push(...tracks);
+
+    // existing tracks are in the playlist, but none are playing. play the first track out of the new tracks
+    if (!this.hasAnyPlaying() && tracks.length > 0) {
+      this.activeTrackIndex = previousTrackLength;
+      this.announceTrackChange();
+      return length;
+    }
 
     // emit a track change if there is no item
     if (this.activeTrackIndex === undefined) {
@@ -126,6 +135,10 @@ export class Playlist {
     this.eventEmitter.emit('controls.playlist.tracks.clear');
     this.tracks = [];
     this.activeTrackIndex = undefined;
+  }
+
+  private hasAnyPlaying() {
+    return this.tracks.some((track) => track.playing);
   }
 
   private announceTrackFinishIfSet() {
