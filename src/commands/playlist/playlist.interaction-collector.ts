@@ -30,7 +30,10 @@ export class PlaylistInteractionCollector {
 
   @Filter()
   filter(interaction: ButtonInteraction): boolean {
-    return this.causeInteraction.id === interaction.message.interaction.id;
+    return (
+      interaction.message.interaction !== null &&
+      this.causeInteraction.id === interaction.message.interaction.id
+    );
   }
 
   @On('collect')
@@ -55,7 +58,7 @@ export class PlaylistInteractionCollector {
     await interaction.update(reply as InteractionUpdateOptions);
   }
 
-  private getInteraction(interaction: ButtonInteraction): number | null {
+  private getInteraction(interaction: ButtonInteraction): number | undefined {
     const current = this.playlistCommand.pageData.get(this.causeInteraction.id);
 
     if (current === undefined) {

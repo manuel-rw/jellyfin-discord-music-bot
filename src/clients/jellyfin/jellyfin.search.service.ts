@@ -1,4 +1,5 @@
 import {
+  BaseItemDto,
   BaseItemKind,
   RemoteImageResult,
   SearchHint as JellyfinSearchHint,
@@ -57,9 +58,13 @@ export class JellyfinSearchService {
 
       const { SearchHints } = data;
 
-      return SearchHints.map((hint) => this.transformToSearchHint(hint)).filter(
-        (x) => x !== null,
-      );
+      if (!SearchHints) {
+        throw new Error('SearchHints were undefined');
+      }
+
+      return SearchHints.map((hint) =>
+        this.transformToSearchHintFromHint(hint),
+      ).filter((x) => x !== null) as SearchHint[];
     } catch (err) {
       this.logger.error(`Failed to search on Jellyfin: ${err}`);
       return [];
@@ -82,8 +87,15 @@ export class JellyfinSearchService {
       return [];
     }
 
+    if (!axiosResponse.data.Items) {
+      this.logger.error(
+        `Jellyfin search returned no items: ${axiosResponse.data}`,
+      );
+      return [];
+    }
+
     return axiosResponse.data.Items.map((hint) =>
-      SearchHint.constructFromHint(hint),
+      SearchHint.constructFromBaseItem(hint),
     );
   }
 
@@ -104,6 +116,13 @@ export class JellyfinSearchService {
       return [];
     }
 
+    if (!axiosResponse.data.SearchHints) {
+      this.logger.error(
+        `Received an unexpected empty list but expected a list of tracks of the album`,
+      );
+      return [];
+    }
+
     return [...axiosResponse.data.SearchHints]
       .reverse()
       .map((hint) => SearchHint.constructFromHint(hint));
@@ -112,7 +131,7 @@ export class JellyfinSearchService {
   async getById(
     id: string,
     includeItemTypes: BaseItemKind[],
-  ): Promise<SearchHint> | undefined {
+  ): Promise<SearchHint | undefined> {
     const api = this.jellyfinService.getApi();
 
     const searchApi = getItemsApi(api);
@@ -122,18 +141,18 @@ export class JellyfinSearchService {
       includeItemTypes: includeItemTypes,
     });
 
-    if (data.Items.length !== 1) {
+    if (!data.Items || data.Items.length !== 1) {
       this.logger.warn(`Failed to retrieve item via id '${id}'`);
-      return null;
+      return undefined;
     }
 
-    return this.transformToSearchHint(data.Items[0]);
+    return this.transformToSearchHintFromBaseItemDto(data.Items[0]);
   }
 
   async getAllById(
     ids: string[],
     includeItemTypes: BaseItemKind[] = [BaseItemKind.Audio],
-  ): Promise<SearchHint[]> | undefined {
+  ): Promise<SearchHint[]> {
     const api = this.jellyfinService.getApi();
 
     const searchApi = getItemsApi(api);
@@ -143,12 +162,14 @@ export class JellyfinSearchService {
       includeItemTypes: includeItemTypes,
     });
 
-    if (data.Items.length !== 1) {
+    if (!data.Items || data.Items.length !== 1) {
       this.logger.warn(`Failed to retrieve item via id '${ids}'`);
-      return null;
+      return [];
     }
 
-    return data.Items.map((item) => this.transformToSearchHint(item));
+    return data.Items.map((item) =>
+      this.transformToSearchHintFromBaseItemDto(item),
+    ).filter((searchHint) => searchHint !== undefined) as SearchHint[];
   }
 
   async getRemoteImageById(id: string, limit = 20): Promise<RemoteImageResult> {
@@ -204,18 +225,25 @@ export class JellyfinSearchService {
         recursive: true,
       });
 
+      if (!response.data.Items) {
+        this.logger.error(
+          `Received empty list of items but expected a random list of tracks`,
+        );
+        return [];
+      }
+
       return response.data.Items.map((item) => {
         return SearchHint.constructFromBaseItem(item);
       });
     } catch (err) {
       this.logger.error(
-        `Unabele to retrieve random items from Jellyfin: ${err}`,
+        `Unable to retrieve random items from Jellyfin: ${err}`,
       );
       return [];
     }
   }
 
-  private transformToSearchHint(jellyifnHint: JellyfinSearchHint) {
+  private transformToSearchHintFromHint(jellyifnHint: JellyfinSearchHint) {
     switch (jellyifnHint.Type) {
       case BaseItemKind[BaseItemKind.Audio]:
         return SearchHint.constructFromHint(jellyifnHint);
@@ -227,7 +255,23 @@ export class JellyfinSearchService {
         this.logger.warn(
           `Received unexpected item type from Jellyfin search: ${jellyifnHint.Type}`,
         );
-        return null;
+        return undefined;
+    }
+  }
+
+  private transformToSearchHintFromBaseItemDto(baseItemDto: BaseItemDto) {
+    switch (baseItemDto.Type) {
+      case BaseItemKind[BaseItemKind.Audio]:
+        return SearchHint.constructFromBaseItem(baseItemDto);
+      case BaseItemKind[BaseItemKind.MusicAlbum]:
+        return AlbumSearchHint.constructFromBaseItem(baseItemDto);
+      case BaseItemKind[BaseItemKind.Playlist]:
+        return PlaylistSearchHint.constructFromBaseItem(baseItemDto);
+      default:
+        this.logger.warn(
+          `Received unexpected item type from Jellyfin search: ${baseItemDto.Type}`,
+        );
+        return undefined;
     }
   }
 }
