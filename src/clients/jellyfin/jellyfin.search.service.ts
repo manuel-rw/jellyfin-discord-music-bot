@@ -130,6 +130,27 @@ export class JellyfinSearchService {
     return this.transformToSearchHint(data.Items[0]);
   }
 
+  async getAllById(
+    ids: string[],
+    includeItemTypes: BaseItemKind[] = [BaseItemKind.Audio],
+  ): Promise<SearchHint[]> | undefined {
+    const api = this.jellyfinService.getApi();
+
+    const searchApi = getItemsApi(api);
+    const { data } = await searchApi.getItems({
+      ids: ids,
+      userId: this.jellyfinService.getUserId(),
+      includeItemTypes: includeItemTypes,
+    });
+
+    if (data.Items.length !== 1) {
+      this.logger.warn(`Failed to retrieve item via id '${ids}'`);
+      return null;
+    }
+
+    return data.Items.map((item) => this.transformToSearchHint(item));
+  }
+
   async getRemoteImageById(id: string, limit = 20): Promise<RemoteImageResult> {
     const api = this.jellyfinService.getApi();
     const remoteImageApi = getRemoteImageApi(api);

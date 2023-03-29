@@ -39,6 +39,7 @@ export class Track {
     this.name = name;
     this.duration = duration;
     this.remoteImages = remoteImages;
+    this.playing = false;
   }
 
   getDuration() {

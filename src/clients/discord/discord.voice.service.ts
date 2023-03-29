@@ -116,6 +116,7 @@ export class DiscordVoiceService {
   /**
    * Pauses the current audio player
    */
+  @OnEvent('internal.voice.controls.pause')
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     this.eventEmitter.emit('playback.state.pause', true);
@@ -124,6 +125,7 @@ export class DiscordVoiceService {
   /**
    * Stops the audio player
    */
+  @OnEvent('internal.voice.controls.stop')
   stop(force: boolean): boolean {
     const stopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     this.eventEmitter.emit('playback.state.stop');
@@ -161,6 +163,7 @@ export class DiscordVoiceService {
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
+  @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();
