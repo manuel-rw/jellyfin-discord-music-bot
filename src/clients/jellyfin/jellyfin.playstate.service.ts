@@ -71,4 +71,23 @@ export class JellyinPlaystateService {
       },
     });
   }
+
+  @OnEvent('playback.state.pause')
+  private async onPlaybackPause(paused: boolean) {
+    const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
+
+    if (!track) {
+      this.logger.error(
+        `Unable to report changed playstate to Jellyfin because no track was active`,
+      );
+      return;
+    }
+
+    this.playstateApi.reportPlaybackProgress({
+      playbackProgressInfo: {
+        IsPaused: paused,
+        ItemId: track.id,
+      },
+    });
+  }
 }
