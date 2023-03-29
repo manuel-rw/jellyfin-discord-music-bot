@@ -104,9 +104,9 @@ export class JellyfinSearchService {
       return [];
     }
 
-    return axiosResponse.data.SearchHints.map((hint) =>
-      SearchHint.constructFromHint(hint),
-    );
+    return [...axiosResponse.data.SearchHints]
+      .reverse()
+      .map((hint) => SearchHint.constructFromHint(hint));
   }
 
   async getById(

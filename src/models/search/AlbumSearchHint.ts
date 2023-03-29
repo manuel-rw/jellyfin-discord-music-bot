@@ -18,7 +18,6 @@ export class AlbumSearchHint extends SearchHint {
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
     const remoteImages = await searchService.getRemoteImageById(this.id);
-
     const albumItems = await searchService.getAlbumItems(this.id);
     const tracks = await Promise.all(
       albumItems.map(async (x) =>
