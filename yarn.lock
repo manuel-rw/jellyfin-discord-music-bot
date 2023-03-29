@@ -903,10 +903,10 @@
   dependencies:
     path-to-regexp "0.2.5"
 
-"@nestjs/terminus@^9.1.4":
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-9.2.1.tgz#f173ba807bbab6ed2ee892e859455553274a725e"
-  integrity sha512-bPJsxKzqLl1BIs1YFIji20h42VG4ElGqc+lyw7nW+as0DkfjpRYUdyEBQJo6dTAcqRrVxSN2m3wKweBknK3Nxw==
+"@nestjs/terminus@^9.2.2":
+  version "9.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-9.2.2.tgz#88c78061307eaf19308b1f6a6055aa6c33750195"
+  integrity sha512-AWUA8XLcgxWUjUFYHDqi42M7CZn2e+DEWxP+MqNAbMzz4ybB5jGcFK5Fy8qwaNBoWg6KMF1JiXOOygGXgk9ydg==
   dependencies:
     boxen "5.1.2"
     check-disk-space "3.3.1"

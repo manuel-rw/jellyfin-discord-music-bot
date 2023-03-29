@@ -33,7 +33,7 @@
     "@nestjs/platform-express": "^9.3.12",
     "@nestjs/schedule": "^2.1.0",
     "@nestjs/serve-static": "^3.0.1",
-    "@nestjs/terminus": "^9.1.4",
+    "@nestjs/terminus": "^9.2.2",
     "date-fns": "^2.29.3",
     "discord.js": "^14.8.0",
     "joi": "^17.9.1",
