@@ -60,7 +60,7 @@ export class JellyinPlaystateService {
   private async onPlaybackFinished(track: Track) {
     if (!track) {
       this.logger.error(
-        `Unable to report playback because finished track was undefined`,
+        "Unable to report playback because finished track was undefined",
       );
       return;
     }
@@ -78,7 +78,7 @@ export class JellyinPlaystateService {
 
     if (!track) {
       this.logger.error(
-        `Unable to report changed playstate to Jellyfin because no track was active`,
+        "Unable to report changed playstate to Jellyfin because no track was active",
       );
       return;
     }
