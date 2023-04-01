@@ -37,7 +37,7 @@ export class JellyfinSearchService {
 
     if (includeItemTypes.length === 0) {
       this.logger.warn(
-        `Included item types are empty. This may lead to unwanted results`,
+        "Included item types are empty. This may lead to unwanted results",
       );
     }
 

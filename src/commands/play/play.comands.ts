@@ -70,7 +70,7 @@ export class PlayItemCommand {
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'No results found',
-            description: `- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters`,
+            description: "- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters",
           }),
         ],
         ephemeral: true,
