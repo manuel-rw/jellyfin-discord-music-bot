@@ -33,7 +33,7 @@ describe('UpdatesService', () => {
           } as DiscordMessageService;
         }
 
-        if (token === Client || token == '__inject_discord_client__') {
+        if (token === Client || token === '__inject_discord_client__') {
           return {
             guilds: {
               cache: [
