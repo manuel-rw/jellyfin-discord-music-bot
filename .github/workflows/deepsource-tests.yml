@@ -53,6 +53,6 @@ jobs:
           curl https://deepsource.io/cli | sh
 
           # Send the report to DeepSource
-          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/clover.xml
+          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/lcov.info
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
