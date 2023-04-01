@@ -46,10 +46,7 @@ export class JellyfinService {
         process.env.JELLYFIN_AUTHENTICATION_PASSWORD,
       )
       .then(async (response) => {
-        if (
-          response.data.SessionInfo === undefined ||
-          response.data.SessionInfo.UserId === undefined
-        ) {
+        if (response.data.SessionInfo?.UserId === undefined) {
           this.logger.error(
             `Failed to authenticate with response code ${response.status}: '${response.data}'`,
           );

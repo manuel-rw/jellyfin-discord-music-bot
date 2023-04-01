@@ -105,7 +105,9 @@ export class DiscordVoiceService {
 
   changeVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
-      this.logger.error(`AudioResource or volume was undefined`);
+      this.logger.error(
+        `Failed to change audio volume, AudioResource or volume was undefined`,
+      );
       return;
     }
     this.audioResource.volume.setVolume(volume);

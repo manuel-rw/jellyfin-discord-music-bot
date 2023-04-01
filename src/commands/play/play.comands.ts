@@ -104,9 +104,9 @@ export class PlayItemCommand {
     );
     this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
-    const remoteImage: RemoteImageInfo | undefined = tracks
-      .flatMap((track) => track.getRemoteImages())
-      .find(() => true);
+    const remoteImages = tracks.flatMap((track) => track.getRemoteImages());
+    const remoteImage: RemoteImageInfo | undefined =
+      remoteImages.length > 0 ? remoteImages[0] : undefined;
 
     await interaction.followUp({
       embeds: [
@@ -117,10 +117,10 @@ export class PlayItemCommand {
             reducedDuration,
           )})`,
           mixin(embedBuilder) {
-            if (!remoteImage) {
+            if (!remoteImage?.Url) {
               return embedBuilder;
             }
-            return embedBuilder.setThumbnail(remoteImage.Url ?? '');
+            return embedBuilder.setThumbnail(remoteImage.Url);
           },
         }),
       ],
