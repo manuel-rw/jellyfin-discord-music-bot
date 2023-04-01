@@ -1,0 +1,58 @@
+name: Deepsource report test coverage
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+on:
+  push:
+    branches: [dev,master]
+    paths-ignore:
+      - '.github/**'
+      - 'images/'
+      - '*.md'
+  pull_request:
+    branches:
+      - master
+      - dev
+
+  workflow_dispatch:
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  report-test-coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Setup
+        uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn install --immutable
+      - run: yarn test:cov
+      - run: curl https://deepsource.io/cli | sh
+      - name: Report test-coverage to DeepSource
+        run: |
+          # Install the CLI
+          curl https://deepsource.io/cli | sh
+
+          # Send the report to DeepSource
+          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/clover.xml
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}

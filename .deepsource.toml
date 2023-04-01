@@ -8,3 +8,7 @@ name = "javascript"
 
 [[analyzers]]
 name = "docker"
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true
