@@ -1,13 +1,11 @@
 import {
   PlaystateCommand,
   SessionMessageType,
-  UserItemDataDto,
 } from '@jellyfin/sdk/lib/generated-client/models';
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
-import { Session } from 'inspector';
 
 import { WebSocket } from 'ws';
 
