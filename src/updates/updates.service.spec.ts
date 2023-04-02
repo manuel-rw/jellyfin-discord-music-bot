@@ -6,6 +6,7 @@ import { DiscordMessageService } from '../clients/discord/discord.message.servic
 import { GithubRelease } from '../models/github-release';
 import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { UpdatesService } from './updates.service';
+import { InjectionToken } from '@nestjs/common';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900
 jest.mock('axios');
@@ -49,7 +50,7 @@ describe('UpdatesService', () => {
           };
         }
 
-        return useDefaultMockerToken(token);
+        return useDefaultMockerToken(token as InjectionToken);
       })
       .compile();
 
