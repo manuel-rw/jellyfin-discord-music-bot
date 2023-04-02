@@ -20,14 +20,14 @@ import {
   InteractionReplyOptions,
 } from 'discord.js';
 
-import { PlaybackService } from '../../playback/playback.service';
-import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { SearchHint } from '../../models/search/SearchHint';
+import { PlaybackService } from '../../playback/playback.service';
+import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
-import { SearchType, PlayCommandParams } from './play.params.ts';
+import { PlayCommandParams, SearchType } from './play.params.ts';
 
 @Injectable()
 @Command({
@@ -70,7 +70,7 @@ export class PlayItemCommand {
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'No results found',
-            description: `- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters`,
+            description: "- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters",
           }),
         ],
         ephemeral: true,

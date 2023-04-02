@@ -114,7 +114,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
         break;
       case SessionMessageType[SessionMessageType.UserDataChanged]:
-        this.logger.debug(`Received update for user session data`);
+        this.logger.debug("Received update for user session data");
         break;
       default:
         this.logger.warn(

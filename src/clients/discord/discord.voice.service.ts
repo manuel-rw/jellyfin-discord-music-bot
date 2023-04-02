@@ -9,7 +9,6 @@ import {
   joinVoiceChannel,
   NoSubscriberBehavior,
   VoiceConnection,
-  VoiceConnectionStatus,
 } from '@discordjs/voice';
 
 import { Injectable } from '@nestjs/common';
@@ -18,11 +17,11 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { GuildMember } from 'discord.js';
 
+import { GenericTryHandler } from '../../models/generic-try-handler';
+import { Track } from '../../models/shared/Track';
+import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
-import { GenericTryHandler } from '../../models/generic-try-handler';
-import { PlaybackService } from '../../playback/playback.service';
-import { Track } from '../../models/shared/Track';
 
 import { DiscordMessageService } from './discord.message.service';
 
@@ -93,7 +92,7 @@ export class DiscordVoiceService {
 
     this.jellyfinWebSocketService.initializeAndConnect();
 
-    if (this.voiceConnection == undefined) {
+    if (this.voiceConnection === undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);
     }
 
@@ -225,7 +224,7 @@ export class DiscordVoiceService {
 
     if (this.audioPlayer === undefined) {
       this.logger.debug(
-        `Initialized new instance of AudioPlayer because it has not been defined yet`,
+        "Initialized new instance of AudioPlayer because it has not been defined yet",
       );
       this.audioPlayer = createAudioPlayer({
         debug: process.env.DEBUG?.toLowerCase() === 'true',
@@ -292,7 +291,7 @@ export class DiscordVoiceService {
         return;
       }
 
-      this.logger.debug(`Audio player finished playing old resource`);
+      this.logger.debug("Audio player finished playing old resource");
 
       const playlist = this.playbackService.getPlaylistOrDefault();
       const finishedTrack = playlist.getActiveTrack();
@@ -309,7 +308,7 @@ export class DiscordVoiceService {
       );
 
       if (!hasNextTrack) {
-        this.logger.debug(`Reached the end of the playlist`);
+        this.logger.debug("Reached the end of the playlist");
         return;
       }
 

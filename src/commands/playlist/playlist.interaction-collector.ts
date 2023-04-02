@@ -83,7 +83,7 @@ export class PlaylistInteractionCollector {
         return current - 1;
       default:
         this.logger.error(
-          `Unable to map button interaction from collector to target page`,
+          "Unable to map button interaction from collector to target page",
         );
         return undefined;
     }
