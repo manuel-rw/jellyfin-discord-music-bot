@@ -24,7 +24,7 @@ export class Playlist {
    * @returns active track or undefined if there's none
    */
   getActiveTrack(): Track | undefined {
-    if (this.isActiveTrackOutOfSync()) {
+    if (this.isActiveTrackOutOfSync() || this.activeTrackIndex === undefined) {
       return undefined;
     }
     return this.tracks[this.activeTrackIndex];
@@ -51,7 +51,10 @@ export class Playlist {
   setNextTrackAsActiveTrack(): boolean {
     this.announceTrackFinishIfSet();
 
-    if (this.activeTrackIndex >= this.tracks.length) {
+    if (
+      this.activeTrackIndex === undefined ||
+      this.activeTrackIndex >= this.tracks.length
+    ) {
       return false;
     }
 
@@ -70,7 +73,7 @@ export class Playlist {
   setPreviousTrackAsActiveTrack(): boolean {
     this.announceTrackFinishIfSet();
 
-    if (this.activeTrackIndex <= 0) {
+    if (this.activeTrackIndex === undefined || this.activeTrackIndex <= 0) {
       return false;
     }
 
@@ -120,7 +123,7 @@ export class Playlist {
    * @returns if there is a track next in the playlist
    */
   hasNextTrackInPlaylist() {
-    return this.activeTrackIndex + 1 < this.tracks.length;
+    return (this.activeTrackIndex ?? 0) + 1 < this.tracks.length;
   }
 
   /**
@@ -128,7 +131,7 @@ export class Playlist {
    * @returns if there is a previous track in the playlist
    */
   hasPreviousTrackInPlaylist() {
-    return this.activeTrackIndex > 0;
+    return this.activeTrackIndex !== undefined && this.activeTrackIndex > 0;
   }
 
   clear() {
@@ -156,13 +159,20 @@ export class Playlist {
     }
 
     const activeTrack = this.getActiveTrack();
+
+    if (!activeTrack) {
+      return;
+    }
+
     activeTrack.playing = true;
     this.eventEmitter.emit('internal.audio.track.announce', activeTrack);
   }
 
   private isActiveTrackOutOfSync(): boolean {
     return (
-      this.activeTrackIndex < 0 || this.activeTrackIndex >= this.tracks.length
+      this.activeTrackIndex === undefined ||
+      this.activeTrackIndex < 0 ||
+      this.activeTrackIndex >= this.tracks.length
     );
   }
 }

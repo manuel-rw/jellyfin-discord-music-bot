@@ -51,6 +51,6 @@ export class Track {
   }
 
   getRemoteImages(): RemoteImageInfo[] {
-    return this.remoteImages.Images;
+    return this.remoteImages?.Images ?? [];
   }
 }

@@ -103,6 +103,12 @@ export class DiscordVoiceService {
   }
 
   changeVolume(volume: number) {
+    if (!this.audioResource || !this.audioResource.volume) {
+      this.logger.error(
+        `Failed to change audio volume, AudioResource or volume was undefined`,
+      );
+      return;
+    }
     this.audioResource.volume.setVolume(volume);
   }
 
@@ -235,6 +241,20 @@ export class DiscordVoiceService {
   }
 
   private attachEventListenersToAudioPlayer() {
+    if (!this.voiceConnection) {
+      this.logger.error(
+        `Unable to attach listener events, because the VoiceConnection was undefined`,
+      );
+      return;
+    }
+
+    if (!this.audioPlayer) {
+      this.logger.error(
+        `Unable to attach listener events, because the AudioPlayer was undefined`,
+      );
+      return;
+    }
+
     this.voiceConnection.on('debug', (message) => {
       if (process.env.DEBUG?.toLowerCase() !== 'true') {
         return;
@@ -252,6 +272,13 @@ export class DiscordVoiceService {
       this.logger.error(message);
     });
     this.audioPlayer.on('stateChange', (previousState) => {
+      if (!this.audioPlayer) {
+        this.logger.error(
+          `Unable to process state change from audio player, because the current audio player in the callback was undefined`,
+        );
+        return;
+      }
+
       this.logger.debug(
         `Audio player changed state from ${previousState.status} to ${this.audioPlayer.state.status}`,
       );
@@ -268,9 +295,11 @@ export class DiscordVoiceService {
 
       const playlist = this.playbackService.getPlaylistOrDefault();
       const finishedTrack = playlist.getActiveTrack();
-      finishedTrack.playing = false;
 
-      this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
+      if (finishedTrack) {
+        finishedTrack.playing = false;
+        this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
+      }
 
       const hasNextTrack = playlist.hasNextTrackInPlaylist();
 

@@ -1,3 +1,4 @@
+import { InjectionToken } from '@nestjs/common';
 import {
   HealthCheckResult,
   HealthCheckService,
@@ -42,10 +43,14 @@ describe('HealthController', () => {
         }
 
         if (token === HealthCheckService) {
-          return new HealthCheckService(new HealthCheckExecutor(), null, null);
+          return new HealthCheckService(
+            new HealthCheckExecutor(),
+            { getErrorMessage: jest.fn() },
+            { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
+          );
         }
 
-        return useDefaultMockerToken(token);
+        return useDefaultMockerToken(token as InjectionToken);
       })
       .compile();
 

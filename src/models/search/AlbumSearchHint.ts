@@ -11,6 +11,12 @@ export class AlbumSearchHint extends SearchHint {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
+    if (hint.Id === undefined || !hint.Name || !hint.RunTimeTicks) {
+      throw new Error(
+        'Unable to construct playlist search hint, required properties were undefined',
+      );
+    }
+
     return new AlbumSearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
   }
 
@@ -24,7 +30,7 @@ export class AlbumSearchHint extends SearchHint {
         (await x.toTracks(searchService)).find((x) => x !== null),
       ),
     );
-    return tracks.map((track): Track => {
+    return tracks.map((track: Track): Track => {
       track.remoteImages = remoteImages;
       return track;
     });

@@ -48,12 +48,12 @@ export class PlayItemCommand {
   async handler(
     @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
-  ): Promise<InteractionReplyOptions | string> {
+  ) {
     await interaction.deferReply({ ephemeral: true });
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
-    let item: SearchHint;
+    let item: SearchHint | undefined;
     if (dto.name.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),
@@ -104,9 +104,9 @@ export class PlayItemCommand {
     );
     this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
-    const remoteImage: RemoteImageInfo | undefined = tracks
-      .flatMap((track) => track.getRemoteImages())
-      .find(() => true);
+    const remoteImages = tracks.flatMap((track) => track.getRemoteImages());
+    const remoteImage: RemoteImageInfo | undefined =
+      remoteImages.length > 0 ? remoteImages[0] : undefined;
 
     await interaction.followUp({
       embeds: [
@@ -117,7 +117,7 @@ export class PlayItemCommand {
             reducedDuration,
           )})`,
           mixin(embedBuilder) {
-            if (!remoteImage) {
+            if (!remoteImage?.Url) {
               return embedBuilder;
             }
             return embedBuilder.setThumbnail(remoteImage.Url);
@@ -135,7 +135,15 @@ export class PlayItemCommand {
     }
 
     const focusedAutoCompleteAction = interaction.options.getFocused(true);
-    const typeIndex: number | null = interaction.options.getInteger('type');
+    const typeIndex = interaction.options.getInteger('type');
+
+    if (typeIndex === null) {
+      this.logger.error(
+        `Failed to get type integer from play command interaction autocomplete`,
+      );
+      return;
+    }
+
     const type = Object.values(SearchType)[typeIndex] as SearchType;
     const searchQuery = focusedAutoCompleteAction.value;
 

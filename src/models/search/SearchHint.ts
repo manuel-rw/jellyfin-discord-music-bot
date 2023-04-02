@@ -26,10 +26,20 @@ export class SearchHint {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
+    if (hint.Id === undefined || !hint.Name || !hint.RunTimeTicks) {
+      throw new Error(
+        'Unable to construct search hint, required properties were undefined',
+      );
+    }
     return new SearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
   }
 
   static constructFromBaseItem(baseItem: BaseItemDto) {
+    if (baseItem.Id === undefined || !baseItem.Name || !baseItem.RunTimeTicks) {
+      throw new Error(
+        'Unable to construct search hint from base item, required properties were undefined',
+      );
+    }
     return new SearchHint(
       baseItem.Id,
       baseItem.Name,

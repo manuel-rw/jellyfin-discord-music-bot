@@ -30,7 +30,7 @@ export class PlayNowCommand {
   }
 
   getSelection(): string[] {
-    if (this.hasSelection()) {
+    if (this.hasSelection() && this.StartIndex !== undefined) {
       return [this.ItemIds[this.StartIndex]];
     }
 

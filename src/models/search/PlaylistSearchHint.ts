@@ -4,6 +4,7 @@ import { Track } from '../shared/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
 import { SearchHint } from './SearchHint';
+import { convertToTracks } from 'src/utils/trackConverter';
 
 export class PlaylistSearchHint extends SearchHint {
   override toString(): string {
@@ -11,6 +12,12 @@ export class PlaylistSearchHint extends SearchHint {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
+    if (hint.Id === undefined || !hint.Name || !hint.RunTimeTicks) {
+      throw new Error(
+        'Unable to construct playlist search hint, required properties were undefined',
+      );
+    }
+
     return new PlaylistSearchHint(
       hint.Id,
       hint.Name,
@@ -22,9 +29,6 @@ export class PlaylistSearchHint extends SearchHint {
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
     const playlistItems = await searchService.getPlaylistitems(this.id);
-    const tracks = playlistItems.map(async (x) =>
-      (await x.toTracks(searchService)).find((x) => x !== null),
-    );
-    return await Promise.all(tracks);
+    return convertToTracks(playlistItems, searchService);
   }
 }
