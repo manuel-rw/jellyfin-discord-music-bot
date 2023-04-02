@@ -10,6 +10,7 @@ import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
 
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { Interval } from '@nestjs/schedule';
 import { Track } from '../../models/shared/Track';
 
 import { PlaybackService } from '../../playback/playback.service';
@@ -52,6 +53,7 @@ export class JellyinPlaystateService {
     await this.playstateApi.reportPlaybackStart({
       playbackStartInfo: {
         ItemId: track.id,
+        PositionTicks: 0,
       },
     });
   }
@@ -60,7 +62,7 @@ export class JellyinPlaystateService {
   private async onPlaybackFinished(track: Track) {
     if (!track) {
       this.logger.error(
-        "Unable to report playback because finished track was undefined",
+        'Unable to report playback because finished track was undefined',
       );
       return;
     }
@@ -68,6 +70,7 @@ export class JellyinPlaystateService {
     await this.playstateApi.reportPlaybackStopped({
       playbackStopInfo: {
         ItemId: track.id,
+        PositionTicks: track.playbackProgress * 10000,
       },
     });
   }
@@ -78,7 +81,7 @@ export class JellyinPlaystateService {
 
     if (!track) {
       this.logger.error(
-        "Unable to report changed playstate to Jellyfin because no track was active",
+        'Unable to report changed playstate to Jellyfin because no track was active',
       );
       return;
     }
@@ -87,7 +90,28 @@ export class JellyinPlaystateService {
       playbackProgressInfo: {
         IsPaused: paused,
         ItemId: track.id,
+        PositionTicks: track.playbackProgress * 10000,
       },
     });
+  }
+
+  @Interval(1000)
+  private async onPlaybackProgress() {
+    const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
+
+    if (!track) {
+      return;
+    }
+
+    await this.playstateApi.reportPlaybackProgress({
+      playbackProgressInfo: {
+        ItemId: track.id,
+        PositionTicks: track.playbackProgress * 10000,
+      },
+    });
+
+    this.logger.verbose(
+      `Reported playback progress ${track.playbackProgress} to Jellyfin for item ${track.id}`,
+    );
   }
 }

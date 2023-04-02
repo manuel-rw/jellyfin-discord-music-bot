@@ -11,3 +11,6 @@ export const trimStringToFixedLength = (value: string, maxLength: number) => {
 
   return value.substring(0, upperBound) + '...';
 };
+
+export const zeroPad = (num: number, places: number) =>
+  String(num).padStart(places, '0');
