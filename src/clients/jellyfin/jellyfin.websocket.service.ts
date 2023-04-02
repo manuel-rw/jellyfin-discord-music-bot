@@ -113,9 +113,6 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           msg.Data as SessionApiSendPlaystateCommandRequest;
         this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
         break;
-      case SessionMessageType[SessionMessageType.UserDataChanged]:
-        this.logger.debug("Received update for user session data");
-        break;
       default:
         this.logger.warn(
           `Received a package from the socket of unknown type: ${msg.MessageType}`,
@@ -129,13 +126,19 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   ) {
     switch (request.Command) {
       case PlaystateCommand.PlayPause:
-        this.eventEmitter.emitAsync('internal.voice.controls.togglePause');
+        this.eventEmitter.emit('internal.voice.controls.togglePause');
         break;
       case PlaystateCommand.Pause:
-        this.eventEmitter.emitAsync('internal.voice.controls.pause');
+        this.eventEmitter.emit('internal.voice.controls.pause');
         break;
       case PlaystateCommand.Stop:
-        this.eventEmitter.emitAsync('internal.voice.controls.stop');
+        this.eventEmitter.emit('internal.voice.controls.stop');
+        break;
+      case PlaystateCommand.NextTrack:
+        this.eventEmitter.emit('internal.audio.track.next');
+        break;
+      case PlaystateCommand.PreviousTrack:
+        this.eventEmitter.emit('internal.audio.track.previous');
         break;
       default:
         this.logger.warn(
