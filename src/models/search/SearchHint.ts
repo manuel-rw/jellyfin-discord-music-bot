@@ -2,6 +2,7 @@ import {
   BaseItemDto,
   SearchHint as JellyfinSearchHint,
 } from '@jellyfin/sdk/lib/generated-client/models';
+import { z } from 'zod';
 
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { Track } from '../shared/Track';
@@ -26,12 +27,27 @@ export class SearchHint {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
-    if (hint.Id === undefined || !hint.Name || !hint.RunTimeTicks) {
+    const schema = z.object({
+      Id: z.string(),
+      Name: z.string(),
+      RunTimeTicks: z.number(),
+    });
+
+    const result = schema.safeParse(hint);
+
+    if (!result.success) {
       throw new Error(
-        'Unable to construct search hint, required properties were undefined',
+        `Unable to construct search hint, required properties were undefined: ${JSON.stringify(
+          hint,
+        )}`,
       );
     }
-    return new SearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
+
+    return new SearchHint(
+      result.data.Id,
+      result.data.Name,
+      result.data.RunTimeTicks / 10000,
+    );
   }
 
   static constructFromBaseItem(baseItem: BaseItemDto) {

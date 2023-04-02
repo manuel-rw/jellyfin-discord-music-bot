@@ -22,16 +22,19 @@ import {
   InteractionUpdateOptions,
 } from 'discord.js';
 
-import { PlaybackService } from '../../playback/playback.service';
-import { chunkArray } from '../../utils/arrayUtils';
-import { Constants } from '../../utils/constants';
-import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
 import { Track } from '../../models/shared/Track';
-import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
+import { PlaybackService } from '../../playback/playback.service';
+import { chunkArray } from '../../utils/arrayUtils';
+import { trimStringToFixedLength, zeroPad } from '../../utils/stringUtils/stringUtils';
 
+import { Interval } from '@nestjs/schedule';
+import { lightFormat } from 'date-fns';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
+import { PlaylistTempCommandData } from './playlist.types';
+import { tr } from 'date-fns/locale';
+import { takeCoverage } from 'v8';
 
 @Injectable()
 @Command({
@@ -41,7 +44,7 @@ import { PlaylistCommandParams } from './playlist.params';
 @UseInterceptors(CollectorInterceptor)
 @UseCollectors(PlaylistInteractionCollector)
 export class PlaylistCommand {
-  public pageData: Map<string, number> = new Map();
+  public pageData: Map<string, PlaylistTempCommandData> = new Map();
   private readonly logger = new Logger(PlaylistCommand.name);
 
   constructor(
@@ -61,7 +64,10 @@ export class PlaylistCommand {
       this.getReplyForPage(page) as InteractionReplyOptions,
     );
 
-    this.pageData.set(interaction.id, page);
+    this.pageData.set(interaction.id, {
+      page,
+      interaction,
+    });
     this.logger.debug(
       `Added '${interaction.id}' as a message id for page storage`,
     );
@@ -80,6 +86,36 @@ export class PlaylistCommand {
   private getChunks() {
     const playlist = this.playbackService.getPlaylistOrDefault();
     return chunkArray(playlist.tracks, 10);
+  }
+
+  private createInterval(interaction: CommandInteraction) {
+    return setInterval(async () => {
+      const tempData = this.pageData.get(interaction.id);
+
+      if (!tempData) {
+        this.logger.warn(
+          `Failed to update from interval, because temp data was not found`,
+        );
+        return;
+      }
+
+      await interaction.editReply(this.getReplyForPage(tempData.page));
+    }, 2000);
+  }
+
+  @Interval(2 * 1000)
+  private async updatePlaylists() {
+    if (this.pageData.size === 0) {
+      return;
+    }
+
+    this.logger.verbose(
+      `Updating playlist for ${this.pageData.size} playlist datas`,
+    );
+
+    this.pageData.forEach(async (value) => {
+      await value.interaction.editReply(this.getReplyForPage(value.page));
+    });
   }
 
   public getReplyForPage(
@@ -176,26 +212,34 @@ export class PlaylistCommand {
       );
     }
 
+    const paddingNumber = playlist.getLength() >= 100 ? 3 : 2;
+
     const content = chunk
       .map((track, index) => {
         const isCurrent = track === playlist.getActiveTrack();
 
-        // use the offset for the page, add the current index and offset by one because the array index is used
-        let point = `${offset + index + 1}. `;
-        point += `**${trimStringToFixedLength(track.name, 30)}**`;
-
+        let line = `\`\`${zeroPad(offset + index + 1, paddingNumber)}.\`\` `;
+        line += this.getTrackName(track, isCurrent) + ' • ';
         if (isCurrent) {
-          point += ' :loud_sound:';
+          line += lightFormat(track.getPlaybackProgress(), 'mm:ss') + ' / ';
         }
-
-        point += '\n';
-        point += Constants.Design.InvisibleSpace.repeat(2);
-        point += formatMillisecondsAsHumanReadable(track.getDuration());
-
-        return point;
+        line += lightFormat(track.getDuration(), 'mm:ss');
+        if (isCurrent) {
+          line += ' • (:play_pause:)';
+        }
+        return line;
       })
       .join('\n');
 
     return new EmbedBuilder().setTitle('Your playlist').setDescription(content);
+  }
+
+  private getTrackName(track: Track, active: boolean) {
+    const trimmedTitle = trimStringToFixedLength(track.name, 30);
+    if (active) {
+      return `**${trimmedTitle}**`;
+    }
+
+    return trimmedTitle;
   }
 }

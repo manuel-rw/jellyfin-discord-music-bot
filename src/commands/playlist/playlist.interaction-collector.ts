@@ -15,6 +15,7 @@ import {
 } from 'discord.js';
 
 import { PlaylistCommand } from './playlist.command';
+import { PlaylistTempCommandData } from './playlist.types';
 
 @Injectable({ scope: Scope.REQUEST })
 @InteractionEventCollector({ time: 60 * 1000 })
@@ -40,7 +41,7 @@ export class PlaylistInteractionCollector {
   async onCollect(interaction: ButtonInteraction): Promise<void> {
     const targetPage = this.getInteraction(interaction);
     this.logger.verbose(
-      `Extracted the target page ${targetPage} from the button interaction`,
+      `Extracted the target page '${targetPage?.page}' from the button interaction`,
     );
 
     if (targetPage === undefined) {
@@ -51,14 +52,16 @@ export class PlaylistInteractionCollector {
     }
 
     this.logger.debug(
-      `Updating current page for interaction ${this.causeInteraction.id} to ${targetPage}`,
+      `Updating current page for interaction ${this.causeInteraction.id} to ${targetPage.page}`,
     );
     this.playlistCommand.pageData.set(this.causeInteraction.id, targetPage);
-    const reply = this.playlistCommand.getReplyForPage(targetPage);
+    const reply = this.playlistCommand.getReplyForPage(targetPage.page);
     await interaction.update(reply as InteractionUpdateOptions);
   }
 
-  private getInteraction(interaction: ButtonInteraction): number | undefined {
+  private getInteraction(
+    interaction: ButtonInteraction,
+  ): PlaylistTempCommandData | undefined {
     const current = this.playlistCommand.pageData.get(this.causeInteraction.id);
 
     if (current === undefined) {
@@ -78,12 +81,18 @@ export class PlaylistInteractionCollector {
 
     switch (interaction.customId) {
       case 'playlist-controls-next':
-        return current + 1;
+        return {
+          ...current,
+          page: current.page + 1,
+        };
       case 'playlist-controls-previous':
-        return current - 1;
+        return {
+          ...current,
+          page: current.page - 1,
+        };
       default:
         this.logger.error(
-          "Unable to map button interaction from collector to target page",
+          'Unable to map button interaction from collector to target page',
         );
         return undefined;
     }

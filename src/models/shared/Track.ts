@@ -29,6 +29,8 @@ export class Track {
 
   playing: boolean;
 
+  playbackProgress: number;
+
   constructor(
     id: string,
     name: string,
@@ -40,6 +42,7 @@ export class Track {
     this.duration = duration;
     this.remoteImages = remoteImages;
     this.playing = false;
+    this.playbackProgress = 0;
   }
 
   getDuration() {
@@ -52,5 +55,13 @@ export class Track {
 
   getRemoteImages(): RemoteImageInfo[] {
     return this.remoteImages?.Images ?? [];
+  }
+
+  getPlaybackProgress() {
+    return this.playbackProgress;
+  }
+
+  updatePlaybackProgress(progress: number) {
+    this.playbackProgress = progress;
   }
 }

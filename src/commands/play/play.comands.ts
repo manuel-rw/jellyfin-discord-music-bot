@@ -70,7 +70,8 @@ export class PlayItemCommand {
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'No results found',
-            description: "- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters",
+            description:
+              '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
           }),
         ],
         ephemeral: true,
@@ -136,15 +137,8 @@ export class PlayItemCommand {
 
     const focusedAutoCompleteAction = interaction.options.getFocused(true);
     const typeIndex = interaction.options.getInteger('type');
-
-    if (typeIndex === null) {
-      this.logger.error(
-        `Failed to get type integer from play command interaction autocomplete`,
-      );
-      return;
-    }
-
-    const type = Object.values(SearchType)[typeIndex] as SearchType;
+    const type =
+      typeIndex !== null ? Object.values(SearchType)[typeIndex] : undefined;
     const searchQuery = focusedAutoCompleteAction.value;
 
     if (!searchQuery || searchQuery.length < 1) {

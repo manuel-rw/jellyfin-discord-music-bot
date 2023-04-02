@@ -14,6 +14,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { Interval } from '@nestjs/schedule';
 
 import { GuildMember } from 'discord.js';
 
@@ -224,7 +225,7 @@ export class DiscordVoiceService {
 
     if (this.audioPlayer === undefined) {
       this.logger.debug(
-        "Initialized new instance of AudioPlayer because it has not been defined yet",
+        'Initialized new instance of AudioPlayer because it has not been defined yet',
       );
       this.audioPlayer = createAudioPlayer({
         debug: process.env.DEBUG?.toLowerCase() === 'true',
@@ -291,7 +292,7 @@ export class DiscordVoiceService {
         return;
       }
 
-      this.logger.debug("Audio player finished playing old resource");
+      this.logger.debug('Audio player finished playing old resource');
 
       const playlist = this.playbackService.getPlaylistOrDefault();
       const finishedTrack = playlist.getActiveTrack();
@@ -308,11 +309,43 @@ export class DiscordVoiceService {
       );
 
       if (!hasNextTrack) {
-        this.logger.debug("Reached the end of the playlist");
+        this.logger.debug('Reached the end of the playlist');
         return;
       }
 
       this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     });
+  }
+
+  @Interval(500)
+  private checkAudioResourcePlayback() {
+    if (!this.audioResource) {
+      return;
+    }
+
+    const progress = this.audioResource.playbackDuration;
+
+    const playlist = this.playbackService.getPlaylistOrDefault();
+
+    if (!playlist) {
+      this.logger.error(
+        `Failed to update ellapsed audio time because playlist was unexpectitly undefined`,
+      );
+      return;
+    }
+
+    const activeTrack = playlist.getActiveTrack();
+
+    if (!activeTrack) {
+      this.logger.error(
+        `Failed to update ellapsed audio time because active track was unexpectitly undefined`,
+      );
+      return;
+    }
+
+    activeTrack.updatePlaybackProgress(progress);
+    this.logger.verbose(
+      `Reporting progress: ${progress} on track ${activeTrack.id}`,
+    );
   }
 }
