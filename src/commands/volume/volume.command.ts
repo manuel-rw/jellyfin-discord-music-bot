@@ -36,7 +36,7 @@ export class VolumeCommand {
       await interaction.editReply({
         embeds: [
           this.discordMessageService.buildMessage({
-            title: `Unable to change your volume`,
+            title: "Unable to change your volume",
             description:
               'The bot is not playing any music or is not straming to a channel',
           }),

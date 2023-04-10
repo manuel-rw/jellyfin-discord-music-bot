@@ -39,7 +39,7 @@ export class StatusCommand {
     const status = Status[this.client.ws.status];
 
     const interval = intervalToDuration({
-      start: this.client.uptime,
+      start: this.client.uptime ?? 0,
       end: 0,
     });
     const formattedDuration = formatDuration(interval);

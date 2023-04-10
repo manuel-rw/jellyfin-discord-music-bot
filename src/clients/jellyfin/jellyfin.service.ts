@@ -33,18 +33,20 @@ export class JellyfinService {
       },
     });
 
-    this.api = this.jellyfin.createApi(process.env.JELLYFIN_SERVER_ADDRESS);
+    this.api = this.jellyfin.createApi(
+      process.env.JELLYFIN_SERVER_ADDRESS ?? '',
+    );
     this.logger.debug('Created Jellyfin Client and Api');
   }
 
   authenticate() {
     this.api
       .authenticateUserByName(
-        process.env.JELLYFIN_AUTHENTICATION_USERNAME,
+        process.env.JELLYFIN_AUTHENTICATION_USERNAME ?? '',
         process.env.JELLYFIN_AUTHENTICATION_PASSWORD,
       )
       .then(async (response) => {
-        if (response.data.SessionInfo === undefined) {
+        if (response.data.SessionInfo?.UserId === undefined) {
           this.logger.error(
             `Failed to authenticate with response code ${response.status}: '${response.data}'`,
           );

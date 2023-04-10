@@ -30,8 +30,8 @@ export class StopPlaybackCommand {
       ? 'In addition, your playlist has been cleared'
       : 'There is no active track in the queue';
     if (hasActiveTrack) {
-      this.playbackService.getPlaylistOrDefault().clear();
       this.discordVoiceService.stop(false);
+      // this.playbackService.getPlaylistOrDefault().clear();
     }
 
     await interaction.reply({

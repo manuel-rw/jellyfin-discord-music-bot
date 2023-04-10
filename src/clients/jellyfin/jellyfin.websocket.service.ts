@@ -4,8 +4,9 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models';
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Cron } from '@nestjs/schedule';
+import { convertToTracks } from 'src/utils/trackConverter';
 
 import { WebSocket } from 'ws';
 
@@ -14,11 +15,9 @@ import {
   PlayNowCommand,
   SessionApiSendPlaystateCommandRequest,
 } from '../../types/websocket';
-import { Track } from '../../models/shared/Track';
 
 import { JellyfinSearchService } from './jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
-import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -28,9 +27,8 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   constructor(
     private readonly jellyfinService: JellyfinService,
-    private readonly jellyfinSearchService: JellyfinSearchService,
     private readonly playbackService: PlaybackService,
-    private readonly jellyfinStreamBuilderService: JellyfinStreamBuilderService,
+    private readonly jellyfinSearchService: JellyfinSearchService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -103,8 +101,12 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         data.hasSelection = PlayNowCommand.prototype.hasSelection;
         data.getSelection = PlayNowCommand.prototype.getSelection;
         const ids = data.getSelection();
-
-        // TODO: Implement this again
+        this.logger.log(
+          `Processing ${ids.length} ids received via websocket and adding them to the queue`,
+        );
+        const searchHints = await this.jellyfinSearchService.getAllById(ids);
+        const tracks = convertToTracks(searchHints, this.jellyfinSearchService);
+        this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       case SessionMessageType[SessionMessageType.Playstate]:
         const sendPlaystateCommandRequest =
@@ -124,13 +126,19 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   ) {
     switch (request.Command) {
       case PlaystateCommand.PlayPause:
-        this.eventEmitter.emitAsync('playback.control.togglePause');
+        this.eventEmitter.emit('internal.voice.controls.togglePause');
         break;
       case PlaystateCommand.Pause:
-        this.eventEmitter.emitAsync('playback.control.pause');
+        this.eventEmitter.emit('internal.voice.controls.pause');
         break;
       case PlaystateCommand.Stop:
-        this.eventEmitter.emitAsync('playback.control.stop');
+        this.eventEmitter.emit('internal.voice.controls.stop');
+        break;
+      case PlaystateCommand.NextTrack:
+        this.eventEmitter.emit('internal.audio.track.next');
+        break;
+      case PlaystateCommand.PreviousTrack:
+        this.eventEmitter.emit('internal.audio.track.previous');
         break;
       default:
         this.logger.warn(

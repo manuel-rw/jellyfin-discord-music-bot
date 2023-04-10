@@ -9,20 +9,20 @@ import {
   joinVoiceChannel,
   NoSubscriberBehavior,
   VoiceConnection,
-  VoiceConnectionStatus,
 } from '@discordjs/voice';
 
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { Interval } from '@nestjs/schedule';
 
 import { GuildMember } from 'discord.js';
 
+import { GenericTryHandler } from '../../models/generic-try-handler';
+import { Track } from '../../models/shared/Track';
+import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
-import { GenericTryHandler } from '../../models/generic-try-handler';
-import { PlaybackService } from '../../playback/playback.service';
-import { Track } from '../../models/shared/Track';
 
 import { DiscordMessageService } from './discord.message.service';
 
@@ -41,7 +41,7 @@ export class DiscordVoiceService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  @OnEvent('internal.audio.announce')
+  @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
     const resource = createAudioResource(
       track.getStreamUrl(this.jellyfinStreamBuilder),
@@ -93,7 +93,7 @@ export class DiscordVoiceService {
 
     this.jellyfinWebSocketService.initializeAndConnect();
 
-    if (this.voiceConnection == undefined) {
+    if (this.voiceConnection === undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);
     }
 
@@ -104,6 +104,12 @@ export class DiscordVoiceService {
   }
 
   changeVolume(volume: number) {
+    if (!this.audioResource || !this.audioResource.volume) {
+      this.logger.error(
+        `Failed to change audio volume, AudioResource or volume was undefined`,
+      );
+      return;
+    }
     this.audioResource.volume.setVolume(volume);
   }
 
@@ -116,6 +122,7 @@ export class DiscordVoiceService {
   /**
    * Pauses the current audio player
    */
+  @OnEvent('internal.voice.controls.pause')
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     this.eventEmitter.emit('playback.state.pause', true);
@@ -124,6 +131,7 @@ export class DiscordVoiceService {
   /**
    * Stops the audio player
    */
+  @OnEvent('internal.voice.controls.stop')
   stop(force: boolean): boolean {
     const stopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     this.eventEmitter.emit('playback.state.stop');
@@ -161,6 +169,7 @@ export class DiscordVoiceService {
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
+  @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();
@@ -216,7 +225,7 @@ export class DiscordVoiceService {
 
     if (this.audioPlayer === undefined) {
       this.logger.debug(
-        `Initialized new instance of AudioPlayer because it has not been defined yet`,
+        'Initialized new instance of AudioPlayer because it has not been defined yet',
       );
       this.audioPlayer = createAudioPlayer({
         debug: process.env.DEBUG?.toLowerCase() === 'true',
@@ -233,6 +242,20 @@ export class DiscordVoiceService {
   }
 
   private attachEventListenersToAudioPlayer() {
+    if (!this.voiceConnection) {
+      this.logger.error(
+        `Unable to attach listener events, because the VoiceConnection was undefined`,
+      );
+      return;
+    }
+
+    if (!this.audioPlayer) {
+      this.logger.error(
+        `Unable to attach listener events, because the AudioPlayer was undefined`,
+      );
+      return;
+    }
+
     this.voiceConnection.on('debug', (message) => {
       if (process.env.DEBUG?.toLowerCase() !== 'true') {
         return;
@@ -250,6 +273,13 @@ export class DiscordVoiceService {
       this.logger.error(message);
     });
     this.audioPlayer.on('stateChange', (previousState) => {
+      if (!this.audioPlayer) {
+        this.logger.error(
+          `Unable to process state change from audio player, because the current audio player in the callback was undefined`,
+        );
+        return;
+      }
+
       this.logger.debug(
         `Audio player changed state from ${previousState.status} to ${this.audioPlayer.state.status}`,
       );
@@ -262,22 +292,60 @@ export class DiscordVoiceService {
         return;
       }
 
-      this.logger.debug(`Audio player finished playing old resource`);
+      this.logger.debug('Audio player finished playing old resource');
 
-      const hasNextTrack = this.playbackService
-        .getPlaylistOrDefault()
-        .hasNextTrackInPlaylist();
+      const playlist = this.playbackService.getPlaylistOrDefault();
+      const finishedTrack = playlist.getActiveTrack();
+
+      if (finishedTrack) {
+        finishedTrack.playing = false;
+        this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
+      }
+
+      const hasNextTrack = playlist.hasNextTrackInPlaylist();
 
       this.logger.debug(
         `Playlist has next track: ${hasNextTrack ? 'yes' : 'no'}`,
       );
 
       if (!hasNextTrack) {
-        this.logger.debug(`Reached the end of the playlist`);
+        this.logger.debug('Reached the end of the playlist');
         return;
       }
 
       this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     });
+  }
+
+  @Interval(500)
+  private checkAudioResourcePlayback() {
+    if (!this.audioResource) {
+      return;
+    }
+
+    const progress = this.audioResource.playbackDuration;
+
+    const playlist = this.playbackService.getPlaylistOrDefault();
+
+    if (!playlist) {
+      this.logger.error(
+        `Failed to update ellapsed audio time because playlist was unexpectitly undefined`,
+      );
+      return;
+    }
+
+    const activeTrack = playlist.getActiveTrack();
+
+    if (!activeTrack) {
+      this.logger.error(
+        `Failed to update ellapsed audio time because active track was unexpectitly undefined`,
+      );
+      return;
+    }
+
+    activeTrack.updatePlaybackProgress(progress);
+    this.logger.verbose(
+      `Reporting progress: ${progress} on track ${activeTrack.id}`,
+    );
   }
 }

@@ -1,3 +1,4 @@
+import { InjectionToken } from '@nestjs/common';
 import { HealthIndicatorResult } from '@nestjs/terminus';
 import { Test } from '@nestjs/testing';
 import { JellyfinService } from '../../clients/jellyfin/jellyfin.service';
@@ -16,7 +17,7 @@ describe('JellyfinHealthIndicator', () => {
         if (token === JellyfinService) {
           return { isConnected: jest.fn() };
         }
-        return useDefaultMockerToken(token);
+        return useDefaultMockerToken(token as InjectionToken);
       })
       .compile();
 
