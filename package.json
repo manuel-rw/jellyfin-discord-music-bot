@@ -5,6 +5,7 @@
   "author": "manuel-rw",
   "private": true,
   "license": "MIT",
+  "type": "commonjs",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -25,7 +26,7 @@
     "@discord-nestjs/core": "^5.3.5",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.0",
-    "@jellyfin/sdk": "^0.8.1",
+    "@jellyfin/sdk": "^0.7.0",
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.4.0",
