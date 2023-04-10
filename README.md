@@ -18,6 +18,7 @@
   <br/>
   <br/>
   <img src="https://github.com/manuel-rw/jellyfin-discord-music-bot/actions/workflows/docker.yml/badge.svg?branch=master" />
+  <img src="https://deepsource.io/gh/manuel-rw/jellyfin-discord-music-bot.svg/?label=active+issues&show_trend=true&token=vhfm8cbHaoCyXTf7Gfs9FweR)](https://deepsource.io/gh/manuel-rw/jellyfin-discord-music-bot/?ref=repository-badge" />
 </p>
 
 <br/>

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Playlist } from '../models/shared/Playlist';
 
@@ -17,5 +17,15 @@ export class PlaybackService {
 
     this.playlist = new Playlist(this.eventEmitter);
     return this.playlist;
+  }
+
+  @OnEvent('internal.audio.track.previous')
+  private handlePreviousTrackEvent() {
+    this.getPlaylistOrDefault().setPreviousTrackAsActiveTrack();
+  }
+
+  @OnEvent('internal.audio.track.next')
+  private handleNextTrackEvent() {
+    this.getPlaylistOrDefault().setNextTrackAsActiveTrack();
   }
 }

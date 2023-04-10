@@ -25,7 +25,11 @@ export class Track {
   /**
    * A result object that contains a collection of images that are available outside the current network.
    */
-  readonly remoteImages?: RemoteImageResult;
+  remoteImages?: RemoteImageResult;
+
+  playing: boolean;
+
+  playbackProgress: number;
 
   constructor(
     id: string,
@@ -37,6 +41,8 @@ export class Track {
     this.name = name;
     this.duration = duration;
     this.remoteImages = remoteImages;
+    this.playing = false;
+    this.playbackProgress = 0;
   }
 
   getDuration() {
@@ -48,6 +54,14 @@ export class Track {
   }
 
   getRemoteImages(): RemoteImageInfo[] {
-    return this.remoteImages.Images;
+    return this.remoteImages?.Images ?? [];
+  }
+
+  getPlaybackProgress() {
+    return this.playbackProgress;
+  }
+
+  updatePlaybackProgress(progress: number) {
+    this.playbackProgress = progress;
   }
 }

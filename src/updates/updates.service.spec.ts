@@ -1,10 +1,12 @@
 import { Test } from '@nestjs/testing';
 import axios from 'axios';
 import { Client, GuildMember } from 'discord.js';
+import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/github-release';
 import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { UpdatesService } from './updates.service';
+import { InjectionToken } from '@nestjs/common';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900
 jest.mock('axios');
@@ -14,7 +16,6 @@ describe('UpdatesService', () => {
   const OLD_ENV = process.env;
 
   let updatesService: UpdatesService;
-  let discordClient: Client;
   let discordMessageService: DiscordMessageService;
 
   beforeEach(async () => {
@@ -33,7 +34,7 @@ describe('UpdatesService', () => {
           } as DiscordMessageService;
         }
 
-        if (token === Client || token == '__inject_discord_client__') {
+        if (token === Client || token === '__inject_discord_client__') {
           return {
             guilds: {
               cache: [
@@ -49,12 +50,11 @@ describe('UpdatesService', () => {
           };
         }
 
-        return useDefaultMockerToken(token);
+        return useDefaultMockerToken(token as InjectionToken);
       })
       .compile();
 
     updatesService = moduleRef.get<UpdatesService>(UpdatesService);
-    discordClient = moduleRef.get<Client>('__inject_discord_client__');
     discordMessageService = moduleRef.get<DiscordMessageService>(
       DiscordMessageService,
     );
@@ -88,6 +88,12 @@ describe('UpdatesService', () => {
 
   it('handleCronShouldNotifyWhenNewRelease', async () => {
     process.env.UPDATER_DISABLE_NOTIFICATIONS = 'false';
+    Constants.Metadata.Version = {
+      All: () => '0.0.5',
+      Major: 0,
+      Minor: 0,
+      Patch: 5,
+    };
 
     mockedAxios.mockResolvedValue({
       data: {

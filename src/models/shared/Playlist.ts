@@ -1,4 +1,4 @@
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Track } from './Track';
 
@@ -24,7 +24,7 @@ export class Playlist {
    * @returns active track or undefined if there's none
    */
   getActiveTrack(): Track | undefined {
-    if (this.isActiveTrackOutOfSync()) {
+    if (this.isActiveTrackOutOfSync() || this.activeTrackIndex === undefined) {
       return undefined;
     }
     return this.tracks[this.activeTrackIndex];
@@ -49,7 +49,12 @@ export class Playlist {
    * @returns if the track has been changed successfully
    */
   setNextTrackAsActiveTrack(): boolean {
-    if (this.activeTrackIndex >= this.tracks.length) {
+    this.announceTrackFinishIfSet();
+
+    if (
+      this.activeTrackIndex === undefined ||
+      this.activeTrackIndex >= this.tracks.length
+    ) {
       return false;
     }
 
@@ -66,7 +71,9 @@ export class Playlist {
    * @returns if the track has been changed successfully
    */
   setPreviousTrackAsActiveTrack(): boolean {
-    if (this.activeTrackIndex <= 0) {
+    this.announceTrackFinishIfSet();
+
+    if (this.activeTrackIndex === undefined || this.activeTrackIndex <= 0) {
       return false;
     }
 
@@ -84,11 +91,24 @@ export class Playlist {
    * @returns the new lendth of the tracks in the playlist
    */
   enqueueTracks(tracks: Track[]) {
+    if (tracks.length === 0) {
+      return 0;
+    }
+
+    const previousTrackLength = this.tracks.length;
+
     this.eventEmitter.emit('controls.playlist.tracks.enqueued', {
       count: tracks.length,
       activeTrack: this.activeTrackIndex,
     });
     const length = this.tracks.push(...tracks);
+
+    // existing tracks are in the playlist, but none are playing. play the first track out of the new tracks
+    if (!this.hasAnyPlaying() && tracks.length > 0) {
+      this.activeTrackIndex = previousTrackLength;
+      this.announceTrackChange();
+      return length;
+    }
 
     // emit a track change if there is no item
     if (this.activeTrackIndex === undefined) {
@@ -103,7 +123,7 @@ export class Playlist {
    * @returns if there is a track next in the playlist
    */
   hasNextTrackInPlaylist() {
-    return this.activeTrackIndex + 1 < this.tracks.length;
+    return (this.activeTrackIndex ?? 0) + 1 < this.tracks.length;
   }
 
   /**
@@ -111,7 +131,7 @@ export class Playlist {
    * @returns if there is a previous track in the playlist
    */
   hasPreviousTrackInPlaylist() {
-    return this.activeTrackIndex > 0;
+    return this.activeTrackIndex !== undefined && this.activeTrackIndex > 0;
   }
 
   clear() {
@@ -120,17 +140,39 @@ export class Playlist {
     this.activeTrackIndex = undefined;
   }
 
+  private hasAnyPlaying() {
+    return this.tracks.some((track) => track.playing);
+  }
+
+  private announceTrackFinishIfSet() {
+    if (this.activeTrackIndex === undefined) {
+      return;
+    }
+
+    const currentTrack = this.getActiveTrack();
+    this.eventEmitter.emit('internal.audio.track.finish', currentTrack);
+  }
+
   private announceTrackChange() {
     if (!this.activeTrackIndex) {
       this.activeTrackIndex = 0;
     }
 
-    this.eventEmitter.emit('internal.audio.announce', this.getActiveTrack());
+    const activeTrack = this.getActiveTrack();
+
+    if (!activeTrack) {
+      return;
+    }
+
+    activeTrack.playing = true;
+    this.eventEmitter.emit('internal.audio.track.announce', activeTrack);
   }
 
   private isActiveTrackOutOfSync(): boolean {
     return (
-      this.activeTrackIndex < 0 || this.activeTrackIndex >= this.tracks.length
+      this.activeTrackIndex === undefined ||
+      this.activeTrackIndex < 0 ||
+      this.activeTrackIndex >= this.tracks.length
     );
   }
 }

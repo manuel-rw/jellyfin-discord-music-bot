@@ -30,6 +30,14 @@ export class UpdatesService {
     this.logger.debug('Checking for available updates...');
 
     const latestGitHubRelease = await this.fetchLatestGithubRelease();
+
+    if (!latestGitHubRelease) {
+      this.logger.warn(
+        `Aborting update check because api request failed. Please check your internet connection or disable the check`,
+      );
+      return;
+    }
+
     const currentVersion = Constants.Metadata.Version.All();
 
     if (latestGitHubRelease.tag_name <= currentVersion) {
@@ -95,21 +103,21 @@ export class UpdatesService {
     });
   }
 
-  private async fetchLatestGithubRelease(): Promise<null | GithubRelease> {
+  private async fetchLatestGithubRelease(): Promise<GithubRelease | undefined> {
     return axios({
       method: 'GET',
       url: Constants.Links.Api.GetLatestRelease,
     })
       .then((response) => {
         if (response.status !== 200) {
-          return null;
+          return undefined;
         }
 
         return response.data as GithubRelease;
       })
       .catch((err) => {
         this.logger.error('Error while checking for updates', err);
-        return null;
+        return undefined;
       });
   }
 }

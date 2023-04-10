@@ -11,16 +11,28 @@ export class AlbumSearchHint extends SearchHint {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
+    if (hint.Id === undefined || !hint.Name || !hint.RunTimeTicks) {
+      throw new Error(
+        'Unable to construct playlist search hint, required properties were undefined',
+      );
+    }
+
     return new AlbumSearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
   }
 
   override async toTracks(
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
+    const remoteImages = await searchService.getRemoteImageById(this.id);
     const albumItems = await searchService.getAlbumItems(this.id);
-    const tracks = albumItems.map(async (x) =>
-      (await x.toTracks(searchService)).find((x) => x !== null),
+    const tracks = await Promise.all(
+      albumItems.map(async (x) =>
+        (await x.toTracks(searchService)).find((x) => x !== null),
+      ),
     );
-    return await Promise.all(tracks);
+    return tracks.map((track: Track): Track => {
+      track.remoteImages = remoteImages;
+      return track;
+    });
   }
 }

@@ -27,7 +27,7 @@ import { DiscordVoiceService } from '../../clients/discord/discord.voice.service
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { SearchHint } from '../../models/search/SearchHint';
 
-import { SearchType, PlayCommandParams } from './play.params.ts';
+import { PlayCommandParams, SearchType } from './play.params.ts';
 
 @Injectable()
 @Command({
@@ -48,12 +48,12 @@ export class PlayItemCommand {
   async handler(
     @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
-  ): Promise<InteractionReplyOptions | string> {
+  ) {
     await interaction.deferReply({ ephemeral: true });
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
-    let item: SearchHint;
+    let item: SearchHint | undefined;
     if (dto.name.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),
@@ -70,7 +70,8 @@ export class PlayItemCommand {
         embeds: [
           this.discordMessageService.buildMessage({
             title: 'No results found',
-            description: `- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters`,
+            description:
+              '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
           }),
         ],
         ephemeral: true,
@@ -94,15 +95,19 @@ export class PlayItemCommand {
     }
 
     const tracks = await item.toTracks(this.jellyfinSearchService);
+    this.logger.debug(`Extracted ${tracks.length} tracks from the search item`);
     const reducedDuration = tracks.reduce(
       (sum, item) => sum + item.duration,
       0,
     );
+    this.logger.debug(
+      `Adding ${tracks.length} tracks with a duration of ${reducedDuration} ticks`,
+    );
     this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
-    const remoteImage: RemoteImageInfo | undefined = tracks
-      .flatMap((x) => x.getRemoteImages())
-      .find((x) => true);
+    const remoteImages = tracks.flatMap((track) => track.getRemoteImages());
+    const remoteImage: RemoteImageInfo | undefined =
+      remoteImages.length > 0 ? remoteImages[0] : undefined;
 
     await interaction.followUp({
       embeds: [
@@ -113,7 +118,7 @@ export class PlayItemCommand {
             reducedDuration,
           )})`,
           mixin(embedBuilder) {
-            if (!remoteImage) {
+            if (!remoteImage?.Url) {
               return embedBuilder;
             }
             return embedBuilder.setThumbnail(remoteImage.Url);
@@ -131,8 +136,9 @@ export class PlayItemCommand {
     }
 
     const focusedAutoCompleteAction = interaction.options.getFocused(true);
-    const typeIndex: number | null = interaction.options.getInteger('type');
-    const type = Object.values(SearchType)[typeIndex] as SearchType;
+    const typeIndex = interaction.options.getInteger('type');
+    const type =
+      typeIndex !== null ? Object.values(SearchType)[typeIndex] : undefined;
     const searchQuery = focusedAutoCompleteAction.value;
 
     if (!searchQuery || searchQuery.length < 1) {
@@ -150,7 +156,7 @@ export class PlayItemCommand {
     const hints = await this.jellyfinSearchService.searchItem(
       searchQuery,
       20,
-      PlayCommandParams.getBaseItemKinds(type),
+      PlayCommandParams.getBaseItemKinds(type as SearchType),
     );
 
     if (hints.length === 0) {
