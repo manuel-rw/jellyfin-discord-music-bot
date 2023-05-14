@@ -1,7 +1,7 @@
 import { DiscordModule } from '@discord-nestjs/core';
 
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -14,7 +14,10 @@ import { CommandModule } from './commands/command.module';
 import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
-import { environmentVariablesSchema } from './utils/environment';
+import {
+  environmentVariablesSchema,
+  getEnvironmentVariables,
+} from './utils/environment';
 import { fromZodError } from 'zod-validation-error';
 
 @Module({
@@ -48,4 +51,21 @@ import { fromZodError } from 'zod-validation-error';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  private readonly logger = new Logger(AppModule.name);
+
+  onModuleInit() {
+    const variables = getEnvironmentVariables();
+
+    if (!variables.ALLOW_EVERYONE_FOR_DEFAULT_PERMS) {
+      return;
+    }
+
+    this.logger.warn(
+      'WARNING: You are using a potentially dangerous configuration: Everyone on your server has access to your bot. Ensure, that your bot is properly secured. Disable this by setting the environment variable ALLOW_EVERYONE to false',
+    );
+    this.logger.warn(
+      'WARNING: You are using a feature, that will only work for new server invitations. The permissions on existing servers will not be changed',
+    );
+  }
+}

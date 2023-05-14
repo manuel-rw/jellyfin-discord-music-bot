@@ -1,7 +1,9 @@
-import { ConfigModule } from '@nestjs/config';
 import { PermissionResolvable } from 'discord.js';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
+
+import * as env from 'dotenv';
+env.config();
 
 export const environmentVariablesSchema = z.object({
   DISCORD_CLIENT_TOKEN: z.string(),
@@ -11,16 +13,21 @@ export const environmentVariablesSchema = z.object({
   UPDATER_DISABLE_NOTIFICATIONS: z
     .enum(['true', 'false'])
     .default('false')
-    .optional(),
+    .transform((value) => Boolean(value)),
   LOG_LEVEL: z
     .enum(['ERROR', 'WARN', 'LOG', 'DEBUG', 'VERBOSE'])
     .default('LOG'),
-  PORT: z.number().min(1).max(9999).optional(),
-  ALLOW_EVERYONE: z.enum(['true', 'false']).default('false').optional(),
+  PORT: z.preprocess(
+    (value) => (Number.isInteger(value) ? Number(value) : undefined),
+    z.number().positive().max(9999).default(3000),
+  ),
+  ALLOW_EVERYONE_FOR_DEFAULT_PERMS: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => Boolean(value)),
 });
 
 export const getEnvironmentVariables = () => {
-  console.log(process.env);
   try {
     return environmentVariablesSchema.strip().parse(process.env);
   } catch (err) {
@@ -28,5 +35,5 @@ export const getEnvironmentVariables = () => {
   }
 };
 
-export const defaultMemberPermissions: PermissionResolvable =
-  getEnvironmentVariables().ALLOW_EVERYONE ? 'SendMessages' : 'Administrator';
+export const defaultMemberPermissions: PermissionResolvable | undefined =
+  getEnvironmentVariables().ALLOW_EVERYONE_FOR_DEFAULT_PERMS ? 'ViewChannel' : undefined;

@@ -114,7 +114,11 @@ export class DiscordVoiceService {
   }
 
   playResource(resource: AudioResource<unknown>) {
-    this.logger.debug(`Playing audio resource with volume ${resource.volume}`);
+    this.logger.debug(
+      `Playing audio resource with volume ${
+        resource.volume?.volume ?? 'unknown'
+      }`,
+    );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
   }

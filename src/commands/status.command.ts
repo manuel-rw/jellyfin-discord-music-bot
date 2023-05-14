@@ -13,15 +13,14 @@ import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
 
-import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { Constants } from '../utils/constants';
 
 @Command({
   name: 'status',
   description: 'Display the current status for troubleshooting',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions: 'ViewChannel',
 })
 @Injectable()
 export class StatusCommand {
