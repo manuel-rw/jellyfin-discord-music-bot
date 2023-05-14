@@ -374,19 +374,19 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@discord-nestjs/common@^5.2.4":
-  version "5.2.4"
-  resolved "https://registry.yarnpkg.com/@discord-nestjs/common/-/common-5.2.4.tgz#294aa89f76651a69692acda81513ea99e7c59ebb"
-  integrity sha512-/HbRSqat/3q15nE2OO+QvOSiPopQkHB31KnwEAhzJIUWgqq1l+UdRwqHFm+2pbbcRBQx/o/wpp2ljRgUB1eoGQ==
+"@discord-nestjs/common@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@discord-nestjs/common/-/common-5.2.5.tgz#29ffa962658176e9406ced6220cd165be3f1900c"
+  integrity sha512-sVtXLb1wIiUXOaleLidDC5wfdQrP3DyCjIfQaYgzuoIJPKFAs3FQs0Q43DGXqWj6qeyTaZEr+JgwhYYO4Ju5Ww==
   dependencies:
     "@nestjs/mapped-types" "1.2.2"
     class-transformer "0.5.1"
     class-validator "0.14.0"
 
-"@discord-nestjs/core@^5.3.6":
-  version "5.3.6"
-  resolved "https://registry.yarnpkg.com/@discord-nestjs/core/-/core-5.3.6.tgz#ff7f7d456d05ada0cbe51b070b43551d5278c466"
-  integrity sha512-AHPkivFJoL+2G+rqZVzmNGL4X1TGGXvJDgNlULHRN/wn4GXVbHXdB3tLJY5PimgTFtj8jn+XFIbVLlLE/W9kLA==
+"@discord-nestjs/core@^5.3.7":
+  version "5.3.7"
+  resolved "https://registry.yarnpkg.com/@discord-nestjs/core/-/core-5.3.7.tgz#17da51aadcdd240161b14b8d8b19c299970e8ac1"
+  integrity sha512-wJMNeUAh0ZzN+Q0NAexPsd9oXSE/L/YrBd6/vWmd4t0NF0SgrwOqu5roh7IaB8Q040Ysh7wTqhFvEfHn8PMzhQ==
   dependencies:
     class-transformer "0.5.1"
 
@@ -5476,6 +5476,11 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zod-validation-error@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-1.3.0.tgz#6a37e8b1896e45362a4e4cf9506eca203fad3c6e"
+  integrity sha512-4WoQnuWnj06kwKR4A+cykRxFmy+CTvwMQO5ogTXLiVx1AuvYYmMjixh7sbkSsQTr1Fvtss6d5kVz8PGeMPUQjQ==
 
 zod@^3.21.4:
   version "3.21.4"

@@ -26,20 +26,23 @@ import { DiscordMessageService } from '../../clients/discord/discord.message.ser
 import { Track } from '../../models/shared/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
-import { trimStringToFixedLength, zeroPad } from '../../utils/stringUtils/stringUtils';
+import {
+  trimStringToFixedLength,
+  zeroPad,
+} from '../../utils/stringUtils/stringUtils';
 
 import { Interval } from '@nestjs/schedule';
 import { lightFormat } from 'date-fns';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
 import { PlaylistTempCommandData } from './playlist.types';
-import { tr } from 'date-fns/locale';
-import { takeCoverage } from 'v8';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Injectable()
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 @UseInterceptors(CollectorInterceptor)
 @UseCollectors(PlaylistInteractionCollector)

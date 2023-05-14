@@ -20,19 +20,21 @@ import {
   InteractionReplyOptions,
 } from 'discord.js';
 
-import { PlaybackService } from '../../playback/playback.service';
-import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { SearchHint } from '../../models/search/SearchHint';
+import { PlaybackService } from '../../playback/playback.service';
+import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
+import { defaultMemberPermissions } from 'src/utils/environment';
 import { PlayCommandParams, SearchType } from './play.params.ts';
 
 @Injectable()
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 export class PlayItemCommand {
   private readonly logger: Logger = new Logger(PlayItemCommand.name);

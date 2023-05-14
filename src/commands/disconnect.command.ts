@@ -6,11 +6,13 @@ import { CommandInteraction } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Injectable()
 @Command({
   name: 'disconnect',
   description: 'Join your current voice channel',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 export class DisconnectCommand {
   constructor(
