@@ -22,7 +22,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@discord-nestjs/common": "^5.2.4",
+    "@discord-nestjs/common": "^5.2.5",
     "@discord-nestjs/core": "^5.3.6",
     "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "^0.16.0",
