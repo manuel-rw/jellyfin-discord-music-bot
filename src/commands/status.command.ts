@@ -1,4 +1,9 @@
-import { Command, Handler, IA, InjectDiscordClient } from '@discord-nestjs/core';
+import {
+  Command,
+  Handler,
+  IA,
+  InjectDiscordClient,
+} from '@discord-nestjs/core';
 
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 
@@ -8,13 +13,14 @@ import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
 
-import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
+import { Constants } from '../utils/constants';
 
 @Command({
   name: 'status',
   description: 'Display the current status for troubleshooting',
+  defaultMemberPermissions: 'ViewChannel',
 })
 @Injectable()
 export class StatusCommand {

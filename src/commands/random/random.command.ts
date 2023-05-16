@@ -12,10 +12,12 @@ import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.serv
 import { SearchHint } from 'src/models/search/SearchHint';
 import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Command({
   name: 'random',
   description: 'Enqueues a random selection of tracks to your playlist',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 @Injectable()
 export class EnqueueRandomItemsCommand {

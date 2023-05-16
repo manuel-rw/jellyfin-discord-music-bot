@@ -6,11 +6,13 @@ import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Injectable()
 @Command({
   name: 'previous',
   description: 'Go to the previous track',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 export class PreviousTrackCommand {
   constructor(

@@ -7,10 +7,12 @@ import { CommandInteraction } from 'discord.js';
 import { PlaybackService } from '../playback/playback.service';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Command({
   name: 'stop',
   description: 'Stop playback entirely and clear the current playlist',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 @Injectable()
 export class StopPlaybackCommand {
