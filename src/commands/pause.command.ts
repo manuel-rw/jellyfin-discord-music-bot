@@ -6,11 +6,13 @@ import { CommandInteraction } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Injectable()
 @Command({
   name: 'pause',
   description: 'Pause or resume the playback of the current track',
+  defaultMemberPermissions: defaultMemberPermissions,
 })
 export class PausePlaybackCommand {
   constructor(
