@@ -24,7 +24,7 @@ export const environmentVariablesSchema = z.object({
   ALLOW_EVERYONE_FOR_DEFAULT_PERMS: z
     .enum(['true', 'false'])
     .default('false')
-    .transform((value) => Boolean(value)),
+    .transform((value) => value === 'true'),
 });
 
 export const getEnvironmentVariables = () => {
