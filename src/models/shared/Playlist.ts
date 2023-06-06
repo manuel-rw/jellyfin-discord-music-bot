@@ -1,4 +1,4 @@
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { Track } from './Track';
 
@@ -88,7 +88,7 @@ export class Playlist {
   /**
    * Add new track(-s) to the playlist
    * @param tracks the tracks that should be added
-   * @returns the new lendth of the tracks in the playlist
+   * @returns the new length of the tracks in the playlist
    */
   enqueueTracks(tracks: Track[]) {
     if (tracks.length === 0) {

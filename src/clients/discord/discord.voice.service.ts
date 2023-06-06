@@ -25,6 +25,7 @@ import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builde
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
 import { DiscordMessageService } from './discord.message.service';
+import { JellyfinSearchService } from '../jellyfin/jellyfin.search.service';
 
 @Injectable()
 export class DiscordVoiceService {
@@ -39,6 +40,7 @@ export class DiscordVoiceService {
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly jellyfinSearchService: JellyfinSearchService,
   ) {}
 
   @OnEvent('internal.audio.track.announce')
@@ -314,6 +316,7 @@ export class DiscordVoiceService {
 
       if (!hasNextTrack) {
         this.logger.debug('Reached the end of the playlist');
+        this.eventEmitter.emit('internal.audio.track.no-next-track');
         return;
       }
 

@@ -3,7 +3,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Api, Jellyfin } from '@jellyfin/sdk';
 import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api';
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Constants } from '../../utils/constants';
 import { JellyinPlaystateService } from './jellyfin.playstate.service';
 
@@ -16,10 +15,7 @@ export class JellyfinService {
   private userId: string;
   private connected = false;
 
-  constructor(
-    private eventEmitter: EventEmitter2,
-    private readonly jellyfinPlayState: JellyinPlaystateService,
-  ) {}
+  constructor(private readonly jellyfinPlayState: JellyinPlaystateService) {}
 
   init() {
     this.jellyfin = new Jellyfin({

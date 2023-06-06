@@ -19,6 +19,7 @@ import {
   getEnvironmentVariables,
 } from './utils/environment';
 import { fromZodError } from 'zod-validation-error';
+import { RadioModule } from './radio/radio.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { fromZodError } from 'zod-validation-error';
     PlaybackModule,
     UpdatesModule,
     HealthModule,
+    RadioModule,
   ],
   controllers: [],
   providers: [],

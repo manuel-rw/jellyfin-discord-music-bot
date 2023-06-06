@@ -105,7 +105,10 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           `Processing ${ids.length} ids received via websocket and adding them to the queue`,
         );
         const searchHints = await this.jellyfinSearchService.getAllById(ids);
-        const tracks = convertToTracks(searchHints, this.jellyfinSearchService);
+        const tracks = await convertToTracks(
+          searchHints,
+          this.jellyfinSearchService,
+        );
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       case SessionMessageType[SessionMessageType.Playstate]:

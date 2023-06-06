@@ -17,6 +17,8 @@ import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
 import { EnqueueRandomItemsCommand } from './random/random.command';
 import { VolumeCommand } from './volume/volume.command';
+import { RadioCommand } from './radio/radio.command';
+import { RadioModule } from 'src/radio/radio.module';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { VolumeCommand } from './volume/volume.command';
     JellyfinClientModule,
     DiscordClientModule,
     PlaybackModule,
+    RadioModule
   ],
   controllers: [],
   providers: [
@@ -40,6 +43,7 @@ import { VolumeCommand } from './volume/volume.command';
     PlayItemCommand,
     PreviousTrackCommand,
     VolumeCommand,
+    RadioCommand,
   ],
   exports: [],
 })
