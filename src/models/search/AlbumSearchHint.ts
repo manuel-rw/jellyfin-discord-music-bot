@@ -4,6 +4,7 @@ import { Track } from '../shared/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
 import { SearchHint } from './SearchHint';
+import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
 
 export class AlbumSearchHint extends SearchHint {
   override toString(): string {
@@ -17,7 +18,11 @@ export class AlbumSearchHint extends SearchHint {
       );
     }
 
-    return new AlbumSearchHint(hint.Id, hint.Name, hint.RunTimeTicks / 10000);
+    return new AlbumSearchHint(
+      hint.Id,
+      trimStringToFixedLength(hint.Name, 50),
+      hint.RunTimeTicks / 10000,
+    );
   }
 
   override async toTracks(

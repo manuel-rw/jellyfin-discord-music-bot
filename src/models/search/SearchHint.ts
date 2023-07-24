@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { Track } from '../shared/Track';
+import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
 
 export class SearchHint {
   constructor(
@@ -45,7 +46,7 @@ export class SearchHint {
 
     return new SearchHint(
       result.data.Id,
-      result.data.Name,
+      trimStringToFixedLength(result.data.Name, 50),
       result.data.RunTimeTicks / 10000,
     );
   }
@@ -58,7 +59,7 @@ export class SearchHint {
     }
     return new SearchHint(
       baseItem.Id,
-      baseItem.Name,
+      trimStringToFixedLength(baseItem.Name, 50),
       baseItem.RunTimeTicks / 10000,
     );
   }
