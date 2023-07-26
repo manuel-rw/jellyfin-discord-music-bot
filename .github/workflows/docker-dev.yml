@@ -10,8 +10,11 @@ on:
       - '.github/**'
       - 'images/'
       - '*.md'
-
   workflow_dispatch:
+    inputs:
+      tag:
+        required: false
+        description: 'Tag to deploy to'
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -51,8 +54,9 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=raw,value=dev
-            type=pep440,pattern={{version}}
+            type=ref,event=pr
+            type=raw,value=${{ github.event.inputs.tag }}, prefix=test-,enable=${{ github.event.inputs.tag != '' }}
+            tpye=raw,value=dev,priority=1,enable=${{ github.event.inputs.tag == '' }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
