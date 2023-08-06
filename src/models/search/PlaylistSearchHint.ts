@@ -5,6 +5,7 @@ import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.se
 
 import { SearchHint } from './SearchHint';
 import { convertToTracks } from 'src/utils/trackConverter';
+import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
 
 export class PlaylistSearchHint extends SearchHint {
   override toString(): string {
@@ -20,7 +21,7 @@ export class PlaylistSearchHint extends SearchHint {
 
     return new PlaylistSearchHint(
       hint.Id,
-      hint.Name,
+      trimStringToFixedLength(hint.Name, 50),
       hint.RunTimeTicks / 10000,
     );
   }
