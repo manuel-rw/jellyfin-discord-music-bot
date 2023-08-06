@@ -1,12 +1,19 @@
-import { Api } from '@jellyfin/sdk';
-import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api';
-import { SessionApi } from '@jellyfin/sdk/lib/generated-client/api/session-api';
-import {
-  BaseItemKind,
-  GeneralCommandType,
-} from '@jellyfin/sdk/lib/generated-client/models';
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api';
-import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
+const { Api } = await import('@jellyfin/sdk');
+const { PlaystateApi } = await import(
+  '@jellyfin/sdk/lib/generated-client/api/playstate-api'
+);
+const { SessionApi } = await import(
+  '@jellyfin/sdk/lib/generated-client/api/session-api'
+);
+const { BaseItemKind, GeneralCommandType } = await import(
+  '@jellyfin/sdk/lib/generated-client/models/index'
+);
+const { getPlaystateApi } = await import(
+  '@jellyfin/sdk/lib/utils/api/playstate-api'
+);
+const { getSessionApi } = await import(
+  '@jellyfin/sdk/lib/utils/api/session-api'
+);
 
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -15,16 +22,18 @@ import { Track } from '../../models/shared/Track';
 
 import { PlaybackService } from '../../playback/playback.service';
 
+type PlaystateApiType = typeof PlaystateApi;
+
 @Injectable()
 export class JellyinPlaystateService {
-  private playstateApi: PlaystateApi;
-  private sessionApi: SessionApi;
+  private playstateApi: PlaystateApiType;
+  private sessionApi: typeof SessionApi;
 
   constructor(private readonly playbackService: PlaybackService) {}
 
   private readonly logger = new Logger(JellyinPlaystateService.name);
 
-  async initializePlayState(api: Api) {
+  async initializePlayState(api: typeof Api) {
     this.initializeApis(api);
     await this.reportCapabilities();
   }
