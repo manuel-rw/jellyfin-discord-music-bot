@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^9.4.2",
-    "@nestjs/schematics": "^9.1.0",
+    "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^9.4.0",
     "@types/cron": "^2.0.1",
     "@types/express": "^4.17.13",
