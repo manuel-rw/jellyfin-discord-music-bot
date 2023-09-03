@@ -97,7 +97,7 @@ export class PlaylistCommand {
 
       if (!tempData) {
         this.logger.warn(
-          `Failed to update from interval, because temp data was not found`,
+          "Failed to update from interval, because temp data was not found",
         );
         return;
       }

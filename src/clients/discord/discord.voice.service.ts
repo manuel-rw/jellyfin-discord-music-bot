@@ -106,7 +106,7 @@ export class DiscordVoiceService {
   changeVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
       this.logger.error(
-        `Failed to change audio volume, AudioResource or volume was undefined`,
+        "Failed to change audio volume, AudioResource or volume was undefined",
       );
       return;
     }
@@ -248,14 +248,14 @@ export class DiscordVoiceService {
   private attachEventListenersToAudioPlayer() {
     if (!this.voiceConnection) {
       this.logger.error(
-        `Unable to attach listener events, because the VoiceConnection was undefined`,
+        "Unable to attach listener events, because the VoiceConnection was undefined",
       );
       return;
     }
 
     if (!this.audioPlayer) {
       this.logger.error(
-        `Unable to attach listener events, because the AudioPlayer was undefined`,
+        "Unable to attach listener events, because the AudioPlayer was undefined",
       );
       return;
     }
@@ -279,7 +279,7 @@ export class DiscordVoiceService {
     this.audioPlayer.on('stateChange', (previousState) => {
       if (!this.audioPlayer) {
         this.logger.error(
-          `Unable to process state change from audio player, because the current audio player in the callback was undefined`,
+          "Unable to process state change from audio player, because the current audio player in the callback was undefined",
         );
         return;
       }
@@ -333,7 +333,7 @@ export class DiscordVoiceService {
 
     if (!playlist) {
       this.logger.error(
-        `Failed to update ellapsed audio time because playlist was unexpectitly undefined`,
+        "Failed to update ellapsed audio time because playlist was unexpectitly undefined",
       );
       return;
     }
@@ -342,7 +342,7 @@ export class DiscordVoiceService {
 
     if (!activeTrack) {
       this.logger.error(
-        `Failed to update ellapsed audio time because active track was unexpectitly undefined`,
+        "Failed to update ellapsed audio time because active track was unexpectitly undefined",
       );
       return;
     }
