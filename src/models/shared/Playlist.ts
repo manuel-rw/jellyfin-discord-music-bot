@@ -1,4 +1,4 @@
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { Track } from './Track';
 
