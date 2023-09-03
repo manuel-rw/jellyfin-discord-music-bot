@@ -118,7 +118,7 @@ export class JellyfinSearchService {
 
     if (!axiosResponse.data.SearchHints) {
       this.logger.error(
-        `Received an unexpected empty list but expected a list of tracks of the album`,
+        "Received an unexpected empty list but expected a list of tracks of the album",
       );
       return [];
     }
@@ -227,7 +227,7 @@ export class JellyfinSearchService {
 
       if (!response.data.Items) {
         this.logger.error(
-          `Received empty list of items but expected a random list of tracks`,
+          "Received empty list of items but expected a random list of tracks",
         );
         return [];
       }

@@ -33,7 +33,7 @@ export class UpdatesService {
 
     if (!latestGitHubRelease) {
       this.logger.warn(
-        `Aborting update check because api request failed. Please check your internet connection or disable the check`,
+        "Aborting update check because api request failed. Please check your internet connection or disable the check",
       );
       return;
     }
