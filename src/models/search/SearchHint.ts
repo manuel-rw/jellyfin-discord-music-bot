@@ -19,6 +19,7 @@ export class SearchHint {
     return `🎵 ${this.name}`;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
     return [new Track(this.id, this.name, this.runtimeInMilliseconds, {})];
   }
