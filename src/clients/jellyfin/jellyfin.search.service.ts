@@ -44,9 +44,9 @@ export class JellyfinSearchService {
 
     try {
       const { data, status } = await searchApi.get({
-        searchTerm: searchTerm,
-        includeItemTypes: includeItemTypes,
-        limit: limit,
+        searchTerm,
+        includeItemTypes,
+        limit,
       });
 
       if (status !== 200) {
@@ -138,7 +138,7 @@ export class JellyfinSearchService {
     const { data } = await searchApi.getItems({
       ids: [id],
       userId: this.jellyfinService.getUserId(),
-      includeItemTypes: includeItemTypes,
+      includeItemTypes,
     });
 
     if (!data.Items || data.Items.length !== 1) {
@@ -157,9 +157,9 @@ export class JellyfinSearchService {
 
     const searchApi = getItemsApi(api);
     const { data } = await searchApi.getItems({
-      ids: ids,
+      ids,
       userId: this.jellyfinService.getUserId(),
-      includeItemTypes: includeItemTypes,
+      includeItemTypes,
     });
 
     if (!data.Items || data.Items.length !== 1) {
@@ -184,7 +184,7 @@ export class JellyfinSearchService {
       const axiosReponse = await remoteImageApi.getRemoteImages({
         itemId: id,
         includeAllLanguages: true,
-        limit: limit,
+        limit,
       });
 
       if (axiosReponse.status !== 200) {
@@ -219,7 +219,7 @@ export class JellyfinSearchService {
     try {
       const response = await searchApi.getItems({
         includeItemTypes: [BaseItemKind.Audio],
-        limit: limit,
+        limit,
         sortBy: ['random'],
         userId: this.jellyfinService.getUserId(),
         recursive: true,

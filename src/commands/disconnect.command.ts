@@ -12,7 +12,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'disconnect',
   description: 'Join your current voice channel',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class DisconnectCommand {
   constructor(

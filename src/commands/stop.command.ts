@@ -12,7 +12,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'stop',
   description: 'Stop playback entirely and clear the current playlist',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @Injectable()
 export class StopPlaybackCommand {
@@ -41,8 +41,8 @@ export class StopPlaybackCommand {
         this.discordMessageService[
           hasActiveTrack ? 'buildMessage' : 'buildErrorMessage'
         ]({
-          title: title,
-          description: description,
+          title,
+          description,
         }),
       ],
     });
