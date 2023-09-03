@@ -42,7 +42,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @UseInterceptors(CollectorInterceptor)
 @UseCollectors(PlaylistInteractionCollector)

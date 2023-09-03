@@ -16,7 +16,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'volume',
   description: 'Change the volume',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class VolumeCommand {
   private readonly logger = new Logger(VolumeCommand.name);

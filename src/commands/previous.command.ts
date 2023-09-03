@@ -12,7 +12,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'previous',
   description: 'Go to the previous track',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class PreviousTrackCommand {
   constructor(

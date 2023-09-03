@@ -11,7 +11,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'help',
   description: 'Get help if you&apos;re having problems with this bot',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class HelpCommand {
   constructor(private readonly discordMessageService: DiscordMessageService) {}

@@ -12,7 +12,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'summon',
   description: 'Join your current voice channel',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class SummonCommand {
   private readonly logger = new Logger(SummonCommand.name);

@@ -17,7 +17,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'random',
   description: 'Enqueues a random selection of tracks to your playlist',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @Injectable()
 export class EnqueueRandomItemsCommand {

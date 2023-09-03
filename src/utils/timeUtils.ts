@@ -10,7 +10,7 @@ export const formatMillisecondsAsHumanReadable = (
       end: 0,
     }),
     {
-      format: format,
+      format,
     },
   );
   return duration;

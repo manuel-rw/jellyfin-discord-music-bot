@@ -11,7 +11,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'next',
   description: 'Go to the next track in the playlist',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @Injectable()
 export class SkipTrackCommand {

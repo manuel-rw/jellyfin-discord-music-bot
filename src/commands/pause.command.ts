@@ -12,7 +12,7 @@ import { defaultMemberPermissions } from 'src/utils/environment';
 @Command({
   name: 'pause',
   description: 'Pause or resume the playback of the current track',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class PausePlaybackCommand {
   constructor(

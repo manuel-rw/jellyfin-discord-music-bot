@@ -34,7 +34,7 @@ import { PlayCommandParams, SearchType } from './play.params.ts';
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class PlayItemCommand {
   private readonly logger: Logger = new Logger(PlayItemCommand.name);
