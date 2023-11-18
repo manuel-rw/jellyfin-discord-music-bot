@@ -17,10 +17,14 @@ export class AlbumSearchHint extends SearchHint {
         'Unable to construct playlist search hint, required properties were undefined',
       );
     }
+    var artist = ""
+    if(hint.AlbumArtist) {
+    	artist = hint.AlbumArtist + " - "
+    }
 
     return new AlbumSearchHint(
       hint.Id,
-      trimStringToFixedLength(hint.Name, 50),
+      trimStringToFixedLength(artist + hint.Name, 70),
       hint.RunTimeTicks / 10000,
     );
   }
