@@ -154,7 +154,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   private buildSocketUrl(baseName: string, apiToken: string, device: string) {
     const url = new URL(baseName);
-    url.pathname = '/socket';
+    url.pathname += '/socket';
     url.protocol = url.protocol.replace('http', 'ws');
     url.search = `?api_key=${apiToken}&deviceId=${device}`;
     return url;
