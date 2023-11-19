@@ -197,7 +197,8 @@ export class DiscordVoiceService {
       };
     }
 
-    this.voiceConnection.destroy();
+    this.voiceConnection.disconnect();
+    this.audioPlayer = undefined;
     this.voiceConnection = undefined;
     return {
       success: true,
@@ -214,7 +215,7 @@ export class DiscordVoiceService {
     );
 
     connections.forEach((connection) => {
-      connection.destroy();
+      connection.disconnect();
     });
   }
 
