@@ -50,6 +50,7 @@ export class DiscordVoiceService {
       },
     );
     this.playResource(resource);
+    console.log(resource);
   }
 
   tryJoinChannelAndEstablishVoiceConnection(
