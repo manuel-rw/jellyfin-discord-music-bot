@@ -32,8 +32,13 @@ export class DisconnectCommand {
       ],
     });
 
-    this.discordVoiceService.stop(false);
-    this.playbackService.getPlaylistOrDefault().clear();
+    const playlist = this.playbackService.getPlaylistOrDefault();
+
+    if (playlist.hasActiveTrack()) {
+      this.discordVoiceService.stop(false);
+    }
+    playlist.clear();
+    
     const disconnect = this.discordVoiceService.disconnect();
 
     if (!disconnect.success) {
