@@ -6,7 +6,7 @@ import {
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
-import { flatMapTrackItems } from 'src/utils/trackConverter';
+import { flatMapTrackItems } from '../../utils/trackConverter';
 
 import { WebSocket } from 'ws';
 

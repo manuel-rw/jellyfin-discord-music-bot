@@ -4,8 +4,8 @@ import { Track } from '../music/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
 import { SearchItem } from './SearchItem';
-import { flatMapTrackItems } from 'src/utils/trackConverter';
-import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
+import { flatMapTrackItems } from '../../utils/trackConverter';
+import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 
 export class PlaylistSearchItem extends SearchItem {
   override toString(): string {

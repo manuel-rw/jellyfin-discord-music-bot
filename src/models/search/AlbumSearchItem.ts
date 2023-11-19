@@ -4,7 +4,7 @@ import { Track } from '../music/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
 import { SearchItem } from './SearchItem';
-import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
+import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 
 export class AlbumSearchItem extends SearchItem {
   override toString(): string {

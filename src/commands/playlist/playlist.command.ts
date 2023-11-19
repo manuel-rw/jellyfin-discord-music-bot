@@ -30,7 +30,7 @@ import {
 
 import { Interval } from '@nestjs/schedule';
 import { lightFormat } from 'date-fns';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
 import { PlaylistTempCommandData } from './playlist.types';
