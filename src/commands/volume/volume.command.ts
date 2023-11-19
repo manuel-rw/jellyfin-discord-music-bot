@@ -8,15 +8,15 @@ import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { PlaybackService } from 'src/playback/playback.service';
-import { sleep } from 'src/utils/timeUtils';
+import { sleepAsync } from '../../utils/timeUtils';
 import { VolumeCommandParams } from './volume.params';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 
 @Injectable()
 @Command({
   name: 'volume',
   description: 'Change the volume',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class VolumeCommand {
   private readonly logger = new Logger(VolumeCommand.name);
@@ -56,7 +56,7 @@ export class VolumeCommand {
     this.discordVoiceService.changeVolume(volume);
 
     // Discord takes some time to react. Confirmation message should appear after actual change
-    await sleep(1500);
+    await sleepAsync(1500);
 
     await interaction.editReply({
       embeds: [

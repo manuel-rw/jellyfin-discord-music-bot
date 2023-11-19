@@ -6,7 +6,7 @@ import {
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
-import { convertToTracks } from 'src/utils/trackConverter';
+import { flatMapTrackItems } from '../../utils/trackConverter';
 
 import { WebSocket } from 'ws';
 
@@ -105,13 +105,15 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           `Processing ${ids.length} ids received via websocket and adding them to the queue`,
         );
         const searchHints = await this.jellyfinSearchService.getAllById(ids);
-        const tracks = convertToTracks(searchHints, this.jellyfinSearchService);
+        const tracks = flatMapTrackItems(searchHints, this.jellyfinSearchService);
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       case SessionMessageType[SessionMessageType.Playstate]:
         const sendPlaystateCommandRequest =
           msg.Data as SessionApiSendPlaystateCommandRequest;
         this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
+        break;
+      case SessionMessageType[SessionMessageType.UserDataChanged]:
         break;
       default:
         this.logger.warn(
@@ -154,7 +156,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   private buildSocketUrl(baseName: string, apiToken: string, device: string) {
     const url = new URL(baseName);
-    url.pathname = '/socket';
+    url.pathname += '/socket';
     url.protocol = url.protocol.replace('http', 'ws');
     url.search = `?api_key=${apiToken}&deviceId=${device}`;
     return url;

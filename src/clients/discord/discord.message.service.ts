@@ -15,8 +15,8 @@ export class DiscordMessageService {
     description?: string;
   }): APIEmbed {
     return this.buildMessage({
-      title: title,
-      description: description,
+      title,
+      description,
       mixin(embedBuilder) {
         return embedBuilder
           .setAuthor({

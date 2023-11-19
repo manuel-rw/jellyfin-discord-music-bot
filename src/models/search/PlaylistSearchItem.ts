@@ -1,13 +1,13 @@
 import { SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { Track } from '../shared/Track';
+import { Track } from '../music/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 
-import { SearchHint } from './SearchHint';
-import { convertToTracks } from 'src/utils/trackConverter';
-import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
+import { SearchItem } from './SearchItem';
+import { flatMapTrackItems } from '../../utils/trackConverter';
+import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 
-export class PlaylistSearchHint extends SearchHint {
+export class PlaylistSearchItem extends SearchItem {
   override toString(): string {
     return `🎧 ${this.name}`;
   }
@@ -19,7 +19,7 @@ export class PlaylistSearchHint extends SearchHint {
       );
     }
 
-    return new PlaylistSearchHint(
+    return new PlaylistSearchItem(
       hint.Id,
       trimStringToFixedLength(hint.Name, 50),
       hint.RunTimeTicks / 10000,
@@ -30,6 +30,6 @@ export class PlaylistSearchHint extends SearchHint {
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
     const playlistItems = await searchService.getPlaylistitems(this.id);
-    return convertToTracks(playlistItems, searchService);
+    return flatMapTrackItems(playlistItems, searchService);
   }
 }

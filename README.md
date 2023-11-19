@@ -8,7 +8,7 @@
   <p align="center">A simple <a href="https://discord.com" target="_blank">Discord</a> bot that enables you to broadcast<br/>your <a href="https://jellyfin.org/" target="_blank">Jellyfin Media Server</a> music collection to voice channels.<br/>It's Open Source and can easily be hosted by yourself!</p>
 
 <p align="center">
-  <small>Thanky you <a href="https://github.com/KGT1/jellyfin-discord-music-bot/">KGT1</a> for starting this project!<br/>This is a fork of their original repository and re-uses some of their code.</small>
+  <small>Thank you <a href="https://github.com/KGT1/jellyfin-discord-music-bot/">KGT1</a> for starting this project!<br/>This is a fork of their original repository and re-uses some of their code.</small>
 </p>
 
 <p align="center">
@@ -28,14 +28,14 @@
 
 ## ✨ Features
 
-- Leighweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
+- Lightweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
 - Easy usage with Discord command system (eg. ``/play``, ``/pause``, ...)
 - Fast and validated configuration using environment variables
 - Typesafe code for quicker development and less bugs
 - Supports ``Music``, ``Playlists`` and ``Albums`` from your Jellyfin instance
 
 ## 📌 About this project
-This project was originally started by [KGT1 on Github](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came accross this project in late 2021, when wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completly rewritten in other parts using NestJs and features now a module-based approach.
+This project was originally started by [KGT1 on Github](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
 
 ## ⛔ Limitations
 
@@ -55,6 +55,7 @@ https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
 I'm open to any contributions to this project. You can start contributing using the following commands, after executing the installation commands:
 
 ## 👤 Credits
+
 - https://tabler-icons.io/
 - https://docs.nestjs.com/
 - https://discord.js.org/

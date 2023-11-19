@@ -6,13 +6,13 @@ import { CommandInteraction, GuildMember } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()
 @Command({
   name: 'summon',
   description: 'Join your current voice channel',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class SummonCommand {
   private readonly logger = new Logger(SummonCommand.name);

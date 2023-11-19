@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
-import { Playlist } from '../models/shared/Playlist';
+import { Playlist } from '../models/music/Playlist';
 
 @Injectable()
 export class PlaybackService {

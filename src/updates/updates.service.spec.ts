@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Client, GuildMember } from 'discord.js';
 import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { GithubRelease } from '../models/github-release';
+import { GithubRelease } from '../models/GithubRelease';
 import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { UpdatesService } from './updates.service';
 import { InjectionToken } from '@nestjs/common';

@@ -6,12 +6,12 @@ import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
   name: 'next',
   description: 'Go to the next track in the playlist',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @Injectable()
 export class SkipTrackCommand {

@@ -23,18 +23,18 @@ import {
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { SearchHint } from '../../models/search/SearchHint';
+import { SearchItem } from '../../models/search/SearchItem';
 import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 import { PlayCommandParams, SearchType } from './play.params.ts';
 
 @Injectable()
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class PlayItemCommand {
   private readonly logger: Logger = new Logger(PlayItemCommand.name);
@@ -55,7 +55,7 @@ export class PlayItemCommand {
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
-    let item: SearchHint | undefined;
+    let item: SearchItem | undefined;
     if (dto.name.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),
@@ -114,9 +114,7 @@ export class PlayItemCommand {
     await interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: `Added ${this.playbackService
-            .getPlaylistOrDefault()
-            .getLength()} tracks to your playlist (${formatMillisecondsAsHumanReadable(
+          title: `Added ${tracks.length} tracks to your playlist (${formatMillisecondsAsHumanReadable(
             reducedDuration,
           )})`,
           mixin(embedBuilder) {

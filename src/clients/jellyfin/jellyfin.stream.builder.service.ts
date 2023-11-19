@@ -17,20 +17,25 @@ export class JellyfinStreamBuilderService {
 
     const accessToken = this.jellyfinService.getApi().accessToken;
 
-    const uri = new URL(api.basePath);
-    uri.pathname = `/Audio/${jellyfinItemId}/universal`;
-    uri.searchParams.set('UserId', this.jellyfinService.getUserId());
-    uri.searchParams.set(
+    const url = new URL(api.basePath);
+    if (!url.pathname.endsWith('/')) {
+      url.pathname += "/";
+    }
+    url.pathname += `Audio/${jellyfinItemId}/universal`;
+    url.searchParams.set('UserId', this.jellyfinService.getUserId());
+    url.searchParams.set(
       'DeviceId',
       this.jellyfinService.getJellyfin().clientInfo.name,
     );
-    uri.searchParams.set('MaxStreamingBitrate', `${bitrate}`);
-    uri.searchParams.set('Container', 'ogg,opus');
-    uri.searchParams.set('AudioCodec', 'opus');
-    uri.searchParams.set('TranscodingContainer', 'ts');
-    uri.searchParams.set('TranscodingProtocol', 'hls');
-    uri.searchParams.set('api_key', accessToken);
+    url.searchParams.set('MaxStreamingBitrate', `${bitrate}`);
+    url.searchParams.set('Container', 'ogg,opus');
+    url.searchParams.set('AudioCodec', 'opus');
+    url.searchParams.set('TranscodingContainer', 'ts');
+    url.searchParams.set('TranscodingProtocol', 'hls');
+    url.searchParams.set('api_key', accessToken);
 
-    return uri.toString();
+    this.logger.debug(`Built stream URL '${url}'`);
+
+    return url.toString();
   }
 }

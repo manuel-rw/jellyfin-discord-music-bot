@@ -11,7 +11,7 @@ import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
-import { Track } from '../../models/shared/Track';
+import { Track } from '../../models/music/Track';
 
 import { PlaybackService } from '../../playback/playback.service';
 

@@ -6,18 +6,20 @@ import { CommandInteraction } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../utils/environment';
+import { PlaybackService } from 'src/playback/playback.service';
 
 @Injectable()
 @Command({
   name: 'disconnect',
   description: 'Join your current voice channel',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 export class DisconnectCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly discordMessageService: DiscordMessageService,
+    private readonly playbackService: PlaybackService
   ) {}
 
   @Handler()
@@ -30,6 +32,13 @@ export class DisconnectCommand {
       ],
     });
 
+    const playlist = this.playbackService.getPlaylistOrDefault();
+
+    if (playlist.hasActiveTrack()) {
+      this.discordVoiceService.stop(false);
+    }
+    playlist.clear();
+    
     const disconnect = this.discordVoiceService.disconnect();
 
     if (!disconnect.success) {

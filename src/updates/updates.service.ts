@@ -6,7 +6,7 @@ import axios from 'axios';
 import { formatRelative, parseISO } from 'date-fns';
 import { ActionRowBuilder, ButtonStyle, Client } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { GithubRelease } from '../models/github-release';
+import { GithubRelease } from '../models/GithubRelease';
 import { Constants } from '../utils/constants';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class UpdatesService {
 
     if (!latestGitHubRelease) {
       this.logger.warn(
-        `Aborting update check because api request failed. Please check your internet connection or disable the check`,
+        "Aborting update check because api request failed. Please check your internet connection or disable the check",
       );
       return;
     }

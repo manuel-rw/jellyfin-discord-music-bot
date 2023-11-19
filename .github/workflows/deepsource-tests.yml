@@ -35,6 +35,8 @@ jobs:
         uses: actions/setup-node@v3
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
@@ -47,13 +49,13 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
       - run: yarn test:cov
-      - run: curl https://deepsource.io/cli | sh
-      - name: Report test-coverage to DeepSource
+      - name: Add git safe.directory for container
         run: |
-          # Install the CLI
-          curl https://deepsource.io/cli | sh
-
-          # Send the report to DeepSource
-          ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./coverage/lcov.info
-        env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+          mkdir -p /home/runner/work/_temp/_github_home
+          printf "[safe]\ndirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
+      - name: Report test-coverage to DeepSource
+        uses: deepsourcelabs/test-coverage-action@master
+        with:
+          key: javascript
+          coverage-file: ./coverage/lcov.info
+          dsn: ${{ secrets.DEEPSOURCE_DSN }}

@@ -10,12 +10,12 @@ export const formatMillisecondsAsHumanReadable = (
       end: 0,
     }),
     {
-      format: format,
+      format,
     },
   );
   return duration;
 };
 
-export function sleep(ms: number) {
+export function sleepAsync(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

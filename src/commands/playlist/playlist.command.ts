@@ -1,6 +1,5 @@
 import { CollectorInterceptor, SlashCommandPipe } from '@discord-nestjs/common';
 import {
-  AppliedCollectors,
   Command,
   Handler,
   IA,
@@ -13,17 +12,15 @@ import { Injectable, Logger, UseInterceptors } from '@nestjs/common';
 import {
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   EmbedBuilder,
-  InteractionCollector,
   InteractionReplyOptions,
   InteractionUpdateOptions,
 } from 'discord.js';
 
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
-import { Track } from '../../models/shared/Track';
+import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
 import {
@@ -33,16 +30,16 @@ import {
 
 import { Interval } from '@nestjs/schedule';
 import { lightFormat } from 'date-fns';
+import { defaultMemberPermissions } from '../../utils/environment';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
 import { PlaylistTempCommandData } from './playlist.types';
-import { defaultMemberPermissions } from 'src/utils/environment';
 
 @Injectable()
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
-  defaultMemberPermissions: defaultMemberPermissions,
+  defaultMemberPermissions,
 })
 @UseInterceptors(CollectorInterceptor)
 @UseCollectors(PlaylistInteractionCollector)
@@ -59,7 +56,6 @@ export class PlaylistCommand {
   async handler(
     @InteractionEvent(SlashCommandPipe) dto: PlaylistCommandParams,
     @IA() interaction: CommandInteraction,
-    @AppliedCollectors(0) collector: InteractionCollector<ButtonInteraction>,
   ): Promise<void> {
     const page = dto.page ?? 0;
 
@@ -97,7 +93,7 @@ export class PlaylistCommand {
 
       if (!tempData) {
         this.logger.warn(
-          `Failed to update from interval, because temp data was not found`,
+          "Failed to update from interval, because temp data was not found",
         );
         return;
       }
