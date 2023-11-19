@@ -9,7 +9,7 @@ export const flatMapTrackItems = (
   let tracks: Track[] = [];
   hints.forEach(async (hint) => {
     const searchedTracks = await hint.toTracks(jellyfinSearchService);
-    tracks = [...tracks, ...searchedTracks];
+    searchedTracks.forEach((track) => tracks.push(track));
   });
   return tracks;
 };
