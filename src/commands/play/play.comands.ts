@@ -114,9 +114,7 @@ export class PlayItemCommand {
     await interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: `Added ${this.playbackService
-            .getPlaylistOrDefault()
-            .getLength()} tracks to your playlist (${formatMillisecondsAsHumanReadable(
+          title: `Added ${tracks.length} tracks to your playlist (${formatMillisecondsAsHumanReadable(
             reducedDuration,
           )})`,
           mixin(embedBuilder) {

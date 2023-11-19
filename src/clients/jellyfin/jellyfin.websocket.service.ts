@@ -113,6 +113,8 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           msg.Data as SessionApiSendPlaystateCommandRequest;
         this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
         break;
+      case SessionMessageType[SessionMessageType.UserDataChanged]:
+        break;
       default:
         this.logger.warn(
           `Received a package from the socket of unknown type: ${msg.MessageType}`,
