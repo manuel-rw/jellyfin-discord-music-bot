@@ -50,7 +50,6 @@ export class DiscordVoiceService {
       },
     );
     this.playResource(resource);
-    console.log(resource);
   }
 
   tryJoinChannelAndEstablishVoiceConnection(
@@ -138,9 +137,7 @@ export class DiscordVoiceService {
    */
   @OnEvent('internal.voice.controls.stop')
   stop(force: boolean): boolean {
-    const stopped = this.createAndReturnOrGetAudioPlayer().stop(force);
-    this.eventEmitter.emit('playback.state.stop');
-    return stopped;
+    return this.createAndReturnOrGetAudioPlayer().stop(force);
   }
 
   /**
@@ -342,9 +339,6 @@ export class DiscordVoiceService {
     const activeTrack = playlist.getActiveTrack();
 
     if (!activeTrack) {
-      this.logger.error(
-        "Failed to update ellapsed audio time because active track was unexpectitly undefined",
-      );
       return;
     }
 
