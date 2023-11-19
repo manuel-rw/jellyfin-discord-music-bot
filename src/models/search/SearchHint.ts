@@ -31,6 +31,7 @@ export class SearchHint {
   static constructFromHint(hint: JellyfinSearchHint) {
     const schema = z.object({
       Id: z.string(),
+      Artists: z.array(z.string()),
       Name: z.string(),
       RunTimeTicks: z.number(),
     });
@@ -44,10 +45,18 @@ export class SearchHint {
         )}`,
       );
     }
-
+    var artist = "";
+    if (result.data.Artists !== null) {
+    	artist = result.data.Artists[0]
+	if (result.data.Artists.length > 1) {
+    		artist += ",... - "
+	} else {
+    		artist += " - "
+	}
+    }
     return new SearchHint(
       result.data.Id,
-      trimStringToFixedLength(result.data.Name, 50),
+      trimStringToFixedLength(artist + result.data.Name, 70),
       result.data.RunTimeTicks / 10000,
     );
   }
