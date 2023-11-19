@@ -6,7 +6,7 @@ import {
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
-import { convertToTracks } from 'src/utils/trackConverter';
+import { flatMapTrackItems } from 'src/utils/trackConverter';
 
 import { WebSocket } from 'ws';
 
@@ -105,7 +105,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           `Processing ${ids.length} ids received via websocket and adding them to the queue`,
         );
         const searchHints = await this.jellyfinSearchService.getAllById(ids);
-        const tracks = convertToTracks(searchHints, this.jellyfinSearchService);
+        const tracks = flatMapTrackItems(searchHints, this.jellyfinSearchService);
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       case SessionMessageType[SessionMessageType.Playstate]:

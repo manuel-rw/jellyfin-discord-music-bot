@@ -16,10 +16,10 @@ import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 
-import { GuildMember } from 'discord.js';
+import { APIEmbed, GuildMember, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload } from 'discord.js';
 
-import { GenericTryHandler } from '../../models/generic-try-handler';
-import { Track } from '../../models/shared/Track';
+import { TryResult } from '../../models/TryResult';
+import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
@@ -54,7 +54,7 @@ export class DiscordVoiceService {
 
   tryJoinChannelAndEstablishVoiceConnection(
     member: GuildMember,
-  ): GenericTryHandler {
+  ): TryResult<InteractionReplyOptions> {
     if (this.voiceConnection !== undefined) {
       this.logger.debug(
         'Avoided joining the voice channel because voice connection is already defined',
@@ -182,7 +182,7 @@ export class DiscordVoiceService {
     return true;
   }
 
-  disconnect(): GenericTryHandler {
+  disconnect(): TryResult<string | MessagePayload | InteractionEditReplyOptions> {
     if (this.voiceConnection === undefined) {
       return {
         success: false,

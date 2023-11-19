@@ -1,9 +1,9 @@
 import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
-import { SearchHint } from 'src/models/search/SearchHint';
-import { Track } from 'src/models/shared/Track';
+import { SearchItem } from 'src/models/search/SearchItem';
+import { Track } from 'src/models/music/Track';
 
-export const convertToTracks = (
-  hints: SearchHint[],
+export const flatMapTrackItems = (
+  hints: SearchItem[],
   jellyfinSearchService: JellyfinSearchService,
 ): Track[] => {
   let tracks: Track[] = [];
