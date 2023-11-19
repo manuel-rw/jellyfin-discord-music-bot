@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { Track } from '../music/Track';
-import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
+import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
 
 export class SearchItem {
   constructor(

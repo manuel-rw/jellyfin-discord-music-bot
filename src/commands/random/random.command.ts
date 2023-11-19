@@ -12,7 +12,7 @@ import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.serv
 import { SearchItem } from 'src/models/search/SearchItem';
 import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 
 @Command({
   name: 'random',

@@ -6,7 +6,7 @@ import { CommandInteraction } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../utils/environment';
 import { PlaybackService } from 'src/playback/playback.service';
 
 @Injectable()

@@ -8,9 +8,9 @@ import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { PlaybackService } from 'src/playback/playback.service';
-import { sleepAsync } from 'src/utils/timeUtils';
+import { sleepAsync } from '../../utils/timeUtils';
 import { VolumeCommandParams } from './volume.params';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 
 @Injectable()
 @Command({

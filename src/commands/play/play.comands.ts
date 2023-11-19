@@ -27,7 +27,7 @@ import { SearchItem } from '../../models/search/SearchItem';
 import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../../utils/environment';
 import { PlayCommandParams, SearchType } from './play.params.ts';
 
 @Injectable()

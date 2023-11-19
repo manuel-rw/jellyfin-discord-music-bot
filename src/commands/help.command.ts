@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandInteraction } from 'discord.js';
 
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { defaultMemberPermissions } from 'src/utils/environment';
+import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()
 @Command({
