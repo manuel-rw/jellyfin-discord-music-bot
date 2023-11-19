@@ -18,7 +18,7 @@ export class JellyfinStreamBuilderService {
     const accessToken = this.jellyfinService.getApi().accessToken;
 
     const uri = new URL(api.basePath);
-    uri.pathname = `/Audio/${jellyfinItemId}/universal`;
+    uri.pathname += `/Audio/${jellyfinItemId}/universal`;
     uri.searchParams.set('UserId', this.jellyfinService.getUserId());
     uri.searchParams.set(
       'DeviceId',
