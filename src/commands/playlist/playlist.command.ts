@@ -20,7 +20,7 @@ import {
 } from 'discord.js';
 
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
-import { Track } from '../../models/shared/Track';
+import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
 import {

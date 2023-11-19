@@ -9,7 +9,7 @@ import {
 import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
-import { SearchHint } from 'src/models/search/SearchHint';
+import { SearchItem } from 'src/models/search/SearchItem';
 import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
 import { defaultMemberPermissions } from 'src/utils/environment';
@@ -65,7 +65,7 @@ export class EnqueueRandomItemsCommand {
     });
   }
 
-  private async getTracks(hints: SearchHint[]) {
+  private async getTracks(hints: SearchItem[]) {
     const promises = await Promise.all(
       hints.flatMap(async (item) => {
         const tracks = await item.toTracks(this.jellyfinSearchService);

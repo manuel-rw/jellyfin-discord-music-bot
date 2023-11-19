@@ -23,7 +23,7 @@ import {
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { SearchHint } from '../../models/search/SearchHint';
+import { SearchItem } from '../../models/search/SearchItem';
 import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
@@ -55,7 +55,7 @@ export class PlayItemCommand {
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
-    let item: SearchHint | undefined;
+    let item: SearchItem | undefined;
     if (dto.name.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),

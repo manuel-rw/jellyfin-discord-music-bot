@@ -12,9 +12,9 @@ import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 
-import { AlbumSearchHint } from '../../models/search/AlbumSearchHint';
-import { PlaylistSearchHint } from '../../models/search/PlaylistSearchHint';
-import { SearchHint } from '../../models/search/SearchHint';
+import { AlbumSearchItem } from '../../models/search/AlbumSearchItem';
+import { PlaylistSearchItem } from '../../models/search/PlaylistSearchItem';
+import { SearchItem } from '../../models/search/SearchItem';
 
 import { JellyfinService } from './jellyfin.service';
 
@@ -32,7 +32,7 @@ export class JellyfinSearchService {
       BaseItemKind.MusicAlbum,
       BaseItemKind.Playlist,
     ],
-  ): Promise<SearchHint[]> {
+  ): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getSearchApi(api);
 
@@ -64,14 +64,14 @@ export class JellyfinSearchService {
 
       return SearchHints.map((hint) =>
         this.transformToSearchHintFromHint(hint),
-      ).filter((x) => x !== null) as SearchHint[];
+      ).filter((x) => x !== null) as SearchItem[];
     } catch (err) {
       this.logger.error(`Failed to search on Jellyfin: ${err}`);
       return [];
     }
   }
 
-  async getPlaylistitems(id: string): Promise<SearchHint[]> {
+  async getPlaylistitems(id: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getPlaylistsApi(api);
 
@@ -95,11 +95,11 @@ export class JellyfinSearchService {
     }
 
     return axiosResponse.data.Items.map((hint) =>
-      SearchHint.constructFromBaseItem(hint),
+      SearchItem.constructFromBaseItem(hint),
     );
   }
 
-  async getAlbumItems(albumId: string): Promise<SearchHint[]> {
+  async getAlbumItems(albumId: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getSearchApi(api);
     const axiosResponse = await searchApi.get({
@@ -125,13 +125,13 @@ export class JellyfinSearchService {
 
     return [...axiosResponse.data.SearchHints]
       .reverse()
-      .map((hint) => SearchHint.constructFromHint(hint));
+      .map((hint) => SearchItem.constructFromHint(hint));
   }
 
   async getById(
     id: string,
     includeItemTypes: BaseItemKind[],
-  ): Promise<SearchHint | undefined> {
+  ): Promise<SearchItem | undefined> {
     const api = this.jellyfinService.getApi();
 
     const searchApi = getItemsApi(api);
@@ -152,7 +152,7 @@ export class JellyfinSearchService {
   async getAllById(
     ids: string[],
     includeItemTypes: BaseItemKind[] = [BaseItemKind.Audio],
-  ): Promise<SearchHint[]> {
+  ): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
 
     const searchApi = getItemsApi(api);
@@ -169,7 +169,7 @@ export class JellyfinSearchService {
 
     return data.Items.map((item) =>
       this.transformToSearchHintFromBaseItemDto(item),
-    ).filter((searchHint) => searchHint !== undefined) as SearchHint[];
+    ).filter((searchHint) => searchHint !== undefined) as SearchItem[];
   }
 
   async getRemoteImageById(id: string, limit = 20): Promise<RemoteImageResult> {
@@ -233,7 +233,7 @@ export class JellyfinSearchService {
       }
 
       return response.data.Items.map((item) => {
-        return SearchHint.constructFromBaseItem(item);
+        return SearchItem.constructFromBaseItem(item);
       });
     } catch (err) {
       this.logger.error(
@@ -246,11 +246,11 @@ export class JellyfinSearchService {
   private transformToSearchHintFromHint(jellyifnHint: JellyfinSearchHint) {
     switch (jellyifnHint.Type) {
       case BaseItemKind[BaseItemKind.Audio]:
-        return SearchHint.constructFromHint(jellyifnHint);
+        return SearchItem.constructFromHint(jellyifnHint);
       case BaseItemKind[BaseItemKind.MusicAlbum]:
-        return AlbumSearchHint.constructFromHint(jellyifnHint);
+        return AlbumSearchItem.constructFromHint(jellyifnHint);
       case BaseItemKind[BaseItemKind.Playlist]:
-        return PlaylistSearchHint.constructFromHint(jellyifnHint);
+        return PlaylistSearchItem.constructFromHint(jellyifnHint);
       default:
         this.logger.warn(
           `Received unexpected item type from Jellyfin search: ${jellyifnHint.Type}`,
@@ -262,11 +262,11 @@ export class JellyfinSearchService {
   private transformToSearchHintFromBaseItemDto(baseItemDto: BaseItemDto) {
     switch (baseItemDto.Type) {
       case BaseItemKind[BaseItemKind.Audio]:
-        return SearchHint.constructFromBaseItem(baseItemDto);
+        return SearchItem.constructFromBaseItem(baseItemDto);
       case BaseItemKind[BaseItemKind.MusicAlbum]:
-        return AlbumSearchHint.constructFromBaseItem(baseItemDto);
+        return AlbumSearchItem.constructFromBaseItem(baseItemDto);
       case BaseItemKind[BaseItemKind.Playlist]:
-        return PlaylistSearchHint.constructFromBaseItem(baseItemDto);
+        return PlaylistSearchItem.constructFromBaseItem(baseItemDto);
       default:
         this.logger.warn(
           `Received unexpected item type from Jellyfin search: ${baseItemDto.Type}`,

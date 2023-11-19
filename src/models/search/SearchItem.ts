@@ -5,10 +5,10 @@ import {
 import { z } from 'zod';
 
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { Track } from '../shared/Track';
+import { Track } from '../music/Track';
 import { trimStringToFixedLength } from 'src/utils/stringUtils/stringUtils';
 
-export class SearchHint {
+export class SearchItem {
   constructor(
     protected readonly id: string,
     protected readonly name: string,
@@ -54,7 +54,7 @@ export class SearchHint {
     		artist += " - "
 	}
     }
-    return new SearchHint(
+    return new SearchItem(
       result.data.Id,
       trimStringToFixedLength(artist + result.data.Name, 70),
       result.data.RunTimeTicks / 10000,
@@ -67,7 +67,7 @@ export class SearchHint {
         'Unable to construct search hint from base item, required properties were undefined',
       );
     }
-    return new SearchHint(
+    return new SearchItem(
       baseItem.Id,
       trimStringToFixedLength(baseItem.Name, 50),
       baseItem.RunTimeTicks / 10000,
