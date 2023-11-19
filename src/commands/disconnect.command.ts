@@ -7,6 +7,7 @@ import { CommandInteraction } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from 'src/utils/environment';
+import { PlaybackService } from 'src/playback/playback.service';
 
 @Injectable()
 @Command({
@@ -18,6 +19,7 @@ export class DisconnectCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly discordMessageService: DiscordMessageService,
+    private readonly playbackService: PlaybackService
   ) {}
 
   @Handler()
@@ -30,6 +32,8 @@ export class DisconnectCommand {
       ],
     });
 
+    this.discordVoiceService.stop(false);
+    this.playbackService.getPlaylistOrDefault().clear();
     const disconnect = this.discordVoiceService.disconnect();
 
     if (!disconnect.success) {
