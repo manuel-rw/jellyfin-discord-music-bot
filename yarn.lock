@@ -929,13 +929,13 @@
     multer "1.4.4-lts.1"
     tslib "2.5.3"
 
-"@nestjs/schedule@^2.1.0":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/schedule/-/schedule-2.2.3.tgz#905912b43fc83323a4f992f43515c42b4b5be0c9"
-  integrity sha512-PxoGdoBwZQ6SzGfFcERTk7mDxrmesNt2cfqKgtLsFpjYNpV6ZYlKw9Ku8C0ZIjdhy0tBbysj+Fsi3sYua6o6Eg==
+"@nestjs/schedule@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/schedule/-/schedule-4.0.0.tgz#522fa0c79a2b44a66aab16a46bdf4c11ae73f3c3"
+  integrity sha512-zz4h54m/F/1qyQKvMJCRphmuwGqJltDAkFxUXCVqJBXEs5kbPt93Pza3heCQOcMH22MZNhGlc9DmDMLXVHmgVQ==
   dependencies:
-    cron "2.3.1"
-    uuid "9.0.0"
+    cron "3.1.3"
+    uuid "9.0.1"
 
 "@nestjs/schematics@^10.0.1":
   version "10.0.3"
@@ -2303,20 +2303,13 @@ create-require@^1.1.0:
   resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
-cron@*:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/cron/-/cron-3.1.0.tgz#8bb519a4191555bda829ea26f26b7b7bd2db8d4c"
-  integrity sha512-u6Z89TV7zhG7aW7MX7aLQhK5PYjTzFpzjFgiSX5r7qC1vjPvRt1FVfarHRaN/5IokEXM1DRJcXnwXI0e9G0awA==
+cron@*, cron@3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-3.1.3.tgz#4eac8f6691ce7e24c8e89b5317b8097d6f2d0053"
+  integrity sha512-KVxeKTKYj2eNzN4ElnT6nRSbjbfhyxR92O/Jdp6SH3pc05CDJws59jBrZWEMQlxevCiE6QUTrXy+Im3vC3oD3A==
   dependencies:
     "@types/luxon" "~3.3.0"
-    luxon "~3.3.0"
-
-cron@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/cron/-/cron-2.3.1.tgz#71caa566ffef60ada9183b8677df4afa9a214ad7"
-  integrity sha512-1eRRlIT0UfIqauwbG9pkg3J6CX9A6My2ytJWqAXoK0T9oJnUZTzGBNPxao0zjodIbPgf8UQWjE62BMb9eVllSQ==
-  dependencies:
-    luxon "^3.2.1"
+    luxon "~3.4.0"
 
 cross-spawn@^7.0.0, cross-spawn@^7.0.2, cross-spawn@^7.0.3:
   version "7.0.3"
@@ -4009,15 +4002,10 @@ lru-cache@^6.0.0:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.0.1.tgz#0a3be479df549cca0e5d693ac402ff19537a6b7a"
   integrity sha512-IJ4uwUTi2qCccrioU6g9g/5rvvVl13bsdczUUcqbciD9iLr095yj8DQKdObriEvuNSx325N1rV1O0sJFszx75g==
 
-luxon@^3.2.1:
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.4.3.tgz#8ddf0358a9492267ffec6a13675fbaab5551315d"
-  integrity sha512-tFWBiv3h7z+T/tDaoxA8rqTxy1CHV6gHS//QdaH4pulbq/JuBSGgQspQQqcgnwdAx6pNI7cmvz5Sv/addzHmUg==
-
-luxon@~3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.3.0.tgz#d73ab5b5d2b49a461c47cedbc7e73309b4805b48"
-  integrity sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==
+luxon@~3.4.0:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.4.4.tgz#cf20dc27dc532ba41a169c43fdcc0063601577af"
+  integrity sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==
 
 macos-release@^2.5.0:
   version "2.5.1"
@@ -5395,7 +5383,7 @@ uuid@9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
   integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
-uuid@^9.0.0:
+uuid@9.0.1, uuid@^9.0.0:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
