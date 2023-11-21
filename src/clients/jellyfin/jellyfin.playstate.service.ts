@@ -99,7 +99,7 @@ export class JellyinPlaystateService {
   private async onPlaybackProgress() {
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
 
-    if (!track) {
+    if (!track || !playlist.hasAnyPlaying()) {
       return;
     }
 
