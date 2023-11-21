@@ -162,7 +162,7 @@ export class JellyfinSearchService {
       includeItemTypes,
     });
 
-    if (!data.Items || data.Items.length !== 1) {
+    if (!data.Items || data.Items.length === 0) {
       this.logger.warn(`Failed to retrieve item via id '${ids}'`);
       return [];
     }
