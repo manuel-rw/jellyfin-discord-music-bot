@@ -140,7 +140,7 @@ export class Playlist {
     this.activeTrackIndex = undefined;
   }
 
-  private hasAnyPlaying() {
+  hasAnyPlaying() {
     return this.tracks.some((track) => track.playing);
   }
 
