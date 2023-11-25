@@ -9,6 +9,7 @@ import {
   joinVoiceChannel,
   NoSubscriberBehavior,
   VoiceConnection,
+  VoiceConnectionStatus,
 } from '@discordjs/voice';
 
 import { Injectable } from '@nestjs/common';
@@ -96,7 +97,12 @@ export class DiscordVoiceService {
     if (this.voiceConnection === undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);
     }
-
+    this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
+      if (this.voiceConnection !== undefined) {
+        const playlist = this.playbackService.getPlaylistOrDefault().clear();
+        this.disconnect();
+      }
+    });
     return {
       success: true,
       reply: {},
