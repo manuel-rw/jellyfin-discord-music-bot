@@ -3,7 +3,7 @@ export const Constants = {
     Version: {
       Major: 0,
       Minor: 1,
-      Patch: 0,
+      Patch: 1,
       All: () =>
         `${Constants.Metadata.Version.Major}.${Constants.Metadata.Version.Minor}.${Constants.Metadata.Version.Patch}`,
     },

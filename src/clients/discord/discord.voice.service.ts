@@ -9,6 +9,7 @@ import {
   joinVoiceChannel,
   NoSubscriberBehavior,
   VoiceConnection,
+  VoiceConnectionStatus,
 } from '@discordjs/voice';
 
 import { Injectable } from '@nestjs/common';
@@ -96,7 +97,12 @@ export class DiscordVoiceService {
     if (this.voiceConnection === undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);
     }
-
+    this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
+      if (this.voiceConnection !== undefined) {
+        const playlist = this.playbackService.getPlaylistOrDefault().clear();
+        this.disconnect();
+      }
+    });
     return {
       success: true,
       reply: {},
@@ -129,6 +135,10 @@ export class DiscordVoiceService {
   @OnEvent('internal.voice.controls.pause')
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
+    const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
+    if(track) {
+      track.playing = false;
+    }
     this.eventEmitter.emit('playback.state.pause', true);
   }
 
@@ -137,7 +147,13 @@ export class DiscordVoiceService {
    */
   @OnEvent('internal.voice.controls.stop')
   stop(force: boolean): boolean {
-    return this.createAndReturnOrGetAudioPlayer().stop(force);
+    const hasStopped = this.createAndReturnOrGetAudioPlayer().stop(force);
+    if (hasStopped) {
+      const playlist = this.playbackService.getPlaylistOrDefault();
+      this.eventEmitter.emit('internal.audio.track.finish', playlist.getActiveTrack());
+      playlist.clear();
+    }
+    return hasStopped;
   }
 
   /**
@@ -145,6 +161,10 @@ export class DiscordVoiceService {
    */
   unpause() {
     this.createAndReturnOrGetAudioPlayer().unpause();
+    const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
+    if(track) {
+      track.playing = true;
+    }
     this.eventEmitter.emit('playback.state.pause', false);
   }
 
