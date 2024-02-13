@@ -40,7 +40,7 @@
     "joi": "^17.9.2",
     "libsodium-wrappers": "^0.7.10",
     "opusscript": "^0.1.1",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.1.14",
     "rimraf": "^5.0.1",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.0",
