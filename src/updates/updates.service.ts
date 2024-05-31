@@ -2,7 +2,6 @@ import { InjectDiscordClient } from '@discord-nestjs/core';
 import { ButtonBuilder } from '@discordjs/builders';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import axios from 'axios';
 import { formatRelative, parseISO } from 'date-fns';
 import { ActionRowBuilder, ButtonStyle, Client } from 'discord.js';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
@@ -104,16 +103,15 @@ export class UpdatesService {
   }
 
   private async fetchLatestGithubRelease(): Promise<GithubRelease | undefined> {
-    return axios({
+    return fetch(Constants.Links.Api.GetLatestRelease, {
       method: 'GET',
-      url: Constants.Links.Api.GetLatestRelease,
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status !== 200) {
           return undefined;
         }
 
-        return response.data as GithubRelease;
+        return (await response.json()) as GithubRelease;
       })
       .catch((err) => {
         this.logger.error('Error while checking for updates', err);
