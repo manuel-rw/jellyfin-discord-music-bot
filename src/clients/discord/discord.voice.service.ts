@@ -99,7 +99,7 @@ export class DiscordVoiceService {
     }
     this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
       if (this.voiceConnection !== undefined) {
-        const playlist = this.playbackService.getPlaylistOrDefault().clear();
+        this.playbackService.getPlaylistOrDefault().clear();
         this.disconnect();
       }
     });
@@ -122,11 +122,17 @@ export class DiscordVoiceService {
   playResource(resource: AudioResource<unknown>) {
     this.logger.debug(
       `Playing audio resource with volume ${
-        resource.volume?.volume ?? 'unknown'
-      }`,
+        resource.volume?.volume
+      } (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
+
+    const isPlayable = this.audioPlayer?.checkPlayable();
+    if (isPlayable) {
+      return;
+    }
+    this.logger.warn(`Current resource is is not playable. This means playback will get stuck. Please report this issue.`)
   }
 
   /**
@@ -177,14 +183,6 @@ export class DiscordVoiceService {
       this.createAndReturnOrGetAudioPlayer().state.status ===
       AudioPlayerStatus.Paused
     );
-  }
-
-  /**
-   * Gets the current audio player status
-   * @returns The current audio player status
-   */
-  getPlayerStatus(): AudioPlayerStatus {
-    return this.createAndReturnOrGetAudioPlayer().state.status;
   }
 
   /**
@@ -280,25 +278,22 @@ export class DiscordVoiceService {
     }
 
     this.voiceConnection.on('debug', (message) => {
-      if (process.env.DEBUG?.toLowerCase() !== 'true') {
-        return;
-      }
-      this.logger.debug(message);
+      this.logger.debug('Voice connection debug', message);
     });
     this.voiceConnection.on('error', (err) => {
-      this.logger.error(`Voice connection error: ${err}`);
+      this.logger.error('Voice connection error', err);
     });
 
     this.audioPlayer.on('debug', (message) => {
-      this.logger.debug(message);
+      this.logger.debug('Audio player debug', message);
     });
     this.audioPlayer.on('error', (message) => {
-      this.logger.error(message);
+      this.logger.error('Audio player error', message);
     });
     this.audioPlayer.on('stateChange', (previousState) => {
       if (!this.audioPlayer) {
         this.logger.error(
-          "Unable to process state change from audio player, because the current audio player in the callback was undefined",
+          'Unable to process state change from audio player, because the current audio player in the callback was undefined',
         );
         return;
       }
@@ -346,13 +341,11 @@ export class DiscordVoiceService {
       return;
     }
 
-    const progress = this.audioResource.playbackDuration;
-
     const playlist = this.playbackService.getPlaylistOrDefault();
 
     if (!playlist) {
       this.logger.error(
-        "Failed to update ellapsed audio time because playlist was unexpectitly undefined",
+        'Failed to update elapsed audio time because playlist was unexpectedly undefined',
       );
       return;
     }
@@ -363,9 +356,9 @@ export class DiscordVoiceService {
       return;
     }
 
-    activeTrack.updatePlaybackProgress(progress);
-    this.logger.verbose(
-      `Reporting progress: ${progress} on track ${activeTrack.id}`,
+    activeTrack.updatePlaybackProgress(this.audioResource.playbackDuration);
+    this.logger.debug(
+      `Reporting progress: ${this.audioResource.playbackDuration} on track ${activeTrack.id} (ended: ${this.audioResource.ended}) (started: ${this.audioResource.started}) (silence remaining: ${this.audioResource.silenceRemaining})`,
     );
   }
 }
