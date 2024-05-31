@@ -1,6 +1,6 @@
 {
   "name": "jellyfin-discord-music-bot",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "A simple and leightweight Discord Bot, that integrates with your Jellyfin Media server and enables you to listen to your favourite music directly from discord.",
   "author": "manuel-rw",
   "private": true,
