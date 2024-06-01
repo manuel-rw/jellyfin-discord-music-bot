@@ -1,6 +1,7 @@
 import { Choice, Param, ParamType } from '@discord-nestjs/core';
 
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models';
+import { PlaybackMode } from '../../types/playback-mode';
 
 export enum SearchType {
   Audio = 0,
@@ -19,6 +20,10 @@ export class PlayCommandParams {
   @Choice(SearchType)
   @Param({ description: 'Desired item type', type: ParamType.INTEGER })
   type: SearchType | undefined;
+
+  @Choice(PlaybackMode)
+  @Param({ description: 'Playback mode', type: ParamType.INTEGER, required: false })
+  mode: PlaybackMode | undefined = PlaybackMode.InOrder;
 
   static getBaseItemKinds(type: SearchType | undefined) {
     switch (type) {

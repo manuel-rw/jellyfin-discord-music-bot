@@ -28,7 +28,8 @@ import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
 import { defaultMemberPermissions } from '../../utils/environment';
-import { PlayCommandParams, SearchType } from './play.params.ts';
+import { PlayCommandParams, SearchType } from './play.params';
+import { PlaybackMode } from '../../types/playback-mode';
 
 @Injectable()
 @Command({
@@ -48,22 +49,22 @@ export class PlayItemCommand {
 
   @Handler()
   async handler(
-    @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
+    @InteractionEvent(SlashCommandPipe) commandOptions: PlayCommandParams,
     @IA() interaction: CommandInteraction,
   ) {
     await interaction.deferReply({ ephemeral: true });
 
-    const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
+    const baseItems = PlayCommandParams.getBaseItemKinds(commandOptions.type);
 
     let item: SearchItem | undefined;
-    if (dto.name.startsWith('native-')) {
+    if (commandOptions.name.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
-        dto.name.replace('native-', ''),
+        commandOptions.name.replace('native-', ''),
         baseItems,
       );
     } else {
       item = (
-        await this.jellyfinSearchService.searchItem(dto.name, 1, baseItems)
+        await this.jellyfinSearchService.searchItem(commandOptions.name, 1, baseItems)
       ).find((x) => x);
     }
 
@@ -96,7 +97,15 @@ export class PlayItemCommand {
       return;
     }
 
-    const tracks = await item.toTracks(this.jellyfinSearchService);
+    let tracks = await item.toTracks(this.jellyfinSearchService);
+
+    if (commandOptions.mode == PlaybackMode.ShuffleRandomly) {
+      tracks = tracks
+        .map((track) => ({ track: track, sort: Math.random() }))
+        .sort((track1, track2) => track1.sort - track2.sort)
+        .map(({ track }) => track);
+    }
+
     this.logger.debug(`Extracted ${tracks.length} tracks from the search item`);
     const reducedDuration = tracks.reduce(
       (sum, item) => sum + item.duration,
