@@ -29,18 +29,18 @@
 ## ✨ Features
 
 - Lightweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
-- Easy usage with Discord command system (eg. ``/play``, ``/pause``, ...)
+- Easy usage with Discord command system (e.g. ``/play``, ``/pause``, ...)
 - Fast and validated configuration using environment variables
 - Typesafe code for quicker development and less bugs
 - Supports ``Music``, ``Playlists`` and ``Albums`` from your Jellyfin instance
 
 ## 📌 About this project
-This project was originally started by [KGT1 on Github](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
+This project was originally started by [KGT1 on GitHub](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
 
 ## ⛔ Limitations
 
 - Bot does not support shards. This means, you cannot use it in multiple servers concurrently.
-- Album covers are not visible, unless they are remote (eg. provided by external metadata provider)
+- Album covers are not visible, unless they are remote (e.g. provided by external metadata provider)
 - Streaming any video content in voice channels (See [this issue](https://github.com/discordjs/discord.js/issues/4116))
 
 ## 🚀 Installation

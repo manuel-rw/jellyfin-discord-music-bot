@@ -19,7 +19,7 @@ export class JellyfinStreamBuilderService {
 
     const url = new URL(api.basePath);
     if (!url.pathname.endsWith('/')) {
-      url.pathname += "/";
+      url.pathname += '/';
     }
     url.pathname += `Audio/${jellyfinItemId}/universal`;
     url.searchParams.set('UserId', this.jellyfinService.getUserId());

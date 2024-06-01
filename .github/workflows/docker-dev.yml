@@ -44,8 +44,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn install --immutable
-      - run: yarn test
+      - run: yarn format
       - run: yarn build
+      - run: yarn test
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4

@@ -3,7 +3,7 @@ import { PlaystateCommand } from '@jellyfin/sdk/lib/generated-client/models';
 export class PlayNowCommand {
   /**
    * A list of all items available in the parent element.
-   * Usually, this is a list of all tracks in an album or playlist.
+   * Usually, this is a list of all tracks on an album or playlist.
    */
   ItemIds: string[];
 

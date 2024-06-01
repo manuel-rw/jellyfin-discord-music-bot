@@ -30,7 +30,7 @@ export class StopPlaybackCommand {
       await interaction.reply({
         embeds: [
           this.discordMessageService.buildErrorMessage({
-            title: 'Unable to stop when nothing is playing'
+            title: 'Unable to stop when nothing is playing',
           }),
         ],
       });
@@ -45,7 +45,7 @@ export class StopPlaybackCommand {
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'Playback stopped'
+          title: 'Playback stopped',
         }),
       ],
     });

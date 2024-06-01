@@ -17,7 +17,12 @@ import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 
-import { APIEmbed, GuildMember, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload } from 'discord.js';
+import {
+  GuildMember,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
+  MessagePayload,
+} from 'discord.js';
 
 import { TryResult } from '../../models/TryResult';
 import { Track } from '../../models/music/Track';
@@ -112,7 +117,7 @@ export class DiscordVoiceService {
   changeVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
       this.logger.error(
-        "Failed to change audio volume, AudioResource or volume was undefined",
+        'Failed to change audio volume, AudioResource or volume was undefined',
       );
       return;
     }
@@ -121,9 +126,7 @@ export class DiscordVoiceService {
 
   playResource(resource: AudioResource<unknown>) {
     this.logger.debug(
-      `Playing audio resource with volume ${
-        resource.volume?.volume
-      } (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
+      `Playing audio resource with volume ${resource.volume?.volume} (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
@@ -132,7 +135,9 @@ export class DiscordVoiceService {
     if (isPlayable) {
       return;
     }
-    this.logger.warn(`Current resource is is not playable. This means playback will get stuck. Please report this issue.`)
+    this.logger.warn(
+      `Current resource is is not playable. This means playback will get stuck. Please report this issue.`,
+    );
   }
 
   /**
@@ -142,7 +147,7 @@ export class DiscordVoiceService {
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
-    if(track) {
+    if (track) {
       track.playing = false;
     }
     this.eventEmitter.emit('playback.state.pause', true);
@@ -156,7 +161,10 @@ export class DiscordVoiceService {
     const hasStopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     if (hasStopped) {
       const playlist = this.playbackService.getPlaylistOrDefault();
-      this.eventEmitter.emit('internal.audio.track.finish', playlist.getActiveTrack());
+      this.eventEmitter.emit(
+        'internal.audio.track.finish',
+        playlist.getActiveTrack(),
+      );
       playlist.clear();
     }
     return hasStopped;
@@ -168,7 +176,7 @@ export class DiscordVoiceService {
   unpause() {
     this.createAndReturnOrGetAudioPlayer().unpause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
-    if(track) {
+    if (track) {
       track.playing = true;
     }
     this.eventEmitter.emit('playback.state.pause', false);
@@ -200,7 +208,9 @@ export class DiscordVoiceService {
     return true;
   }
 
-  disconnect(): TryResult<string | MessagePayload | InteractionEditReplyOptions> {
+  disconnect(): TryResult<
+    string | MessagePayload | InteractionEditReplyOptions
+  > {
     if (this.voiceConnection === undefined) {
       return {
         success: false,
@@ -265,14 +275,14 @@ export class DiscordVoiceService {
   private attachEventListenersToAudioPlayer() {
     if (!this.voiceConnection) {
       this.logger.error(
-        "Unable to attach listener events, because the VoiceConnection was undefined",
+        'Unable to attach listener events, because the VoiceConnection was undefined',
       );
       return;
     }
 
     if (!this.audioPlayer) {
       this.logger.error(
-        "Unable to attach listener events, because the AudioPlayer was undefined",
+        'Unable to attach listener events, because the AudioPlayer was undefined',
       );
       return;
     }

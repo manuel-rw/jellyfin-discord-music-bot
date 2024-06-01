@@ -1,6 +1,11 @@
 import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+} from 'discord.js';
 
 import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
@@ -19,7 +24,7 @@ export class CommandExecutionError implements ExceptionFilter {
     }
 
     this.logger.error(
-      `Exception catched during the execution of command '${interaction.commandName}': ${exception.message}`,
+      `Exception caught during the execution of command '${interaction.commandName}': ${exception.message}`,
       exception.stack,
     );
 
@@ -38,10 +43,10 @@ export class CommandExecutionError implements ExceptionFilter {
         ),
     );
 
-    interaction.reply({
+    await interaction.reply({
       embeds: [
         this.discordMessageService.buildErrorMessage({
-          title: 'An unexpected exception occured',
+          title: 'An unexpected exception occurred',
           description: `Oh no! This isn't supposed to happen. Something did not went right during the execution of your command.\n\nPlease check if there is any update available. If not, please check on ${Constants.Links.Issues} if this problem has already been reported. If not, please report this problem using the button below.\n\n**Debug Information** (please include in your report):\n\`\`\`${exception.stack}\`\`\``,
         }),
       ],

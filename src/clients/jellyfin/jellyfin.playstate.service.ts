@@ -25,7 +25,7 @@ export class JellyinPlaystateService {
   private readonly logger = new Logger(JellyinPlaystateService.name);
 
   async initializePlayState(api: Api) {
-    this.initializeApis(api);
+    await this.initializeApis(api);
     await this.reportCapabilities();
   }
 

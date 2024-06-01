@@ -43,7 +43,7 @@ describe('UpdatesService', () => {
                     ({
                       send: jest.fn(),
                       user: { tag: 'test' },
-                    } as unknown as GuildMember),
+                    }) as unknown as GuildMember,
                 },
               ],
             },

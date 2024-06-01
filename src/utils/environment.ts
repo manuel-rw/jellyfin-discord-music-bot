@@ -36,4 +36,6 @@ export const getEnvironmentVariables = () => {
 };
 
 export const defaultMemberPermissions: PermissionResolvable | undefined =
-  getEnvironmentVariables().ALLOW_EVERYONE_FOR_DEFAULT_PERMS ? 'ViewChannel' : undefined;
+  getEnvironmentVariables().ALLOW_EVERYONE_FOR_DEFAULT_PERMS
+    ? 'ViewChannel'
+    : undefined;

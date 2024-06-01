@@ -1,7 +1,7 @@
 import { useDefaultMockerToken } from './defaultMockerToken';
 
 describe('defaultMockerToken', () => {
-  it('useDefaultMockerTokenShouldbeNull', () => {
+  it('useDefaultMockerTokenShouldBeNull', () => {
     const mockerToken = useDefaultMockerToken('test');
 
     expect(mockerToken).toBeNull();
