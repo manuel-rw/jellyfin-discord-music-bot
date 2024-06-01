@@ -195,7 +195,7 @@ export class DiscordVoiceService {
 
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
-   * @returns The new paused state - true: paused, false: unpaused
+   * @returns The new paused state - true: paused, false: un-paused
    */
   @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
@@ -237,7 +237,7 @@ export class DiscordVoiceService {
   disconnectGracefully() {
     const connections = getVoiceConnections();
     this.logger.debug(
-      `Disonnecting gracefully from ${
+      `Disconnecting gracefully from ${
         Object.keys(connections).length
       } connections`,
     );

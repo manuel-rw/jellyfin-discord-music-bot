@@ -11,15 +11,6 @@ export class Playlist {
   }
 
   /**
-   * Returns if the playlist has been started.
-   * Does not indicate if it's paused.
-   * @returns if the playlist has been started and has an active track
-   */
-  hasStarted() {
-    return this.activeTrackIndex !== undefined;
-  }
-
-  /**
    * Checks if the active track is out of bounds
    * @returns active track or undefined if there's none
    */
@@ -28,10 +19,6 @@ export class Playlist {
       return undefined;
     }
     return this.tracks[this.activeTrackIndex];
-  }
-
-  isEmpty(): boolean {
-    return this.tracks.length === 0;
   }
 
   hasActiveTrack(): boolean {
@@ -88,7 +75,7 @@ export class Playlist {
   /**
    * Add new track(-s) to the playlist
    * @param tracks the tracks that should be added
-   * @returns the new lendth of the tracks in the playlist
+   * @returns the new length of the tracks in the playlist
    */
   enqueueTracks(tracks: Track[]) {
     if (tracks.length === 0) {
@@ -124,14 +111,6 @@ export class Playlist {
    */
   hasNextTrackInPlaylist() {
     return (this.activeTrackIndex ?? 0) + 1 < this.tracks.length;
-  }
-
-  /**
-   * Check if there is a previous track
-   * @returns if there is a previous track in the playlist
-   */
-  hasPreviousTrackInPlaylist() {
-    return this.activeTrackIndex !== undefined && this.activeTrackIndex > 0;
   }
 
   clear() {
@@ -176,9 +155,3 @@ export class Playlist {
     );
   }
 }
-
-export type PlaylistPlaybackType =
-  | 'once'
-  | 'repeat-once'
-  | 'repeat-indefinetly'
-  | 'shuffle';

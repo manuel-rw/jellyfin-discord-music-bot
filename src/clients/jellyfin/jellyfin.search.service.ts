@@ -71,7 +71,7 @@ export class JellyfinSearchService {
     }
   }
 
-  async getPlaylistitems(id: string): Promise<SearchItem[]> {
+  async getPlaylistItems(id: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getPlaylistsApi(api);
 
@@ -181,15 +181,15 @@ export class JellyfinSearchService {
     );
 
     try {
-      const axiosReponse = await remoteImageApi.getRemoteImages({
+      const axiosResponse = await remoteImageApi.getRemoteImages({
         itemId: id,
         includeAllLanguages: true,
         limit,
       });
 
-      if (axiosReponse.status !== 200) {
+      if (axiosResponse.status !== 200) {
         this.logger.warn(
-          `Failed to retrieve remote images. Response has status ${axiosReponse.status}`,
+          `Failed to retrieve remote images. Response has status ${axiosResponse.status}`,
         );
         return {
           Images: [],
@@ -199,9 +199,9 @@ export class JellyfinSearchService {
       }
 
       this.logger.verbose(
-        `Retrieved ${axiosReponse.data.TotalRecordCount} remote images from Jellyfin`,
+        `Retrieved ${axiosResponse.data.TotalRecordCount} remote images from Jellyfin`,
       );
-      return axiosReponse.data;
+      return axiosResponse.data;
     } catch (err) {
       this.logger.error(`Failed to retrieve remote images: ${err}`);
       return {
@@ -243,17 +243,17 @@ export class JellyfinSearchService {
     }
   }
 
-  private transformToSearchHintFromHint(jellyifnHint: JellyfinSearchHint) {
-    switch (jellyifnHint.Type) {
+  private transformToSearchHintFromHint(jellyfinHint: JellyfinSearchHint) {
+    switch (jellyfinHint.Type) {
       case BaseItemKind[BaseItemKind.Audio]:
-        return SearchItem.constructFromHint(jellyifnHint);
+        return SearchItem.constructFromHint(jellyfinHint);
       case BaseItemKind[BaseItemKind.MusicAlbum]:
-        return AlbumSearchItem.constructFromHint(jellyifnHint);
+        return AlbumSearchItem.constructFromHint(jellyfinHint);
       case BaseItemKind[BaseItemKind.Playlist]:
-        return PlaylistSearchItem.constructFromHint(jellyifnHint);
+        return PlaylistSearchItem.constructFromHint(jellyfinHint);
       default:
         this.logger.warn(
-          `Received unexpected item type from Jellyfin search: ${jellyifnHint.Type}`,
+          `Received unexpected item type from Jellyfin search: ${jellyfinHint.Type}`,
         );
         return undefined;
     }

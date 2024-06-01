@@ -4,7 +4,7 @@ export const formatMillisecondsAsHumanReadable = (
   milliseconds: number,
   format = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'],
 ) => {
-  const duration = formatDuration(
+  return formatDuration(
     intervalToDuration({
       start: milliseconds,
       end: 0,
@@ -13,7 +13,6 @@ export const formatMillisecondsAsHumanReadable = (
       format,
     },
   );
-  return duration;
 };
 
 export function sleepAsync(ms: number) {

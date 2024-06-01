@@ -46,7 +46,7 @@ export class PlaylistSearchItem extends SearchItem {
   override async toTracks(
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
-    const playlistItems = await searchService.getPlaylistitems(this.id);
+    const playlistItems = await searchService.getPlaylistItems(this.id);
     return flatMapTrackItems(playlistItems, searchService);
   }
 }

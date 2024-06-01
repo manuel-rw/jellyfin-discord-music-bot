@@ -16,7 +16,7 @@ export class PlayNowCommand {
 
   /**
    * An enum of possible play modes.
-   * PlayNow: Play the selection immideatly
+   * PlayNow: Play the selection immediately
    */
   PlayCommand: 'PlayNow';
 
@@ -38,23 +38,17 @@ export class PlayNowCommand {
   }
 }
 
-export interface SessionApiSendPlaystateCommandRequest {
+export interface SessionApiSendPlayStateCommandRequest {
   /**
-   * The MediaBrowser.Model.Session.PlaystateCommand.
-   * @type {PlaystateCommand}
-   * @memberof SessionApiSendPlaystateCommand
+   * The MediaBrowser.Model.Session.PlayStateCommand.
    */
   readonly Command: PlaystateCommand;
   /**
    * The optional position ticks.
-   * @type {number}
-   * @memberof SessionApiSendPlaystateCommand
    */
   readonly SeekPositionTicks?: number;
   /**
    * The optional controlling user id.
-   * @type {string}
-   * @memberof SessionApiSendPlaystateCommand
    */
   readonly ControllingUserId?: string;
 }

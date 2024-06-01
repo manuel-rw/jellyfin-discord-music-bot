@@ -5,21 +5,17 @@ import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api';
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Constants } from '../../utils/constants';
-import { JellyinPlaystateService } from './jellyfin.playstate.service';
+import { JellyfinPlayStateService } from './jellyfinPlayStateService';
 
 @Injectable()
 export class JellyfinService {
   private readonly logger = new Logger(JellyfinService.name);
   private jellyfin: Jellyfin;
   private api: Api;
-  private systemApi: SystemApi;
   private userId: string;
   private connected = false;
 
-  constructor(
-    private eventEmitter: EventEmitter2,
-    private readonly jellyfinPlayState: JellyinPlaystateService,
-  ) {}
+  constructor(private readonly jellyfinPlayState: JellyfinPlayStateService) {}
 
   init() {
     this.jellyfin = new Jellyfin({
@@ -57,8 +53,6 @@ export class JellyfinService {
           `Connected using user '${response.data.SessionInfo.UserId}'`,
         );
         this.userId = response.data.SessionInfo.UserId;
-
-        this.systemApi = getSystemApi(this.api);
         this.connected = true;
 
         await this.jellyfinPlayState.initializePlayState(this.api);
@@ -69,14 +63,14 @@ export class JellyfinService {
       });
   }
 
-  destroy() {
+  async destroy() {
     if (!this.api) {
       this.logger.warn(
-        'Jellyfin Api Client was unexpectitly undefined. Graceful destroy has failed',
+        'Jellyfin Api Client was unexpectedly undefined. Graceful destroy has failed',
       );
       return;
     }
-    this.api.logout();
+    await this.api.logout();
     this.connected = false;
   }
 
@@ -86,10 +80,6 @@ export class JellyfinService {
 
   getJellyfin() {
     return this.jellyfin;
-  }
-
-  getSystemApi() {
-    return this.systemApi;
   }
 
   getUserId() {

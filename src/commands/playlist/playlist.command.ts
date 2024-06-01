@@ -73,7 +73,7 @@ export class PlaylistCommand {
 
     setTimeout(async () => {
       this.logger.log(
-        `Removed the components of message from interaction '${interaction.id}' because the event collector has reachted the timeout`,
+        `Removed the components of message from interaction '${interaction.id}' because the event collector has reached the timeout`,
       );
       this.pageData.delete(interaction.id);
       await interaction.editReply({
@@ -109,7 +109,7 @@ export class PlaylistCommand {
     }
 
     this.logger.verbose(
-      `Updating playlist for ${this.pageData.size} playlist datas`,
+      `Updating playlist for ${this.pageData.size} playlist data`,
     );
 
     this.pageData.forEach(async (value) => {

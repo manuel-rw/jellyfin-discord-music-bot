@@ -40,7 +40,7 @@ export class VolumeCommand {
           this.discordMessageService.buildMessage({
             title: 'Unable to change your volume',
             description:
-              'The bot is not playing any music or is not straming to a channel',
+              'The bot is not playing any music or is not streaming to a channel',
           }),
         ],
       });
@@ -61,7 +61,7 @@ export class VolumeCommand {
     await interaction.editReply({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: `Sucessfully set volume to ${dto.volume.toFixed(0)}%`,
+          title: `Successfully set volume to ${dto.volume.toFixed(0)}%`,
           description:
             'Updating may take a few seconds to take effect.\nPlease note that listening at a high volume for a long time may damage your hearing',
         }),
