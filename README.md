@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://github.com/walkxcode/dashboard-icons/blob/main/png/jellyfin.png?raw=true" width="200" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://github.com/7eventy7/jellyfin-discord-music-bot/assets/75962770/f3e0efdc-740c-4307-8163-5f57586f4864" width="300" alt="Nest Logo" /></a>
 </p>
 
   <br/>
