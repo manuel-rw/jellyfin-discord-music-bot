@@ -31,7 +31,7 @@
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^9.4.0",
-    "@nestjs/event-emitter": "^2.0.3",
+    "@nestjs/event-emitter": "^2.0.4",
     "@nestjs/platform-express": "^9.4.2",
     "@nestjs/schedule": "^4.0.0",
     "@nestjs/serve-static": "^4.0.2",
