@@ -105,7 +105,7 @@ export class PlayItemCommand {
     this.logger.debug(
       `Adding ${tracks.length} tracks with a duration of ${reducedDuration} ticks`,
     );
-    this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
+    this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks, dto.next);
 
     const remoteImages = tracks.flatMap((track) => track.getRemoteImages());
     const remoteImage: RemoteImageInfo | undefined =

@@ -16,6 +16,13 @@ export class PlayCommandParams {
   })
   name: string;
 
+  @Param({
+    description: 'Add to the start of the playlist',
+    required: false,
+    type: ParamType.BOOLEAN,
+  })
+  next: boolean;
+
   @Choice(SearchType)
   @Param({ description: 'Desired item type', type: ParamType.INTEGER })
   type: SearchType | undefined;

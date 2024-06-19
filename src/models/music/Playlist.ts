@@ -77,7 +77,7 @@ export class Playlist {
    * @param tracks the tracks that should be added
    * @returns the new length of the tracks in the playlist
    */
-  enqueueTracks(tracks: Track[]) {
+  enqueueTracks(tracks: Track[], playNext = false) {
     if (tracks.length === 0) {
       return 0;
     }
@@ -88,13 +88,18 @@ export class Playlist {
       count: tracks.length,
       activeTrack: this.activeTrackIndex,
     });
-    const length = this.tracks.push(...tracks);
+
+    if (playNext) {
+      this.tracks = [...tracks, ...this.tracks];
+    } else {
+      this.tracks.push(...tracks);
+    }
 
     // existing tracks are in the playlist, but none are playing. play the first track out of the new tracks
     if (!this.hasAnyPlaying() && tracks.length > 0) {
       this.activeTrackIndex = previousTrackLength;
       this.announceTrackChange();
-      return length;
+      return this.tracks.length;
     }
 
     // emit a track change if there is no item
@@ -102,7 +107,7 @@ export class Playlist {
       this.announceTrackChange();
     }
 
-    return length;
+    return this.tracks.length;
   }
 
   /**
