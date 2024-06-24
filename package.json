@@ -33,7 +33,7 @@
     "@nestjs/core": "^9.4.0",
     "@nestjs/event-emitter": "^2.0.4",
     "@nestjs/platform-express": "^9.4.2",
-    "@nestjs/schedule": "^4.0.0",
+    "@nestjs/schedule": "^4.0.2",
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/terminus": "^10.2.3",
     "axios": "^1.7.2",
