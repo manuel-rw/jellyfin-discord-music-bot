@@ -12,16 +12,18 @@ import {
   VoiceConnectionStatus,
 } from '@discordjs/voice';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 
 import {
+  Client,
   GuildMember,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   MessagePayload,
+  VoiceChannel,
 } from 'discord.js';
 
 import { TryResult } from '../../models/TryResult';
@@ -31,6 +33,8 @@ import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builde
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
 import { DiscordMessageService } from './discord.message.service';
+import { InjectDiscordClient, On } from '@discord-nestjs/core';
+import { DiscordClientModule } from './discord.module';
 
 @Injectable()
 export class DiscordVoiceService {
@@ -38,6 +42,7 @@ export class DiscordVoiceService {
   private audioPlayer: AudioPlayer | undefined;
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
+  private voiceChannelId: string | undefined;
 
   constructor(
     private readonly discordMessageService: DiscordMessageService,
@@ -97,17 +102,43 @@ export class DiscordVoiceService {
       guildId: channel.guildId,
     });
 
+    this.voiceChannelId = channel.id;
+
     this.jellyfinWebSocketService.initializeAndConnect();
 
     if (this.voiceConnection === undefined) {
       this.voiceConnection = getVoiceConnection(member.guild.id);
     }
+
     this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
       if (this.voiceConnection !== undefined) {
         this.playbackService.getPlaylistOrDefault().clear();
         this.disconnect();
       }
     });
+
+    const mem = member;
+    setTimeout(() => {
+      // leaving channel cuz no listener left
+      const interaval = setInterval(async () => {
+        if (!this.voiceChannelId) return;
+        const voiceChannel = (await mem.guild.channels.fetch(
+          this.voiceChannelId,
+        )) as VoiceChannel;
+        // this.logger.log(voiceChannel?.name);
+        if (!voiceChannel) return;
+        const members = voiceChannel.members.filter((s) => !s.user?.bot);
+        // this.logger.log(members.size);
+        if (members.size === 0) {
+          try {
+            this.stop(true);
+            this.disconnect();
+            clearInterval(interaval);
+          } catch (E) {}
+        }
+      }, 1000 * 20);
+    }, 1000 * 60);
+
     return {
       success: true,
       reply: {},

@@ -54,6 +54,22 @@ export class Playlist {
   }
 
   /**
+   ** shuffle tracks
+   */
+  shuffle() {
+    if (!this.hasActiveTrack())
+      this.tracks = this.tracks.sort(() => Math.random() - 0.5);
+    else {
+      // shuffle all tracks except the active one
+      const activeTrack = this.tracks.splice(this.activeTrackIndex!, 1)[0];
+      this.tracks = this.tracks.sort(() => Math.random() - 0.5);
+      this.tracks.unshift(activeTrack);
+      this.activeTrackIndex = 0;
+      this.announceTrackChange();
+    }
+  }
+
+  /**
    * Go to the previous track in the playlist
    * @returns if the track has been changed successfully
    */

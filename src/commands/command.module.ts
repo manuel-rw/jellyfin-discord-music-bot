@@ -17,7 +17,8 @@ import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
 import { EnqueueRandomItemsCommand } from './random/random.command';
 import { VolumeCommand } from './volume/volume.command';
-
+import { BotStatusCommand } from './bot_status/bot_status.command';
+import { ShuffleCommand } from './shuffle.command';
 @Module({
   imports: [
     DiscordModule.forFeature(),
@@ -40,6 +41,8 @@ import { VolumeCommand } from './volume/volume.command';
     PlayItemCommand,
     PreviousTrackCommand,
     VolumeCommand,
+    BotStatusCommand,
+    ShuffleCommand
   ],
   exports: [],
 })

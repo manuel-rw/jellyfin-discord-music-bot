@@ -72,6 +72,6 @@ export class EnqueueRandomItemsCommand {
       }),
     );
 
-    return promises.flatMap((x) => x);
+    return promises.flat();
   }
 }
