@@ -22,6 +22,7 @@ import {
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   MessagePayload,
+  VoiceChannel,
 } from 'discord.js';
 
 import { TryResult } from '../../models/TryResult';
@@ -108,6 +109,29 @@ export class DiscordVoiceService {
         this.disconnect();
       }
     });
+
+    const voiceChannelId = channel.id;
+    const intervalId = setInterval(async () => {
+      const voiceChannel = (await member.guild.channels.fetch(
+        voiceChannelId,
+      )) as VoiceChannel | undefined;
+      if (voiceChannel === undefined) {
+        clearInterval(intervalId);
+        return;
+      }
+      const voiceHumans = voiceChannel.members.filter(
+        (member) => !member.user.bot,
+      );
+      if (voiceHumans.size === 0) {
+        try {
+          this.stop(true);
+          this.disconnect();
+          clearInterval(intervalId);
+        } catch (e) {
+          this.logger.error(e);
+        }
+      }
+    }, 5000);
     return {
       success: true,
       reply: {},
