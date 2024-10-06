@@ -17,6 +17,7 @@ import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
 import { EnqueueRandomItemsCommand } from './random/random.command';
 import { VolumeCommand } from './volume/volume.command';
+import { ShuffleCommand } from './shuffle.command';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { VolumeCommand } from './volume/volume.command';
     PlayItemCommand,
     PreviousTrackCommand,
     VolumeCommand,
+    ShuffleCommand
   ],
   exports: [],
 })
