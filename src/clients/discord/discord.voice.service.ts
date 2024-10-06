@@ -12,7 +12,7 @@ import {
   VoiceConnectionStatus,
 } from '@discordjs/voice';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
@@ -34,11 +34,12 @@ import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service
 import { DiscordMessageService } from './discord.message.service';
 
 @Injectable()
-export class DiscordVoiceService {
+export class DiscordVoiceService implements OnModuleDestroy {
   private readonly logger = new Logger(DiscordVoiceService.name);
   private audioPlayer: AudioPlayer | undefined;
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
+  private intervalId: NodeJS.Timeout | undefined;
 
   constructor(
     private readonly discordMessageService: DiscordMessageService,
@@ -47,6 +48,18 @@ export class DiscordVoiceService {
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  onModuleDestroy() {
+    if (this.intervalId) {
+      try {
+        clearInterval(this.intervalId);
+        this.intervalId = undefined;
+        this.logger.debug('Cleared interval');
+      } catch (error) {
+        this.logger.error(`Error while clearing interval: ${error}`);
+      }
+    }
+  }
 
   @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
@@ -111,26 +124,26 @@ export class DiscordVoiceService {
     });
 
     const voiceChannelId = channel.id;
-    const intervalId = setInterval(async () => {
+    this.intervalId = setInterval(async () => {
       const voiceChannel = (await member.guild.channels.fetch(
         voiceChannelId,
       )) as VoiceChannel | undefined;
       if (voiceChannel === undefined) {
-        clearInterval(intervalId);
+        clearInterval(this.intervalId);
         return;
       }
       const voiceChannelMembersExpectBots = voiceChannel.members.filter(
         (member) => !member.user.bot,
       );
 
-      if (voiceChannelMembersExpectBots.size >= 0) return;
+      if (voiceChannelMembersExpectBots.size > 0) return;
 
       try {
         this.stop(true);
         this.disconnect();
-        clearInterval(intervalId);
+        clearInterval(this.intervalId);
       } catch (error) {
-        this.logger.error(`Failed to disconnect voice channel ${error}`)
+        this.logger.error(`Failed to disconnect voice channel ${error}`);
       }
     }, 5000);
 
