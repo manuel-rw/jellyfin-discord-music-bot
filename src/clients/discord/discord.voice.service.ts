@@ -130,8 +130,7 @@ export class DiscordVoiceService {
         this.disconnect();
         clearInterval(intervalId);
       } catch (error) {
-        this.logger.debug('Error while disconnecting from voice channel');
-        this.logger.error(error);
+        this.logger.error(`Failed to disconnect voice channel ${error}`)
       }
     }, 5000);
 
