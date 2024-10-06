@@ -119,19 +119,22 @@ export class DiscordVoiceService {
         clearInterval(intervalId);
         return;
       }
-      const voiceHumans = voiceChannel.members.filter(
+      const voiceChannelMembersExpectBots = voiceChannel.members.filter(
         (member) => !member.user.bot,
       );
-      if (voiceHumans.size === 0) {
-        try {
-          this.stop(true);
-          this.disconnect();
-          clearInterval(intervalId);
-        } catch (e) {
-          this.logger.error(e);
-        }
+
+      if (voiceChannelMembersExpectBots.size >= 0) return;
+
+      try {
+        this.stop(true);
+        this.disconnect();
+        clearInterval(intervalId);
+      } catch (error) {
+        this.logger.debug('Error while disconnecting from voice channel');
+        this.logger.error(error);
       }
     }, 5000);
+
     return {
       success: true,
       reply: {},
