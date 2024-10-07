@@ -21,4 +21,3 @@ export class DiscordClientModule implements OnModuleDestroy {
     this.discordVoiceService.disconnectGracefully();
   }
 }
-  
