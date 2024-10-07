@@ -129,6 +129,12 @@ export class DiscordVoiceService implements OnModuleDestroy {
         voiceChannelId,
       )) as VoiceChannel | undefined;
       if (voiceChannel === undefined) {
+        if (!this.autoLeaveIntervalId) {
+          this.logger.error(
+            'Unable to cancel interval because interval id is not defined',
+          );
+          return;
+        }
         clearInterval(this.autoLeaveIntervalId);
         return;
       }
@@ -137,6 +143,10 @@ export class DiscordVoiceService implements OnModuleDestroy {
       );
 
       if (voiceChannelMembersExpectBots.size > 0) return;
+
+      if (!this.autoLeaveIntervalId) {
+        return;
+      }
 
       try {
         this.stop(true);
