@@ -39,7 +39,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
   private audioPlayer: AudioPlayer | undefined;
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
-  private intervalId: NodeJS.Timeout | undefined;
+  private autoLeaveIntervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly discordMessageService: DiscordMessageService,
@@ -50,13 +50,13 @@ export class DiscordVoiceService implements OnModuleDestroy {
   ) {}
 
   onModuleDestroy() {
-    if (this.intervalId) {
+    if (this.autoLeaveIntervalId) {
       try {
-        clearInterval(this.intervalId);
-        this.intervalId = undefined;
-        this.logger.debug('Cleared interval');
+        clearInterval(this.autoLeaveIntervalId);
+        this.autoLeaveIntervalId = null;
+        this.logger.debug('autoLeaveIntervalId Cleared');
       } catch (error) {
-        this.logger.error(`Error while clearing interval: ${error}`);
+        this.logger.error(`Error while clearing autoLeaveIntervalId: ${error}`);
       }
     }
   }
@@ -124,12 +124,12 @@ export class DiscordVoiceService implements OnModuleDestroy {
     });
 
     const voiceChannelId = channel.id;
-    this.intervalId = setInterval(async () => {
+    this.autoLeaveIntervalId = setInterval(async () => {
       const voiceChannel = (await member.guild.channels.fetch(
         voiceChannelId,
       )) as VoiceChannel | undefined;
       if (voiceChannel === undefined) {
-        clearInterval(this.intervalId);
+        clearInterval(this.autoLeaveIntervalId);
         return;
       }
       const voiceChannelMembersExpectBots = voiceChannel.members.filter(
@@ -141,7 +141,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
       try {
         this.stop(true);
         this.disconnect();
-        clearInterval(this.intervalId);
+        clearInterval(this.autoLeaveIntervalId);
       } catch (error) {
         this.logger.error(`Failed to disconnect voice channel ${error}`);
       }
