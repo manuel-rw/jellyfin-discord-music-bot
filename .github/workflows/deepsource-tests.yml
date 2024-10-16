@@ -2,10 +2,6 @@ name: Deepsource report test coverage
 on:
   push:
     branches: [dev,master]
-    paths-ignore:
-      - '.github/**'
-      - 'images/'
-      - '*.md'
   pull_request:
     branches:
       - master
