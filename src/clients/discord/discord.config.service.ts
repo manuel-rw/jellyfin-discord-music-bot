@@ -4,6 +4,7 @@ import {
 } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { GatewayIntentBits } from 'discord.js';
+import { BotStatusConfig } from 'src/config/status';
 
 @Injectable()
 export class DiscordConfigService implements DiscordOptionsFactory {
@@ -18,6 +19,7 @@ export class DiscordConfigService implements DiscordOptionsFactory {
           GatewayIntentBits.GuildIntegrations,
           GatewayIntentBits.GuildVoiceStates,
         ],
+        presence: BotStatusConfig
       },
     };
   }
