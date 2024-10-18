@@ -96,7 +96,9 @@ export class PlayItemCommand {
       return;
     }
 
-    const tracks = await (await item.toTracks(this.jellyfinSearchService)).reverse();
+    const tracks = await (
+      await item.toTracks(this.jellyfinSearchService)
+    ).reverse();
     this.logger.debug(`Extracted ${tracks.length} tracks from the search item`);
     const reducedDuration = tracks.reduce(
       (sum, item) => sum + item.duration,

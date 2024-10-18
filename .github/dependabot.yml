@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     target-branch: "dev"
     commit-message:
       prefix: "⬆️" # prefix with gitmoji
@@ -18,7 +18,7 @@ updates:
   - package-ecosystem: "docker" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
     target-branch: "dev"
     commit-message:
       prefix: "🚀" # prefix with gitmoji
@@ -28,7 +28,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: /.github
     schedule:
-     interval: "weekly"
+     interval: "daily"
     target-branch: "dev"
     commit-message:
       prefix: "👷" # prefix with gitmoji
