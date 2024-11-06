@@ -54,7 +54,7 @@
     "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/testing": "^9.4.0",
-    "@types/cron": "^2.0.1",
+    "@types/cron": "^2.4.3",
     "@types/express": "^5.0.0",
     "@types/jest": "29.5.12",
     "@types/node": "^20.14.0",
