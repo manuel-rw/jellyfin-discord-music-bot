@@ -36,7 +36,7 @@
     "@nestjs/schedule": "^4.1.1",
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/terminus": "^10.2.3",
-    "axios": "^1.7.7",
+    "axios": "^1.8.2",
     "date-fns": "^2.30.0",
     "discord.js": "^14.16.3",
     "joi": "^17.13.3",
