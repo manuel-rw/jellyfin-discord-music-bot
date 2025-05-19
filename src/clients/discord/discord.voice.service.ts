@@ -32,6 +32,7 @@ import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builde
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
 import { DiscordMessageService } from './discord.message.service';
+import { DiscordGatewayAdapterCreator } from '@discordjs/voice';
 
 @Injectable()
 export class DiscordVoiceService implements OnModuleDestroy {
@@ -107,7 +108,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
     joinVoiceChannel({
       channelId: channel.id,
-      adapterCreator: channel.guild.voiceAdapterCreator,
+      adapterCreator: channel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
       guildId: channel.guildId,
     });
 
