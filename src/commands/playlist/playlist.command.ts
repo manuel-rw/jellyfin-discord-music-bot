@@ -16,7 +16,9 @@ import {
   CommandInteraction,
   EmbedBuilder,
   InteractionReplyOptions,
+  InteractionEditReplyOptions,
   InteractionUpdateOptions,
+  MessageFlags,
 } from 'discord.js';
 
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
@@ -119,7 +121,7 @@ export class PlaylistCommand {
 
   public getReplyForPage(
     page: number,
-  ): InteractionReplyOptions | InteractionUpdateOptions {
+  ): InteractionEditReplyOptions | InteractionUpdateOptions {
     const chunks = this.getChunks();
 
     if (chunks.length === 0) {
@@ -131,7 +133,6 @@ export class PlaylistCommand {
               'Use the ``/play`` command to add new items to your playlist',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -143,7 +144,6 @@ export class PlaylistCommand {
             description: 'Please pass a valid page',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -158,7 +158,6 @@ export class PlaylistCommand {
               'You do not have any tracks in your playlist.\nUse the ``/play`` command to add new tracks to your playlist',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -182,7 +181,6 @@ export class PlaylistCommand {
 
     return {
       embeds: [contentForPage.toJSON()],
-      ephemeral: true,
       components: [rowBuilder],
       fetchReply: true,
     };

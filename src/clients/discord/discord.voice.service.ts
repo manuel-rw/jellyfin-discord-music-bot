@@ -74,7 +74,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   tryJoinChannelAndEstablishVoiceConnection(
     member: GuildMember,
-  ): TryResult<InteractionReplyOptions> {
+  ): TryResult<InteractionEditReplyOptions> {
     if (this.voiceConnection !== undefined) {
       this.logger.debug(
         'Avoided joining the voice channel because voice connection is already defined',
