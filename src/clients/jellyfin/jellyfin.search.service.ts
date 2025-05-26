@@ -62,9 +62,19 @@ export class JellyfinSearchService {
         throw new Error('SearchHints were undefined');
       }
 
-      return SearchHints.map((hint) =>
-        this.transformToSearchHintFromHint(hint),
-      ).filter((x) => x !== null) as SearchItem[];
+      var searchItems: SearchItem[] = [];
+      for (let hint of SearchHints) {
+        try {
+	  let searchItem = this.transformToSearchHintFromHint(hint);
+	  if (searchItem instanceof SearchItem)
+	    searchItems.push(searchItem);
+	} catch(err) {
+          this.logger.warn(
+            `Failed to include an item in the search results for ${searchTerm}: ${hint}`,
+          );
+	}	
+      }
+      return searchItems;
     } catch (err) {
       this.logger.error(`Failed to search on Jellyfin: ${err}`);
       return [];
