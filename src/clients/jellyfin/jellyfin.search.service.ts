@@ -65,7 +65,9 @@ export class JellyfinSearchService {
       var searchItems: SearchItem[] = [];
       for (let hint of SearchHints) {
         try {
-	 searchItems.push(this.transformToSearchHintFromHint(hint) as SearchItem) 
+	  let searchItem = this.transformToSearchHintFromHint(hint);
+	  if (searchItem instanceof SearchItem)
+	    searchItems.push(searchItem);
 	} catch(err) {
           this.logger.warn(
             `Failed to include an item in the search results for ${searchTerm}: ${hint}`,
