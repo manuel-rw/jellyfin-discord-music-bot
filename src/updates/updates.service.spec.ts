@@ -4,9 +4,7 @@ import { Client, GuildMember } from 'discord.js';
 import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/GithubRelease';
-import { useDefaultMockerToken } from '../utils/tests/defaultMockerToken';
 import { UpdatesService } from './updates.service';
-import { InjectionToken } from '@nestjs/common';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900
 jest.mock('axios');
@@ -23,19 +21,19 @@ describe('UpdatesService', () => {
     process.env = { ...OLD_ENV };
 
     const moduleRef = await Test.createTestingModule({
-      providers: [UpdatesService],
-    })
-      .useMocker((token) => {
-        if (token === DiscordMessageService) {
-          return {
-            client: jest.fn().mockReturnValue({}),
+      providers: [
+        UpdatesService,
+        {
+          provide: DiscordMessageService,
+          useValue: {
+            client: {},
             buildMessage: jest.fn(),
             buildErrorMessage: jest.fn(),
-          } as DiscordMessageService;
-        }
-
-        if (token === Client || token === '__inject_discord_client__') {
-          return {
+          },
+        },
+        {
+          provide: '__inject_discord_client__',
+          useValue: {
             guilds: {
               cache: [
                 {
@@ -47,12 +45,10 @@ describe('UpdatesService', () => {
                 },
               ],
             },
-          };
-        }
-
-        return useDefaultMockerToken(token as InjectionToken);
-      })
-      .compile();
+          },
+        },
+      ],
+    }).compile();
 
     updatesService = moduleRef.get<UpdatesService>(UpdatesService);
     discordMessageService = moduleRef.get<DiscordMessageService>(
