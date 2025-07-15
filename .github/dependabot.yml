@@ -5,24 +5,24 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "daily"
     target-branch: "dev"
     commit-message:
-      prefix: "⬆️" # prefix with gitmoji
-      include: "scope" # list updated dependencies in message
+      prefix: "chore:"
+      include: "scope"
     assignees:
       - "manuel-rw"
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "docker"
+    directory: "/"
     schedule:
       interval: "daily"
     target-branch: "dev"
     commit-message:
-      prefix: "🚀" # prefix with gitmoji
-      include: "scope" # list updated dependencies in message
+      prefix: "chore:"
+      include: "scope"
     assignees:
       - "manuel-rw"
   - package-ecosystem: "github-actions"
@@ -31,8 +31,8 @@ updates:
      interval: "daily"
     target-branch: "dev"
     commit-message:
-      prefix: "👷" # prefix with gitmoji
-      include: "scope" # list updated dependencies in message
+      prefix: "chore:"
+      include: "scope"
     assignees:
       - "manuel-rw"
 
