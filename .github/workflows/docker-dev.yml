@@ -1,8 +1,5 @@
 name: Container image - Development
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+
 on:
   push:
     branches: [dev]
@@ -17,9 +14,7 @@ on:
         description: 'Tag to deploy to'
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -29,31 +24,18 @@ jobs:
       packages: write
       contents: read
     steps:
-      - name: Setup
-        uses: actions/setup-node@v3
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: yarn install --immutable
-      - run: yarn format
-      - run: yarn build
-      - run: yarn test
+      - uses: ./.github/actions/setup
+      - run: pnpm run build
+      - run: pnpm run format
+      - run: pnpm run build
+      - run: pnpm run test
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
-          # list of Docker images to use as base name for tags
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # generate Docker tags based on the following events/attributes
           tags: |
             type=ref,event=pr
             type=raw,value=${{ github.event.inputs.tag }}, prefix=test-,enable=${{ github.event.inputs.tag != '' }}
