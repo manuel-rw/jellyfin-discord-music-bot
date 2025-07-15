@@ -3,12 +3,10 @@ images
 docs
 package-lock.json
 Dockerfile
-yarn.lock
-.yarn
+pnpm-lock.yaml
 .vscode
 .github
 *.env
 *.gitignore
-.yarnrc.yml
 .nest-cli.json
 .dockerignore
