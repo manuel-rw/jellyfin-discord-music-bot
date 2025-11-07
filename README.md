@@ -12,13 +12,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki/%F0%9F%9A%80-Installation"><img src="https://img.shields.io/badge/-Installation%20Guide-7289da?style=for-the-badge&logo=markdown" alt="badge" /></a>
-  <a href="https://discord.gg/hRHZ3q3VDX"><img src="https://img.shields.io/badge/-Community%20Discord-7289da?style=for-the-badge&logo=discord" alt="badge" /></a>
-  <a href='https://ko-fi.com/A0A42YZ7W' target='_blank'><img src="https://img.shields.io/badge/-Buy%20me%20a%20coffee-f1f1f1?style=for-the-badge&logo=kofi" alt="badge" /></a>
-  <br/>
-  <br/>
-  <img src="https://github.com/manuel-rw/jellyfin-discord-music-bot/actions/workflows/docker.yml/badge.svg?branch=master" />
-  <img src="https://deepsource.io/gh/manuel-rw/jellyfin-discord-music-bot.svg/?label=active+issues&show_trend=true&token=vhfm8cbHaoCyXTf7Gfs9FweR)](https://deepsource.io/gh/manuel-rw/jellyfin-discord-music-bot/?ref=repository-badge" />
 </p>
 
 <br/>

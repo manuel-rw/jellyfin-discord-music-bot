@@ -47,7 +47,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) {
+    // ✅ Log confirmation that persistent volume logic is active
+    this.logger.debug('🔁 Persistent volume integration active.');
+  }
+
 
   onModuleDestroy() {
     if (this.autoLeaveIntervalId) {
@@ -63,12 +67,28 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
+    // Create the audio resource with inline volume support
     const resource = createAudioResource(
       track.getStreamUrl(this.jellyfinStreamBuilder),
       {
         inlineVolume: true,
       },
     );
+
+    // Apply persisted volume from PlaybackService
+    try {
+      const volume = this.playbackService.getVolume();
+      if (resource.volume) {
+        resource.volume.setVolume(volume);
+        this.logger.debug(`🎚️ Applied persistent volume: ${(volume * 100).toFixed(0)}%`);
+      } else {
+        this.logger.warn('⚠️ Resource has no volume control available.');
+      }
+    } catch (err) {
+      this.logger.error(`❌ Failed to apply persistent volume: ${err}`);
+    }
+
+    // Start playback
     this.playResource(resource);
   }
 
@@ -125,37 +145,38 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
     const voiceChannelId = channel.id;
     this.autoLeaveIntervalId = setInterval(async () => {
-      const voiceChannel = (await member.guild.channels.fetch(
-        voiceChannelId,
-      )) as VoiceChannel | undefined;
-      if (voiceChannel === undefined) {
-        if (!this.autoLeaveIntervalId) {
-          this.logger.error(
-            'Unable to cancel interval because interval id is not defined',
-          );
-          return;
-        }
-        clearInterval(this.autoLeaveIntervalId);
+      // 🧩 Early exit if disconnected
+      if (!this.voiceConnection) {
+        clearInterval(this.autoLeaveIntervalId!);
+        this.autoLeaveIntervalId = null;
+        this.logger.debug('🧹 Auto-leave interval stopped (no active voice connection).');
         return;
       }
-      const voiceChannelMembersExpectBots = voiceChannel.members.filter(
-        (member) => !member.user.bot,
-      );
 
+      // Check if the channel still exists
+      const voiceChannel = (await member.guild.channels.fetch(voiceChannelId)) as VoiceChannel | undefined;
+      if (!voiceChannel) {
+        clearInterval(this.autoLeaveIntervalId!);
+        this.autoLeaveIntervalId = null;
+        this.logger.debug('🧹 Auto-leave interval stopped (channel no longer exists).');
+        return;
+      }
+
+      // Ignore if there are still non-bot members in the voice channel
+      const voiceChannelMembersExpectBots = voiceChannel.members.filter(m => !m.user.bot);
       if (voiceChannelMembersExpectBots.size > 0) return;
-
-      if (!this.autoLeaveIntervalId) {
-        return;
-      }
 
       try {
         this.stop(true);
         this.disconnect();
-        clearInterval(this.autoLeaveIntervalId);
-      } catch (error) {
-        this.logger.error(`Failed to disconnect voice channel ${error}`);
+        clearInterval(this.autoLeaveIntervalId!);
+        this.autoLeaveIntervalId = null;
+        this.logger.debug(`👋 Disconnected from empty channel in guild "${member.guild.name}"`);
+      } catch (error: any) {
+        this.logger.warn(`⚠️ Suppressed disconnect error: ${error.message}`);
       }
     }, 5000);
+
 
     return {
       success: true,
@@ -257,30 +278,54 @@ export class DiscordVoiceService implements OnModuleDestroy {
     return true;
   }
 
-  disconnect(): TryResult<
-    string | MessagePayload | InteractionEditReplyOptions
-  > {
-    if (this.voiceConnection === undefined) {
+  disconnect(): TryResult<string | MessagePayload | InteractionEditReplyOptions> {
+    // 🧩 1️⃣ Early exit if already disconnected
+    if (!this.voiceConnection) {
+      this.logger.debug('🔇 No active voice connection to disconnect — skipping.');
+      return {
+        success: false,
+        reply: {},
+      };
+    }
+
+    // 🧩 2️⃣ Clear any lingering auto-leave interval
+    if (this.autoLeaveIntervalId) {
+      clearInterval(this.autoLeaveIntervalId);
+      this.autoLeaveIntervalId = null;
+      this.logger.debug('🧹 Cleared auto-leave interval before disconnecting.');
+    }
+
+    try {
+      // 🧩 3️⃣ Gracefully disconnect
+      this.voiceConnection.disconnect();
+      this.logger.debug(`👋 Disconnected from voice channel in guild.`);
+
+      // 🧩 4️⃣ Clean up references
+      this.audioPlayer = undefined;
+      this.voiceConnection = undefined;
+      this.audioResource = undefined;
+
+      // 🧩 5️⃣ Reset playlist
+      this.playbackService.getPlaylistOrDefault().clear();
+
+      return {
+        success: true,
+        reply: {},
+      };
+    } catch (err: any) {
+      this.logger.error(`❌ Error during disconnect: ${err.message || err}`);
       return {
         success: false,
         reply: {
           embeds: [
             this.discordMessageService.buildErrorMessage({
-              title: 'Unable to disconnect from voice channel',
-              description: 'I am currently not connected to any voice channels',
+              title: 'Error while disconnecting',
+              description: `An unexpected issue occurred: ${err.message || err}`,
             }),
           ],
         },
       };
     }
-
-    this.voiceConnection.disconnect();
-    this.audioPlayer = undefined;
-    this.voiceConnection = undefined;
-    return {
-      success: true,
-      reply: {},
-    };
   }
 
   disconnectGracefully() {
@@ -351,9 +396,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     });
     this.audioPlayer.on('stateChange', (previousState) => {
       if (!this.audioPlayer) {
-        this.logger.error(
-          'Unable to process state change from audio player, because the current audio player in the callback was undefined',
-        );
+        this.logger.debug('StateChange fired after player cleanup — safe to ignore.');
         return;
       }
 
