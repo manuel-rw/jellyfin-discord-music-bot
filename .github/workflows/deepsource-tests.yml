@@ -3,7 +3,7 @@ name: Deepsource report test coverage
 on:
   push:
     branches: [dev,master]
-  pull_request:
+  pull_request_target:
     branches:
       - master
       - dev
