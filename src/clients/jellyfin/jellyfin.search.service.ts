@@ -116,6 +116,9 @@ export class JellyfinSearchService {
       userId: this.jellyfinService.getUserId(),
       mediaTypes: [BaseItemKind[BaseItemKind.Audio]],
       searchTerm: '%',
+      sortBy: ['IndexNumber'],
+      sortOrder: ['Descending' as any],
+      recursive: true,
     });
 
     if (axiosResponse.status !== 200) {
