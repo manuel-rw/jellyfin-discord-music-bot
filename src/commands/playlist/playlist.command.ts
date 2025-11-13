@@ -18,6 +18,7 @@ import {
   InteractionReplyOptions,
   InteractionEditReplyOptions,
   InteractionUpdateOptions,
+  MessageActionRowComponentBuilder,
 } from 'discord.js';
 
 import {
@@ -168,7 +169,7 @@ export class PlaylistCommand {
     const hasPrevious = page;
     const hasNext = page + 1 < chunks.length;
 
-    const rowBuilder = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    const rowBuilder = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setDisabled(!hasPrevious)
         .setCustomId('playlist-controls-previous')
@@ -186,7 +187,7 @@ export class PlaylistCommand {
     return {
       embeds: [contentForPage.toJSON()],
       components: [rowBuilder],
-      fetchReply: true,
+      withResponse: true
     };
   }
 

@@ -18,6 +18,7 @@ import {
   GuildMember,
   Interaction,
   InteractionReplyOptions,
+  MessageFlags,
 } from 'discord.js';
 
 import {
@@ -52,7 +53,7 @@ export class PlayItemCommand {
     @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
   ) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
@@ -77,7 +78,7 @@ export class PlayItemCommand {
               '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
           }),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -128,7 +129,7 @@ export class PlayItemCommand {
           },
         }),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
