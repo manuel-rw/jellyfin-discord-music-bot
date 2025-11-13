@@ -43,7 +43,7 @@ export class JellyfinSearchService {
     }
 
     try {
-      const { data, status } = await searchApi.get({
+      const { data, status } = await searchApi.getSearchHints({
         searchTerm,
         includeItemTypes,
         limit,
@@ -111,7 +111,7 @@ export class JellyfinSearchService {
   async getAlbumItems(albumId: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getSearchApi(api);
-    const axiosResponse = await searchApi.get({
+    const axiosResponse = await searchApi.getSearchHints({
       parentId: albumId,
       userId: this.jellyfinService.getUserId(),
       mediaTypes: [BaseItemKind[BaseItemKind.Audio]],
@@ -229,7 +229,7 @@ export class JellyfinSearchService {
       const response = await searchApi.getItems({
         includeItemTypes: [BaseItemKind.Audio],
         limit,
-        sortBy: ['random'],
+        sortBy: ['Random'],
         userId: this.jellyfinService.getUserId(),
         recursive: true,
       });
