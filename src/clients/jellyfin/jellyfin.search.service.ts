@@ -116,9 +116,6 @@ export class JellyfinSearchService {
       userId: this.jellyfinService.getUserId(),
       mediaTypes: [BaseItemKind[BaseItemKind.Audio]],
       searchTerm: '%',
-      sortBy: ['IndexNumber'],
-      sortOrder: ['Descending' as any],
-      recursive: true,
     });
 
     if (axiosResponse.status !== 200) {
@@ -135,9 +132,9 @@ export class JellyfinSearchService {
       return [];
     }
 
-    return [...axiosResponse.data.SearchHints]
-      .reverse()
-      .map((hint) => SearchItem.constructFromHint(hint));
+    return [...axiosResponse.data.SearchHints].map((hint) =>
+      SearchItem.constructFromHint(hint),
+    );
   }
 
   async getById(
