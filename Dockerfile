@@ -6,4 +6,4 @@ WORKDIR /app
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:prod"]
+CMD ["npm", "run", "start:prod"]
