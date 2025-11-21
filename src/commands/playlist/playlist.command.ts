@@ -220,7 +220,7 @@ export class PlaylistCommand {
         const isCurrent = track === playlist.getActiveTrack();
 
         let line = `\`\`${zeroPad(offset + index + 1, paddingNumber)}.\`\` `;
-        line += `${this.getTrackName(track, isCurrent)} • `;
+        line += `${PlaylistCommand.getTrackName(track, isCurrent)} • `;
         if (isCurrent) {
           line +=  `${lightFormat(track.getPlaybackProgress(), 'mm:ss')} / `;
         }
@@ -235,7 +235,7 @@ export class PlaylistCommand {
     return new EmbedBuilder().setTitle('Your playlist').setDescription(content);
   }
 
-  private getTrackName(track: Track, active: boolean) {
+  private static getTrackName(track: Track, active: boolean) {
     const trimmedTitle = trimStringToFixedLength(track.name, 30);
     if (active) {
       return `**${trimmedTitle}**`;
