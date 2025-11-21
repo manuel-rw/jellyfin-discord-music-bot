@@ -52,9 +52,10 @@ export class VolumeCommand {
       `Calculated volume ${volume} from dto param ${dto.volume}`,
     );
 
-    this.discordVoiceService.changeVolume(volume);
+    this.discordVoiceService.changeCurrentResourceVolume(volume);
+    this.playbackService.setVolume(volume);
 
-    // Discord takes some time to react. Confirmation message should appear after actual change
+    // Discord takes some time to react. Confirmation message should appear after the actual change
     await sleepAsync(1500);
 
     await interaction.editReply({

@@ -7,6 +7,13 @@ import { Playlist } from '../models/music/Playlist';
 export class PlaybackService {
   private playlist: Playlist | undefined = undefined;
 
+  /**
+   * The volume of the playback.
+   * Can between 0 and 1.
+   * @private
+   */
+  private volume = 1;
+
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
   getPlaylistOrDefault(): Playlist {
@@ -16,6 +23,17 @@ export class PlaybackService {
 
     this.playlist = new Playlist(this.eventEmitter);
     return this.playlist;
+  }
+
+  setVolume(volume: number) {
+    if (volume < 0 || volume > 1) {
+      throw new Error('Volume must be between 0 and 1');
+    }
+    this.volume = volume;
+  }
+
+  getVolume() {
+    return this.volume;
   }
 
   @OnEvent('internal.audio.track.previous')
