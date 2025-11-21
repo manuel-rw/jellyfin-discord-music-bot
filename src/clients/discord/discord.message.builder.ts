@@ -3,30 +3,6 @@ import { APIEmbed, EmbedBuilder } from 'discord.js';
 import { DefaultJellyfinColor, ErrorJellyfinColor } from '../../types/colors';
 import { Constants } from '../../utils/constants';
 
-export const buildErrorMessage = ({
-  title,
-  description,
-}: {
-  title: string;
-  description?: string;
-}): APIEmbed => {
-  return buildMessage({
-    title,
-    description,
-    mixin(embedBuilder) {
-      return embedBuilder
-        .setAuthor({
-          name: title,
-          iconURL: Constants.Design.Icons.ErrorIcon,
-        })
-        .setFooter({
-          text: `Report this issue: ${Constants.Links.ReportIssue}`,
-        })
-        .setColor(ErrorJellyfinColor);
-    },
-  });
-}
-
 export const buildMessage = ({
   title,
   description,
@@ -53,4 +29,28 @@ export const buildMessage = ({
   embedBuilder = mixin(embedBuilder);
 
   return embedBuilder.toJSON();
-}
+};
+
+export const buildErrorMessage = ({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string;
+}): APIEmbed => {
+  return buildMessage({
+    title,
+    description,
+    mixin(embedBuilder) {
+      return embedBuilder
+        .setAuthor({
+          name: title,
+          iconURL: Constants.Design.Icons.ErrorIcon,
+        })
+        .setFooter({
+          text: `Report this issue: ${Constants.Links.ReportIssue}`,
+        })
+        .setColor(ErrorJellyfinColor);
+    },
+  });
+};

@@ -186,7 +186,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
       return;
     }
     this.logger.warn(
-      "Current resource is is not playable. This means playback will get stuck. Please report this issue.",
+      'Current resource is is not playable. This means playback will get stuck. Please report this issue.',
     );
   }
 
