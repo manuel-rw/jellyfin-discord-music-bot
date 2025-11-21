@@ -4,7 +4,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import axios from 'axios';
 import { formatRelative, parseISO } from 'date-fns';
-import { ActionRowBuilder, ButtonStyle, Client } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonStyle,
+  Client,
+  MessageActionRowComponentBuilder,
+} from 'discord.js';
 import { GithubRelease } from '../models/GithubRelease';
 import { Constants } from '../utils/constants';
 import { buildMessage } from '../clients/discord/discord.message.builder';
@@ -54,7 +59,7 @@ export class UpdatesService {
   ) {
     const guilds = this.client.guilds.cache;
 
-    const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel('See update')
         .setStyle(ButtonStyle.Link)
