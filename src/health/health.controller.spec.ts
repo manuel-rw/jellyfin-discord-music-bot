@@ -21,7 +21,7 @@ describe('HealthController', () => {
         {
           provide: JellyfinHealthIndicator,
           useValue: {
-            isHealthy: jest.fn().mockResolvedValue({
+            isHealthy: vi.fn().mockResolvedValue({
               jellyfin: {
                 status: 'up',
               },
@@ -31,7 +31,7 @@ describe('HealthController', () => {
         {
           provide: DiscordHealthIndicator,
           useValue: {
-            isHealthy: jest.fn().mockResolvedValue({
+            isHealthy: vi.fn().mockResolvedValue({
               discord: {
                 status: 'up',
               },
@@ -41,7 +41,7 @@ describe('HealthController', () => {
         {
           provide: HealthCheckService,
           useValue: {
-            check: jest.fn(),
+            check: vi.fn(),
           },
         },
       ],
@@ -57,7 +57,7 @@ describe('HealthController', () => {
 
   it('should return health status', async () => {
     // arrange
-    jest.spyOn(healthCheckService, 'check').mockReturnValueOnce(
+    vi.spyOn(healthCheckService, 'check').mockReturnValueOnce(
       Promise.resolve({
         details: {
           discord: {
@@ -104,6 +104,6 @@ describe('HealthController', () => {
       },
       status: 'ok',
     } satisfies HealthCheckResult);
-    expect(jest.spyOn(healthCheckService, 'check')).toHaveBeenCalledTimes(1);
+    expect(vi.spyOn(healthCheckService, 'check')).toHaveBeenCalledTimes(1);
   });
 });
