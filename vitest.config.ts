@@ -5,6 +5,9 @@ export default defineConfig({
   test: {
     globals: true,
     root: './',
+    coverage: {
+      reporter: ['lcov'],
+    },
   },
   plugins: [
     // This is required to build the test files with SWC

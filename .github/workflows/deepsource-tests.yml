@@ -38,5 +38,5 @@ jobs:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         with:
           key: javascript
-          coverage-file: ./coverage/coverage-final.json
+          coverage-file: ./coverage/lcov.info
           dsn: ${{ secrets.DEEPSOURCE_DSN }}

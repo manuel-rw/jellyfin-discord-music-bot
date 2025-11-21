@@ -6,6 +6,9 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['test/**/*.e2e-spec.ts', 'test/**/*.e2e-spec.js'],
+    coverage: {
+      reporter: ['lcov'],
+    },
   },
   plugins: [
     // This is required to build the test files with SWC
