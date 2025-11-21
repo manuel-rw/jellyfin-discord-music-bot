@@ -32,7 +32,7 @@ import { fromZodError } from 'zod-validation-error';
       },
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client'),
+      rootPath: join(__dirname, '..', '..', 'client'),
     }),
     ScheduleModule.forRoot(),
     DiscordModule.forRootAsync({

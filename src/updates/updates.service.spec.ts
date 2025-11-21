@@ -4,10 +4,11 @@ import { GuildMember } from 'discord.js';
 import { Constants } from '../utils/constants';
 import { GithubRelease } from '../models/GithubRelease';
 import { UpdatesService } from './updates.service';
+import { vitest } from 'vitest';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900
-jest.mock('axios');
-const mockedAxios = axios as jest.MockedFunction<typeof axios>;
+vitest.mock('axios');
+const mockedAxios = axios as vitest.MockedFunction<typeof axios>;
 
 describe('UpdatesService', () => {
   const OLD_ENV = process.env;
@@ -15,7 +16,7 @@ describe('UpdatesService', () => {
   let updatesService: UpdatesService;
 
   beforeEach(async () => {
-    jest.resetModules();
+    vitest.resetModules();
     process.env = { ...OLD_ENV };
 
     const moduleRef = await Test.createTestingModule({
@@ -29,7 +30,7 @@ describe('UpdatesService', () => {
                 {
                   fetchOwner: () =>
                     ({
-                      send: jest.fn(),
+                      send: vitest.fn(),
                       user: { tag: 'test' },
                     }) as unknown as GuildMember,
                 },

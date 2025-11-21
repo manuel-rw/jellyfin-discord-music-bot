@@ -12,8 +12,7 @@ module.exports = {
   ],
   root: true,
   env: {
-    node: true,
-    jest: true,
+    node: true
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
