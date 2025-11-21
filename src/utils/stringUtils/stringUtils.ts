@@ -1,6 +1,14 @@
-export const trimStringToFixedLength = (value: string, maxLength: number) => {
+export const trimStringToFixedLength = (
+  value: string,
+  maxLength: number,
+  defalt = '',
+) => {
   if (maxLength < 1) {
     throw new Error('max length must be positive');
+  }
+
+  if (!value) {
+    return defalt;
   }
 
   if (value.length <= maxLength) {

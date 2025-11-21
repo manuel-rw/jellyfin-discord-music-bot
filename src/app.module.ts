@@ -25,8 +25,7 @@ import { fromZodError } from 'zod-validation-error';
     ConfigModule.forRoot({
       validate(config) {
         try {
-          const parsed = environmentVariablesSchema.parse(config);
-          return parsed;
+          return environmentVariablesSchema.parse(config);
         } catch (err) {
           throw fromZodError(err);
         }

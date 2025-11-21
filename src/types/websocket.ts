@@ -3,7 +3,7 @@ import { PlaystateCommand } from '@jellyfin/sdk/lib/generated-client/models';
 export class PlayNowCommand {
   /**
    * A list of all items available in the parent element.
-   * Usually, this is a list of all tracks in an album or playlist.
+   * Usually, this is a list of all tracks on an album or playlist.
    */
   ItemIds: string[];
 
@@ -16,7 +16,7 @@ export class PlayNowCommand {
 
   /**
    * An enum of possible play modes.
-   * PlayNow: Play the selection immideatly
+   * PlayNow: Play the selection immediately
    */
   PlayCommand: 'PlayNow';
 
@@ -38,23 +38,17 @@ export class PlayNowCommand {
   }
 }
 
-export interface SessionApiSendPlaystateCommandRequest {
+export interface SessionApiSendPlayStateCommandRequest {
   /**
-   * The MediaBrowser.Model.Session.PlaystateCommand.
-   * @type {PlaystateCommand}
-   * @memberof SessionApiSendPlaystateCommand
+   * The MediaBrowser.Model.Session.PlayStateCommand.
    */
   readonly Command: PlaystateCommand;
   /**
    * The optional position ticks.
-   * @type {number}
-   * @memberof SessionApiSendPlaystateCommand
    */
   readonly SeekPositionTicks?: number;
   /**
    * The optional controlling user id.
-   * @type {string}
-   * @memberof SessionApiSendPlaystateCommand
    */
   readonly ControllingUserId?: string;
 }

@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - '@discordjs/opus'
+  - '@nestjs/core'

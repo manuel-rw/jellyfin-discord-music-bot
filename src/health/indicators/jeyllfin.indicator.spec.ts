@@ -1,8 +1,6 @@
-import { InjectionToken } from '@nestjs/common';
 import { HealthIndicatorResult } from '@nestjs/terminus';
 import { Test } from '@nestjs/testing';
 import { JellyfinService } from '../../clients/jellyfin/jellyfin.service';
-import { useDefaultMockerToken } from '../../utils/tests/defaultMockerToken';
 import { JellyfinHealthIndicator } from './jellyfin.indicator';
 
 describe('JellyfinHealthIndicator', () => {
@@ -11,15 +9,16 @@ describe('JellyfinHealthIndicator', () => {
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [JellyfinHealthIndicator],
-    })
-      .useMocker((token) => {
-        if (token === JellyfinService) {
-          return { isConnected: jest.fn() };
-        }
-        return useDefaultMockerToken(token as InjectionToken);
-      })
-      .compile();
+      providers: [
+        JellyfinHealthIndicator,
+        {
+          provide: JellyfinService,
+          useValue: {
+            isConnected: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
 
     service = moduleRef.get<JellyfinHealthIndicator>(JellyfinHealthIndicator);
     jellyfinService = moduleRef.get<JellyfinService>(JellyfinService);

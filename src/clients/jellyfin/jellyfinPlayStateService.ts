@@ -16,22 +16,22 @@ import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 
 @Injectable()
-export class JellyinPlaystateService {
-  private playstateApi: PlaystateApi;
+export class JellyfinPlayStateService {
+  private playStateApi: PlaystateApi;
   private sessionApi: SessionApi;
 
   constructor(private readonly playbackService: PlaybackService) {}
 
-  private readonly logger = new Logger(JellyinPlaystateService.name);
+  private readonly logger = new Logger(JellyfinPlayStateService.name);
 
   async initializePlayState(api: Api) {
-    this.initializeApis(api);
+    await this.initializeApis(api);
     await this.reportCapabilities();
   }
 
   private async initializeApis(api: Api) {
     this.sessionApi = getSessionApi(api);
-    this.playstateApi = getPlaystateApi(api);
+    this.playStateApi = getPlaystateApi(api);
   }
 
   private async reportCapabilities() {
@@ -44,13 +44,13 @@ export class JellyinPlaystateService {
       ],
     });
 
-    this.logger.debug('Reported playback capabilities sucessfully');
+    this.logger.debug('Reported playback capabilities successfully');
   }
 
   @OnEvent('internal.audio.track.announce')
   private async onPlaybackNewTrack(track: Track) {
     this.logger.debug(`Reporting playback start on track '${track.id}'`);
-    await this.playstateApi.reportPlaybackStart({
+    await this.playStateApi.reportPlaybackStart({
       playbackStartInfo: {
         ItemId: track.id,
         PositionTicks: 0,
@@ -67,7 +67,7 @@ export class JellyinPlaystateService {
       return;
     }
     this.logger.debug(`Reporting playback finish on track '${track.id}'`);
-    await this.playstateApi.reportPlaybackStopped({
+    await this.playStateApi.reportPlaybackStopped({
       playbackStopInfo: {
         ItemId: track.id,
         PositionTicks: track.playbackProgress * 10000,
@@ -86,7 +86,7 @@ export class JellyinPlaystateService {
       return;
     }
 
-    this.playstateApi.reportPlaybackProgress({
+    this.playStateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         IsPaused: paused,
         ItemId: track.id,
@@ -103,7 +103,7 @@ export class JellyinPlaystateService {
       return;
     }
 
-    await this.playstateApi.reportPlaybackProgress({
+    await this.playStateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         ItemId: track.id,
         PositionTicks: track.playbackProgress * 10000,

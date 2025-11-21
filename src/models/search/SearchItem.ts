@@ -45,14 +45,14 @@ export class SearchItem {
         )}`,
       );
     }
-    var artist = "";
+    let artist = '';
     if (result.data.Artists !== null) {
-    	artist = result.data.Artists[0]
-	if (result.data.Artists.length > 1) {
-    		artist += ",... - "
-	} else {
-    		artist += " - "
-	}
+      artist = result.data.Artists[0];
+      if (result.data.Artists.length > 1) {
+        artist += ',... - ';
+      } else {
+        artist += ' - ';
+      }
     }
     return new SearchItem(
       result.data.Id,

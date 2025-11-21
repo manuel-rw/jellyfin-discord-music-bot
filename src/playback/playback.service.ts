@@ -1,11 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Playlist } from '../models/music/Playlist';
 
 @Injectable()
 export class PlaybackService {
-  private readonly logger = new Logger(PlaybackService.name);
   private playlist: Playlist | undefined = undefined;
 
   constructor(private readonly eventEmitter: EventEmitter2) {}

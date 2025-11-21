@@ -1,4 +1,7 @@
-import { BaseItemDto, SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  BaseItemDto,
+  SearchHint as JellyfinSearchHint,
+} from '@jellyfin/sdk/lib/generated-client/models';
 
 import { Track } from '../music/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
@@ -17,9 +20,9 @@ export class AlbumSearchItem extends SearchItem {
         'Unable to construct playlist search hint, required properties were undefined',
       );
     }
-    var artist = ""
-    if(hint.AlbumArtist) {
-    	artist = hint.AlbumArtist + " - "
+    let artist = '';
+    if (hint.AlbumArtist) {
+      artist = hint.AlbumArtist + ' - ';
     }
 
     return new AlbumSearchItem(
@@ -35,9 +38,9 @@ export class AlbumSearchItem extends SearchItem {
         'Unable to construct search hint from base item, required properties were undefined',
       );
     }
-    var artist = ""
-    if(baseItem.AlbumArtist) {
-    	artist = baseItem.AlbumArtist + " - "
+    let artist = '';
+    if (baseItem.AlbumArtist) {
+      artist = baseItem.AlbumArtist + ' - ';
     }
 
     return new AlbumSearchItem(

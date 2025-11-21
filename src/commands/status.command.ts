@@ -16,6 +16,7 @@ import { formatDuration, intervalToDuration } from 'date-fns';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
 import { Constants } from '../utils/constants';
+import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
 
 @Command({
   name: 'status',
@@ -81,13 +82,19 @@ export class StatusCommand {
               },
               {
                 name: 'Jellyfin Server Version',
-                value: jellyfinSystemInformation.data.Version ?? 'unknown',
+                value: trimStringToFixedLength(
+                  jellyfinSystemInformation.data.Version as string,
+                  1024,
+                ),
                 inline: true,
               },
               {
                 name: 'Jellyfin Server Operating System',
-                value:
-                  jellyfinSystemInformation.data.OperatingSystem ?? 'unknown',
+                value: trimStringToFixedLength(
+                  jellyfinSystemInformation.data.OperatingSystem as string,
+                  1024,
+                  'N/A',
+                ),
                 inline: true,
               },
             ]);

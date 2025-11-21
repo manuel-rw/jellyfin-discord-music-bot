@@ -13,7 +13,7 @@ import { WebSocket } from 'ws';
 import { PlaybackService } from '../../playback/playback.service';
 import {
   PlayNowCommand,
-  SessionApiSendPlaystateCommandRequest,
+  SessionApiSendPlayStateCommandRequest,
 } from '../../types/websocket';
 
 import { JellyfinSearchService } from './jellyfin.search.service';
@@ -62,7 +62,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   disconnect() {
     if (!this.webSocket) {
       this.logger.warn(
-        'Tried to disconnect but WebSocket was unexpectitly undefined',
+        'Tried to disconnect but WebSocket was unexpectedly undefined',
       );
       return;
     }
@@ -80,10 +80,6 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     if (data) obj.Data = data;
 
     this.webSocket.send(JSON.stringify(obj));
-  }
-
-  getReadyState() {
-    return this.webSocket.readyState;
   }
 
   protected async messageHandler(data: any) {
@@ -105,13 +101,18 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           `Processing ${ids.length} ids received via websocket and adding them to the queue`,
         );
         const searchHints = await this.jellyfinSearchService.getAllById(ids);
-        const tracks = await flatMapTrackItems(searchHints, this.jellyfinSearchService);
+        const tracks = flatMapTrackItems(
+          searchHints,
+          this.jellyfinSearchService,
+        );
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       case SessionMessageType[SessionMessageType.Playstate]:
-        const sendPlaystateCommandRequest =
-          msg.Data as SessionApiSendPlaystateCommandRequest;
-        this.handleSendPlaystateCommandRequest(sendPlaystateCommandRequest);
+        const sendPlayStateCommandRequest =
+          msg.Data as SessionApiSendPlayStateCommandRequest;
+        await this.handleSendPlayStateCommandRequest(
+          sendPlayStateCommandRequest,
+        );
         break;
       case SessionMessageType[SessionMessageType.UserDataChanged]:
         break;
@@ -123,8 +124,8 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     }
   }
 
-  private async handleSendPlaystateCommandRequest(
-    request: SessionApiSendPlaystateCommandRequest,
+  private async handleSendPlayStateCommandRequest(
+    request: SessionApiSendPlayStateCommandRequest,
   ) {
     switch (request.Command) {
       case PlaystateCommand.PlayPause:

@@ -12,12 +12,18 @@ import {
   VoiceConnectionStatus,
 } from '@discordjs/voice';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 
-import { APIEmbed, GuildMember, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload } from 'discord.js';
+import {
+  GuildMember,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
+  MessagePayload,
+  VoiceChannel,
+} from 'discord.js';
 
 import { TryResult } from '../../models/TryResult';
 import { Track } from '../../models/music/Track';
@@ -28,11 +34,12 @@ import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service
 import { DiscordMessageService } from './discord.message.service';
 
 @Injectable()
-export class DiscordVoiceService {
+export class DiscordVoiceService implements OnModuleDestroy {
   private readonly logger = new Logger(DiscordVoiceService.name);
   private audioPlayer: AudioPlayer | undefined;
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
+  private autoLeaveIntervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly discordMessageService: DiscordMessageService,
@@ -41,6 +48,18 @@ export class DiscordVoiceService {
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  onModuleDestroy() {
+    if (this.autoLeaveIntervalId) {
+      try {
+        clearInterval(this.autoLeaveIntervalId);
+        this.autoLeaveIntervalId = null;
+        this.logger.debug('autoLeaveIntervalId Cleared');
+      } catch (error) {
+        this.logger.error(`Error while clearing autoLeaveIntervalId: ${error}`);
+      }
+    }
+  }
 
   @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
@@ -55,7 +74,7 @@ export class DiscordVoiceService {
 
   tryJoinChannelAndEstablishVoiceConnection(
     member: GuildMember,
-  ): TryResult<InteractionReplyOptions> {
+  ): TryResult<InteractionEditReplyOptions> {
     if (this.voiceConnection !== undefined) {
       this.logger.debug(
         'Avoided joining the voice channel because voice connection is already defined',
@@ -103,6 +122,41 @@ export class DiscordVoiceService {
         this.disconnect();
       }
     });
+
+    const voiceChannelId = channel.id;
+    this.autoLeaveIntervalId = setInterval(async () => {
+      const voiceChannel = (await member.guild.channels.fetch(
+        voiceChannelId,
+      )) as VoiceChannel | undefined;
+      if (voiceChannel === undefined) {
+        if (!this.autoLeaveIntervalId) {
+          this.logger.error(
+            'Unable to cancel interval because interval id is not defined',
+          );
+          return;
+        }
+        clearInterval(this.autoLeaveIntervalId);
+        return;
+      }
+      const voiceChannelMembersExpectBots = voiceChannel.members.filter(
+        (member) => !member.user.bot,
+      );
+
+      if (voiceChannelMembersExpectBots.size > 0) return;
+
+      if (!this.autoLeaveIntervalId) {
+        return;
+      }
+
+      try {
+        this.stop(true);
+        this.disconnect();
+        clearInterval(this.autoLeaveIntervalId);
+      } catch (error) {
+        this.logger.error(`Failed to disconnect voice channel ${error}`);
+      }
+    }, 5000);
+
     return {
       success: true,
       reply: {},
@@ -112,7 +166,7 @@ export class DiscordVoiceService {
   changeVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
       this.logger.error(
-        "Failed to change audio volume, AudioResource or volume was undefined",
+        'Failed to change audio volume, AudioResource or volume was undefined',
       );
       return;
     }
@@ -121,9 +175,7 @@ export class DiscordVoiceService {
 
   playResource(resource: AudioResource<unknown>) {
     this.logger.debug(
-      `Playing audio resource with volume ${
-        resource.volume?.volume
-      } (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
+      `Playing audio resource with volume ${resource.volume?.volume} (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
@@ -132,7 +184,9 @@ export class DiscordVoiceService {
     if (isPlayable) {
       return;
     }
-    this.logger.warn(`Current resource is is not playable. This means playback will get stuck. Please report this issue.`)
+    this.logger.warn(
+      `Current resource is is not playable. This means playback will get stuck. Please report this issue.`,
+    );
   }
 
   /**
@@ -142,7 +196,7 @@ export class DiscordVoiceService {
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
-    if(track) {
+    if (track) {
       track.playing = false;
     }
     this.eventEmitter.emit('playback.state.pause', true);
@@ -156,7 +210,10 @@ export class DiscordVoiceService {
     const hasStopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     if (hasStopped) {
       const playlist = this.playbackService.getPlaylistOrDefault();
-      this.eventEmitter.emit('internal.audio.track.finish', playlist.getActiveTrack());
+      this.eventEmitter.emit(
+        'internal.audio.track.finish',
+        playlist.getActiveTrack(),
+      );
       playlist.clear();
     }
     return hasStopped;
@@ -168,7 +225,7 @@ export class DiscordVoiceService {
   unpause() {
     this.createAndReturnOrGetAudioPlayer().unpause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
-    if(track) {
+    if (track) {
       track.playing = true;
     }
     this.eventEmitter.emit('playback.state.pause', false);
@@ -187,7 +244,7 @@ export class DiscordVoiceService {
 
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
-   * @returns The new paused state - true: paused, false: unpaused
+   * @returns The new paused state - true: paused, false: un-paused
    */
   @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
@@ -200,7 +257,9 @@ export class DiscordVoiceService {
     return true;
   }
 
-  disconnect(): TryResult<string | MessagePayload | InteractionEditReplyOptions> {
+  disconnect(): TryResult<
+    string | MessagePayload | InteractionEditReplyOptions
+  > {
     if (this.voiceConnection === undefined) {
       return {
         success: false,
@@ -227,7 +286,7 @@ export class DiscordVoiceService {
   disconnectGracefully() {
     const connections = getVoiceConnections();
     this.logger.debug(
-      `Disonnecting gracefully from ${
+      `Disconnecting gracefully from ${
         Object.keys(connections).length
       } connections`,
     );
@@ -265,14 +324,14 @@ export class DiscordVoiceService {
   private attachEventListenersToAudioPlayer() {
     if (!this.voiceConnection) {
       this.logger.error(
-        "Unable to attach listener events, because the VoiceConnection was undefined",
+        'Unable to attach listener events, because the VoiceConnection was undefined',
       );
       return;
     }
 
     if (!this.audioPlayer) {
       this.logger.error(
-        "Unable to attach listener events, because the AudioPlayer was undefined",
+        'Unable to attach listener events, because the AudioPlayer was undefined',
       );
       return;
     }

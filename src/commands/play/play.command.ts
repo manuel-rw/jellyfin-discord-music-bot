@@ -28,7 +28,7 @@ import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
 import { defaultMemberPermissions } from '../../utils/environment';
-import { PlayCommandParams, SearchType } from './play.params.ts';
+import { PlayCommandParams, SearchType } from './play.params';
 
 @Injectable()
 @Command({
@@ -105,7 +105,7 @@ export class PlayItemCommand {
     this.logger.debug(
       `Adding ${tracks.length} tracks with a duration of ${reducedDuration} ticks`,
     );
-    this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
+    this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks, dto.next);
 
     const remoteImages = tracks.flatMap((track) => track.getRemoteImages());
     const remoteImage: RemoteImageInfo | undefined =
@@ -114,7 +114,9 @@ export class PlayItemCommand {
     await interaction.followUp({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: `Added ${tracks.length} tracks to your playlist (${formatMillisecondsAsHumanReadable(
+          title: `Added ${
+            tracks.length
+          } tracks to your playlist (${formatMillisecondsAsHumanReadable(
             reducedDuration,
           )})`,
           mixin(embedBuilder) {

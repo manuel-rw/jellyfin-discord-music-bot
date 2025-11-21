@@ -41,7 +41,7 @@ export class SummonCommand {
     await interaction.editReply({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'Joined your voicehannel',
+          title: 'Joined your voice channel',
           description:
             "I'm ready to play media. Use ``Cast to device`` in Jellyfin or the ``/play`` command to get started.",
         }),

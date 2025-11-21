@@ -1,4 +1,7 @@
-import { BaseItemDto, SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  BaseItemDto,
+  SearchHint as JellyfinSearchHint,
+} from '@jellyfin/sdk/lib/generated-client/models';
 
 import { Track } from '../music/Track';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
@@ -25,7 +28,7 @@ export class PlaylistSearchItem extends SearchItem {
       hint.RunTimeTicks / 10000,
     );
   }
-  
+
   static constructFromBaseItem(baseItem: BaseItemDto) {
     if (baseItem.Id === undefined || !baseItem.Name || !baseItem.RunTimeTicks) {
       throw new Error(
@@ -43,7 +46,7 @@ export class PlaylistSearchItem extends SearchItem {
   override async toTracks(
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
-    const playlistItems = await searchService.getPlaylistitems(this.id);
+    const playlistItems = await searchService.getPlaylistItems(this.id);
     return flatMapTrackItems(playlistItems, searchService);
   }
 }

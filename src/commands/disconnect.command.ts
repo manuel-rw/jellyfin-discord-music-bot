@@ -19,7 +19,7 @@ export class DisconnectCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly discordMessageService: DiscordMessageService,
-    private readonly playbackService: PlaybackService
+    private readonly playbackService: PlaybackService,
   ) {}
 
   @Handler()
@@ -38,7 +38,7 @@ export class DisconnectCommand {
       this.discordVoiceService.stop(false);
     }
     playlist.clear();
-    
+
     const disconnect = this.discordVoiceService.disconnect();
 
     if (!disconnect.success) {

@@ -1,28 +1,17 @@
 name: Deepsource report test coverage
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+
 on:
   push:
     branches: [dev,master]
-    paths-ignore:
-      - '.github/**'
-      - 'images/'
-      - '*.md'
-  pull_request:
+  pull_request_target:
     branches:
       - master
       - dev
-
   workflow_dispatch:
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
 
 jobs:
   report-test-coverage:
@@ -31,30 +20,18 @@ jobs:
       packages: write
       contents: read
     steps:
-      - name: Setup
-        uses: actions/setup-node@v3
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: yarn install --immutable
-      - run: yarn test:cov
+      - uses: ./.github/actions/setup
+      - run: pnpm run test:cov
       - name: Add git safe.directory for container
         run: |
           mkdir -p /home/runner/work/_temp/_github_home
           printf "[safe]\ndirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
       - name: Report test-coverage to DeepSource
         uses: deepsourcelabs/test-coverage-action@master
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         with:
           key: javascript
           coverage-file: ./coverage/lcov.info

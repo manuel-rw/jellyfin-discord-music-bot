@@ -68,8 +68,7 @@ export class EnqueueRandomItemsCommand {
   private async getTracks(hints: SearchItem[]) {
     const promises = await Promise.all(
       hints.flatMap(async (item) => {
-        const tracks = await item.toTracks(this.jellyfinSearchService);
-        return tracks;
+        return await item.toTracks(this.jellyfinSearchService);
       }),
     );
 

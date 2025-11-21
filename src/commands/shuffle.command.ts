@@ -10,12 +10,12 @@ import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
-  name: 'stop',
-  description: 'Stop playback entirely and clear the current playlist',
+  name: 'shuffle',
+  description: 'Randomize your current playlist',
   defaultMemberPermissions,
 })
 @Injectable()
-export class StopPlaybackCommand {
+export class ShuffleCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordMessageService: DiscordMessageService,
@@ -26,26 +26,23 @@ export class StopPlaybackCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     const playlist = this.playbackService.getPlaylistOrDefault();
 
-    if (playlist.tracks.length === 0) {
+    if (playlist.tracks.length < 2) {
       await interaction.reply({
         embeds: [
           this.discordMessageService.buildErrorMessage({
-            title: 'Unable to stop when nothing is playing',
+            title: 'Tracks length is less than 2',
           }),
         ],
       });
       return;
     }
 
-    if (playlist.hasActiveTrack()) {
-      this.discordVoiceService.stop(false);
-    }
-    playlist.clear();
+    playlist.shuffle();
 
     await interaction.reply({
       embeds: [
         this.discordMessageService.buildMessage({
-          title: 'Playback stopped',
+          title: 'Playlist Shuffled',
         }),
       ],
     });

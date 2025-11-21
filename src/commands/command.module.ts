@@ -8,7 +8,7 @@ import { PlaylistCommand } from './playlist/playlist.command';
 import { DisconnectCommand } from './disconnect.command';
 import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
-import { PlayItemCommand } from './play/play.comands';
+import { PlayItemCommand } from './play/play.command';
 import { PreviousTrackCommand } from './previous.command';
 import { SkipTrackCommand } from './next.command';
 import { StatusCommand } from './status.command';
@@ -17,6 +17,8 @@ import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
 import { EnqueueRandomItemsCommand } from './random/random.command';
 import { VolumeCommand } from './volume/volume.command';
+import { ShuffleCommand } from './shuffle.command';
+import { BotStatusCommand } from './bot_status/bot_status.command';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { VolumeCommand } from './volume/volume.command';
     PlayItemCommand,
     PreviousTrackCommand,
     VolumeCommand,
+    ShuffleCommand,
+    BotStatusCommand,
   ],
   exports: [],
 })

@@ -16,7 +16,9 @@ import {
   CommandInteraction,
   EmbedBuilder,
   InteractionReplyOptions,
+  InteractionEditReplyOptions,
   InteractionUpdateOptions,
+  MessageFlags,
 } from 'discord.js';
 
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
@@ -73,7 +75,7 @@ export class PlaylistCommand {
 
     setTimeout(async () => {
       this.logger.log(
-        `Removed the components of message from interaction '${interaction.id}' because the event collector has reachted the timeout`,
+        `Removed the components of message from interaction '${interaction.id}' because the event collector has reached the timeout`,
       );
       this.pageData.delete(interaction.id);
       await interaction.editReply({
@@ -93,7 +95,7 @@ export class PlaylistCommand {
 
       if (!tempData) {
         this.logger.warn(
-          "Failed to update from interval, because temp data was not found",
+          'Failed to update from interval, because temp data was not found',
         );
         return;
       }
@@ -109,7 +111,7 @@ export class PlaylistCommand {
     }
 
     this.logger.verbose(
-      `Updating playlist for ${this.pageData.size} playlist datas`,
+      `Updating playlist for ${this.pageData.size} playlist data`,
     );
 
     this.pageData.forEach(async (value) => {
@@ -119,7 +121,7 @@ export class PlaylistCommand {
 
   public getReplyForPage(
     page: number,
-  ): InteractionReplyOptions | InteractionUpdateOptions {
+  ): InteractionEditReplyOptions | InteractionUpdateOptions {
     const chunks = this.getChunks();
 
     if (chunks.length === 0) {
@@ -131,7 +133,6 @@ export class PlaylistCommand {
               'Use the ``/play`` command to add new items to your playlist',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -143,7 +144,6 @@ export class PlaylistCommand {
             description: 'Please pass a valid page',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -158,7 +158,6 @@ export class PlaylistCommand {
               'You do not have any tracks in your playlist.\nUse the ``/play`` command to add new tracks to your playlist',
           }),
         ],
-        ephemeral: true,
       };
     }
 
@@ -182,7 +181,6 @@ export class PlaylistCommand {
 
     return {
       embeds: [contentForPage.toJSON()],
-      ephemeral: true,
       components: [rowBuilder],
       fetchReply: true,
     };
