@@ -22,6 +22,10 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
+  "engines": {
+    "node": ">=24.0",
+    "pnpm": ">=10.0"
+  },
   "dependencies": {
     "@discord-nestjs/common": "^5.2.12",
     "@discord-nestjs/core": "^5.5.1",

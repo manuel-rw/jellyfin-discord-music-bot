@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import axios from 'axios';
-import { Client, GuildMember } from 'discord.js';
+import { GuildMember } from 'discord.js';
 import { Constants } from '../utils/constants';
 import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/GithubRelease';

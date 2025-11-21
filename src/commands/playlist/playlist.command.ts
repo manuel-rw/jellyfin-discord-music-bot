@@ -18,7 +18,6 @@ import {
   InteractionReplyOptions,
   InteractionEditReplyOptions,
   InteractionUpdateOptions,
-  MessageFlags,
 } from 'discord.js';
 
 import { DiscordMessageService } from '../../clients/discord/discord.message.service';
@@ -114,9 +113,13 @@ export class PlaylistCommand {
       `Updating playlist for ${this.pageData.size} playlist data`,
     );
 
-    this.pageData.forEach(async (value) => {
-      await value.interaction.editReply(this.getReplyForPage(value.page));
-    });
+    await Promise.all(
+      Array.from(this.pageData).map(async ([, value]) => {
+        return await value.interaction.editReply(
+          this.getReplyForPage(value.page),
+        );
+      }),
+    );
   }
 
   public getReplyForPage(
