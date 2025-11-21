@@ -13,9 +13,7 @@ import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
 
-import {
-  buildMessage,
-} from '../clients/discord/discord.message.builder';
+import { buildMessage } from '../clients/discord/discord.message.builder';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
 import { Constants } from '../utils/constants';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';

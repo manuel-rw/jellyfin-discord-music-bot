@@ -6,9 +6,7 @@ import {
   GuildMember,
   InteractionReplyOptions,
 } from 'discord.js';
-import {
-  buildMessage,
-} from 'src/clients/discord/discord.message.builder';
+import { buildMessage } from 'src/clients/discord/discord.message.builder';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
 import { SearchItem } from 'src/models/search/SearchItem';

@@ -19,9 +19,7 @@ export class UpdatesService {
   private readonly logger = new Logger(UpdatesService.name);
   private hasAlreadyNotified: boolean;
 
-  constructor(
-    @InjectDiscordClient() private readonly client: Client
-  ) {}
+  constructor(@InjectDiscordClient() private readonly client: Client) {}
 
   @Cron('0 0 */1 * * *')
   async handleCron() {
@@ -59,20 +57,21 @@ export class UpdatesService {
   ) {
     const guilds = this.client.guilds.cache;
 
-    const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setLabel('See update')
-        .setStyle(ButtonStyle.Link)
-        .setURL(latestVersion.html_url),
-      new ButtonBuilder()
-        .setLabel('Report an issue')
-        .setStyle(ButtonStyle.Link)
-        .setURL(Constants.Links.ReportIssue),
-      new ButtonBuilder()
-        .setLabel('Turn this notification off')
-        .setStyle(ButtonStyle.Link)
-        .setURL(Constants.Links.Wiki.DisableNotifications),
-    );
+    const actionRow =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel('See update')
+          .setStyle(ButtonStyle.Link)
+          .setURL(latestVersion.html_url),
+        new ButtonBuilder()
+          .setLabel('Report an issue')
+          .setStyle(ButtonStyle.Link)
+          .setURL(Constants.Links.ReportIssue),
+        new ButtonBuilder()
+          .setLabel('Turn this notification off')
+          .setStyle(ButtonStyle.Link)
+          .setURL(Constants.Links.Wiki.DisableNotifications),
+      );
 
     const isoDate = parseISO(latestVersion.published_at);
     const relativeReadable = formatRelative(isoDate, new Date());

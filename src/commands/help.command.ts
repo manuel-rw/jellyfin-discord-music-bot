@@ -4,9 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CommandInteraction } from 'discord.js';
 
-import {
-  buildMessage,
-} from '../clients/discord/discord.message.builder';
+import { buildMessage } from '../clients/discord/discord.message.builder';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()

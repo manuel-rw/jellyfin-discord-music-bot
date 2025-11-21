@@ -21,9 +21,7 @@ import {
   MessageActionRowComponentBuilder,
 } from 'discord.js';
 
-import {
-  buildMessage,
-} from '../../clients/discord/discord.message.builder';
+import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
@@ -51,9 +49,7 @@ export class PlaylistCommand {
   public pageData: Map<string, PlaylistTempCommandData> = new Map();
   private readonly logger = new Logger(PlaylistCommand.name);
 
-  constructor(
-    private readonly playbackService: PlaybackService,
-  ) {}
+  constructor(private readonly playbackService: PlaybackService) {}
 
   @Handler()
   async handler(
@@ -169,25 +165,26 @@ export class PlaylistCommand {
     const hasPrevious = page;
     const hasNext = page + 1 < chunks.length;
 
-    const rowBuilder = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setDisabled(!hasPrevious)
-        .setCustomId('playlist-controls-previous')
-        .setEmoji('◀️')
-        .setLabel('Previous')
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
-        .setDisabled(!hasNext)
-        .setCustomId('playlist-controls-next')
-        .setEmoji('▶️')
-        .setLabel('Next')
-        .setStyle(ButtonStyle.Secondary),
-    );
+    const rowBuilder =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setDisabled(!hasPrevious)
+          .setCustomId('playlist-controls-previous')
+          .setEmoji('◀️')
+          .setLabel('Previous')
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setDisabled(!hasNext)
+          .setCustomId('playlist-controls-next')
+          .setEmoji('▶️')
+          .setLabel('Next')
+          .setStyle(ButtonStyle.Secondary),
+      );
 
     return {
       embeds: [contentForPage.toJSON()],
       components: [rowBuilder],
-      withResponse: true
+      withResponse: true,
     };
   }
 
@@ -223,7 +220,7 @@ export class PlaylistCommand {
         let line = `\`\`${zeroPad(offset + index + 1, paddingNumber)}.\`\` `;
         line += `${PlaylistCommand.getTrackName(track, isCurrent)} • `;
         if (isCurrent) {
-          line +=  `${lightFormat(track.getPlaybackProgress(), 'mm:ss')} / `;
+          line += `${lightFormat(track.getPlaybackProgress(), 'mm:ss')} / `;
         }
         line += lightFormat(track.getDuration(), 'mm:ss');
         if (isCurrent) {

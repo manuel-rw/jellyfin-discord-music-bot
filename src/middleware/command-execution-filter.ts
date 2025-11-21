@@ -8,9 +8,7 @@ import {
 } from 'discord.js';
 
 import { Constants } from '../utils/constants';
-import {
-  buildErrorMessage,
-} from '../clients/discord/discord.message.builder';
+import { buildErrorMessage } from '../clients/discord/discord.message.builder';
 
 @Catch(Error)
 export class CommandExecutionError implements ExceptionFilter {

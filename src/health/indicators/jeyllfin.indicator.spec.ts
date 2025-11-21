@@ -36,9 +36,7 @@ describe('JellyfinHealthIndicator', () => {
   });
 
   it('isUnhealthyWhenJellyfinIsNotConnected', async () => {
-    vi
-      .spyOn(jellyfinService, 'isConnected')
-      .mockImplementation(() => false);
+    vi.spyOn(jellyfinService, 'isConnected').mockImplementation(() => false);
     const result = await service.isHealthy('jellyfin');
 
     expect(result).toStrictEqual({
