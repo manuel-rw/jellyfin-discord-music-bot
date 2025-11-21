@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing';
 import axios from 'axios';
 import { GuildMember } from 'discord.js';
 import { Constants } from '../utils/constants';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
 import { GithubRelease } from '../models/GithubRelease';
 import { UpdatesService } from './updates.service';
 
@@ -14,7 +13,6 @@ describe('UpdatesService', () => {
   const OLD_ENV = process.env;
 
   let updatesService: UpdatesService;
-  let discordMessageService: DiscordMessageService;
 
   beforeEach(async () => {
     jest.resetModules();
@@ -23,14 +21,6 @@ describe('UpdatesService', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         UpdatesService,
-        {
-          provide: DiscordMessageService,
-          useValue: {
-            client: {},
-            buildMessage: jest.fn(),
-            buildErrorMessage: jest.fn(),
-          },
-        },
         {
           provide: '__inject_discord_client__',
           useValue: {
@@ -51,9 +41,6 @@ describe('UpdatesService', () => {
     }).compile();
 
     updatesService = moduleRef.get<UpdatesService>(UpdatesService);
-    discordMessageService = moduleRef.get<DiscordMessageService>(
-      DiscordMessageService,
-    );
   });
 
   afterAll(() => {
@@ -78,8 +65,6 @@ describe('UpdatesService', () => {
     await updatesService.handleCron();
 
     expect(mockedAxios).not.toHaveBeenCalled();
-    expect(discordMessageService.buildMessage).not.toHaveBeenCalled();
-    expect(discordMessageService.buildErrorMessage).not.toHaveBeenCalled();
   });
 
   it('handleCronShouldNotifyWhenNewRelease', async () => {
@@ -107,6 +92,5 @@ describe('UpdatesService', () => {
     await updatesService.handleCron();
 
     expect(mockedAxios).toHaveBeenCalled();
-    expect(discordMessageService.buildMessage).toHaveBeenCalled();
   });
 });

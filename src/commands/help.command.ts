@@ -4,7 +4,9 @@ import { Injectable } from '@nestjs/common';
 
 import { CommandInteraction } from 'discord.js';
 
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()
@@ -14,13 +16,11 @@ import { defaultMemberPermissions } from '../utils/environment';
   defaultMemberPermissions,
 })
 export class HelpCommand {
-  constructor(private readonly discordMessageService: DiscordMessageService) {}
-
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: 'Jellyfin Discord Bot',
           description:
             'Jellyfin Discord Bot is an open source and self-hosted Discord bot, that integrates with your Jellyfin Media server and enables you to playback music from your libraries. You can use the Discord Slash Commands to invoke bot commands.',

@@ -5,7 +5,9 @@ import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 
 import { CommandInteraction } from 'discord.js';
-import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from 'src/clients/discord/discord.message.builder';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
 import { PlaybackService } from 'src/playback/playback.service';
 import { sleepAsync } from '../../utils/timeUtils';
@@ -23,7 +25,6 @@ export class VolumeCommand {
 
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
   ) {}
 
@@ -37,7 +38,7 @@ export class VolumeCommand {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.editReply({
         embeds: [
-          this.discordMessageService.buildMessage({
+          buildMessage({
             title: 'Unable to change your volume',
             description:
               'The bot is not playing any music or is not streaming to a channel',
@@ -60,7 +61,7 @@ export class VolumeCommand {
 
     await interaction.editReply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: `Successfully set volume to ${dto.volume.toFixed(0)}%`,
           description:
             'Updating may take a few seconds to take effect.\nPlease note that listening at a high volume for a long time may damage your hearing',

@@ -62,10 +62,10 @@ export class JellyfinSearchService {
         throw new Error('SearchHints were undefined');
       }
 
-      var searchItems: SearchItem[] = [];
-      for (let hint of SearchHints) {
+      const searchItems: SearchItem[] = [];
+      for (const hint of SearchHints) {
         try {
-          let searchItem = this.transformToSearchHintFromHint(hint);
+          const searchItem = this.transformToSearchHintFromHint(hint);
           if (searchItem instanceof SearchItem) searchItems.push(searchItem);
         } catch (err) {
           this.logger.warn(

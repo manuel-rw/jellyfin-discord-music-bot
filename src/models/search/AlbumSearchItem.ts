@@ -22,7 +22,7 @@ export class AlbumSearchItem extends SearchItem {
     }
     let artist = '';
     if (hint.AlbumArtist) {
-      artist = hint.AlbumArtist + ' - ';
+      artist = `${hint.AlbumArtist} - `;
     }
 
     return new AlbumSearchItem(
@@ -40,7 +40,7 @@ export class AlbumSearchItem extends SearchItem {
     }
     let artist = '';
     if (baseItem.AlbumArtist) {
-      artist = baseItem.AlbumArtist + ' - ';
+      artist = `${baseItem.AlbumArtist} - `;
     }
 
     return new AlbumSearchItem(

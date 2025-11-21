@@ -47,7 +47,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   initializeAndConnect() {
     const deviceId = this.jellyfinService.getJellyfin().deviceInfo.id;
-    const url = this.buildSocketUrl(
+    const url = JellyfinWebSocketService.buildSocketUrl(
       this.jellyfinService.getApi().basePath,
       this.jellyfinService.getApi().accessToken,
       deviceId,
@@ -87,12 +87,13 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
     switch (msg.MessageType) {
       case SessionMessageType[SessionMessageType.KeepAlive]:
-      case SessionMessageType[SessionMessageType.ForceKeepAlive]:
+      case SessionMessageType[SessionMessageType.ForceKeepAlive]: {
         this.logger.debug(
           `Received a ${msg.MessageType} package from the server`,
         );
         break;
-      case SessionMessageType[SessionMessageType.Play]:
+      }
+      case SessionMessageType[SessionMessageType.Play]: {
         const data = msg.Data as PlayNowCommand;
         data.hasSelection = PlayNowCommand.prototype.hasSelection;
         data.getSelection = PlayNowCommand.prototype.getSelection;
@@ -107,13 +108,15 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         );
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
-      case SessionMessageType[SessionMessageType.Playstate]:
+      }
+      case SessionMessageType[SessionMessageType.Playstate]: {
         const sendPlayStateCommandRequest =
           msg.Data as SessionApiSendPlayStateCommandRequest;
         await this.handleSendPlayStateCommandRequest(
           sendPlayStateCommandRequest,
         );
         break;
+      }
       case SessionMessageType[SessionMessageType.UserDataChanged]:
         break;
       default:
@@ -155,7 +158,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     this.webSocket.on('message', this.messageHandler.bind(this));
   }
 
-  private buildSocketUrl(baseName: string, apiToken: string, device: string) {
+  private static buildSocketUrl(baseName: string, apiToken: string, device: string) {
     const url = new URL(baseName);
     url.pathname += '/socket';
     url.protocol = url.protocol.replace('http', 'ws');

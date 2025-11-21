@@ -5,7 +5,10 @@ import { Injectable } from '@nestjs/common';
 import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildErrorMessage,
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
@@ -18,7 +21,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class StopPlaybackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
   ) {}
 
@@ -29,7 +31,7 @@ export class StopPlaybackCommand {
     if (playlist.tracks.length === 0) {
       await interaction.reply({
         embeds: [
-          this.discordMessageService.buildErrorMessage({
+          buildErrorMessage({
             title: 'Unable to stop when nothing is playing',
           }),
         ],
@@ -44,7 +46,7 @@ export class StopPlaybackCommand {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: 'Playback stopped',
         }),
       ],

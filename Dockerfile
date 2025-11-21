@@ -1,5 +1,5 @@
 FROM node:24-alpine
-RUN apk add ffmpeg
+RUN apk add --no-cache ffmpeg=6.1.2-r2
 
 COPY . /app
 WORKDIR /app

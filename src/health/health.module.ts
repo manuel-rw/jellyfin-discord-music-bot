@@ -11,4 +11,4 @@ import { JellyfinHealthIndicator } from './indicators/jellyfin.indicator';
   controllers: [HealthController],
   providers: [JellyfinHealthIndicator, DiscordHealthIndicator],
 })
-export class HealthModule {}
+export class HealthModule {} // skipcq: JS-0327
