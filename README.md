@@ -54,8 +54,8 @@
 
 
 > [!TIP]
-> <search:string> -> Equals to a required parameter.
-> <next:boolean?> -> Equals to an optional parameter.
+> ``<search:string>`` -> Equals to a required parameter.<br/>
+> ``<next:boolean?>`` -> Equals to an optional parameter.
 
 ## 🚀 Installation
 
