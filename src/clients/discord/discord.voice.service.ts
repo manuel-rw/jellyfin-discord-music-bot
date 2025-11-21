@@ -30,10 +30,7 @@ import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
-import {
-  buildErrorMessage,
-  buildMessage,
-} from './discord.message.builder';
+import { buildErrorMessage, buildMessage } from './discord.message.builder';
 
 @Injectable()
 export class DiscordVoiceService implements OnModuleDestroy {

@@ -18,9 +18,7 @@ import { defaultMemberPermissions } from '../utils/environment';
   defaultMemberPermissions,
 })
 export class PreviousTrackCommand {
-  constructor(
-    private readonly playbackService: PlaybackService,
-  ) {}
+  constructor(private readonly playbackService: PlaybackService) {}
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {

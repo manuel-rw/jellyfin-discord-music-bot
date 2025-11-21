@@ -21,9 +21,7 @@ import {
   MessageFlags,
 } from 'discord.js';
 
-import {
-  buildMessage,
-} from '../../clients/discord/discord.message.builder';
+import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { SearchItem } from '../../models/search/SearchItem';

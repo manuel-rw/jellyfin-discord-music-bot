@@ -18,9 +18,7 @@ import { defaultMemberPermissions } from '../utils/environment';
 })
 @Injectable()
 export class SkipTrackCommand {
-  constructor(
-    private readonly playbackService: PlaybackService,
-  ) {}
+  constructor(private readonly playbackService: PlaybackService) {}
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {

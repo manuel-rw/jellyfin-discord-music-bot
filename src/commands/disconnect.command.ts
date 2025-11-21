@@ -4,9 +4,7 @@ import { Injectable } from '@nestjs/common/decorators';
 
 import { CommandInteraction } from 'discord.js';
 
-import {
-  buildMessage,
-} from '../clients/discord/discord.message.builder';
+import { buildMessage } from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from '../utils/environment';
 import { PlaybackService } from 'src/playback/playback.service';
