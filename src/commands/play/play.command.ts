@@ -20,7 +20,9 @@ import {
   InteractionReplyOptions,
 } from 'discord.js';
 
-import { DiscordMessageService } from '../../clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from '../../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
 import { SearchItem } from '../../models/search/SearchItem';
@@ -69,7 +71,7 @@ export class PlayItemCommand {
     if (!item) {
       await interaction.followUp({
         embeds: [
-          DiscordMessageService.buildMessage({
+          buildMessage({
             title: 'No results found',
             description:
               '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
@@ -112,7 +114,7 @@ export class PlayItemCommand {
 
     await interaction.followUp({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: `Added ${
             tracks.length
           } tracks to your playlist (${formatMillisecondsAsHumanReadable(

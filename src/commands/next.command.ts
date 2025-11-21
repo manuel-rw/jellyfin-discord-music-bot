@@ -5,7 +5,10 @@ import { Injectable } from '@nestjs/common';
 import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildErrorMessage,
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
@@ -24,7 +27,7 @@ export class SkipTrackCommand {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.reply({
         embeds: [
-          DiscordMessageService.buildErrorMessage({
+          buildErrorMessage({
             title: 'There is no next track',
           }),
         ],
@@ -35,7 +38,7 @@ export class SkipTrackCommand {
     this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     await interaction.reply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Skipped to the next track',
         }),
       ],

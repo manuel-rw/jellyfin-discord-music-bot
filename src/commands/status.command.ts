@@ -13,7 +13,9 @@ import { Client, CommandInteraction, Status } from 'discord.js';
 
 import { formatDuration, intervalToDuration } from 'date-fns';
 
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
 import { Constants } from '../utils/constants';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
@@ -35,7 +37,7 @@ export class StatusCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Retrieving status information...',
         }),
       ],
@@ -55,7 +57,7 @@ export class StatusCommand {
 
     await interaction.editReply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Discord Bot Status',
           mixin(embedBuilder) {
             return embedBuilder.addFields([

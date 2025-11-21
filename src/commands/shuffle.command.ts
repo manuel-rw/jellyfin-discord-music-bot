@@ -5,8 +5,10 @@ import { Injectable } from '@nestjs/common';
 import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import {
+  buildErrorMessage,
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
@@ -18,7 +20,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class ShuffleCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordVoiceService: DiscordVoiceService,
   ) {}
 
   @Handler()
@@ -28,7 +29,7 @@ export class ShuffleCommand {
     if (playlist.tracks.length < 2) {
       await interaction.reply({
         embeds: [
-          DiscordMessageService.buildErrorMessage({
+          buildErrorMessage({
             title: 'Tracks length is less than 2',
           }),
         ],
@@ -40,7 +41,7 @@ export class ShuffleCommand {
 
     await interaction.reply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Playlist Shuffled',
         }),
       ],

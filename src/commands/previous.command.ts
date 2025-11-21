@@ -5,7 +5,10 @@ import { Injectable } from '@nestjs/common/decorators';
 import { CommandInteraction } from 'discord.js';
 
 import { PlaybackService } from '../playback/playback.service';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildErrorMessage,
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()
@@ -24,7 +27,7 @@ export class PreviousTrackCommand {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.reply({
         embeds: [
-          DiscordMessageService.buildErrorMessage({
+          buildErrorMessage({
             title: 'There is no previous track',
           }),
         ],
@@ -35,7 +38,7 @@ export class PreviousTrackCommand {
     this.playbackService.getPlaylistOrDefault().setPreviousTrackAsActiveTrack();
     await interaction.reply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Went to previous track',
         }),
       ],

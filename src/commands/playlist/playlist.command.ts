@@ -20,7 +20,9 @@ import {
   InteractionUpdateOptions,
 } from 'discord.js';
 
-import { DiscordMessageService } from '../../clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from '../../clients/discord/discord.message.builder';
 import { Track } from '../../models/music/Track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
@@ -129,7 +131,7 @@ export class PlaylistCommand {
     if (chunks.length === 0) {
       return {
         embeds: [
-          DiscordMessageService.buildMessage({
+          buildMessage({
             title: 'There are no items in your playlist',
             description:
               'Use the ``/play`` command to add new items to your playlist',
@@ -141,7 +143,7 @@ export class PlaylistCommand {
     if (page >= chunks.length) {
       return {
         embeds: [
-          DiscordMessageService.buildMessage({
+          buildMessage({
             title: 'Page does not exist',
             description: 'Please pass a valid page',
           }),
@@ -154,7 +156,7 @@ export class PlaylistCommand {
     if (!contentForPage) {
       return {
         embeds: [
-          DiscordMessageService.buildMessage({
+          buildMessage({
             title: 'Your Playlist',
             description:
               'You do not have any tracks in your playlist.\nUse the ``/play`` command to add new tracks to your playlist',

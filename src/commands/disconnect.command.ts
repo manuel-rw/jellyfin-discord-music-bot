@@ -4,7 +4,9 @@ import { Injectable } from '@nestjs/common/decorators';
 
 import { CommandInteraction } from 'discord.js';
 
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import {
+  buildMessage,
+} from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from '../utils/environment';
 import { PlaybackService } from 'src/playback/playback.service';
@@ -25,7 +27,7 @@ export class DisconnectCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Disconnecting...',
         }),
       ],
@@ -47,7 +49,7 @@ export class DisconnectCommand {
 
     await interaction.editReply({
       embeds: [
-        DiscordMessageService.buildMessage({
+        buildMessage({
           title: 'Disconnected from your channel',
         }),
       ],
