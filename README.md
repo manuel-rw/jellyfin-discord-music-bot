@@ -35,6 +35,34 @@
 - Typesafe code for quicker development and fewer bugs
 - Supports ``Music``, ``Playlists`` and ``Albums`` from your Jellyfin instance
 
+## ⚙️ Commands
+
+- ``/play <search:string> <next:boolean?> <type:Type?>`` Play a song, album or playlist from your media server
+- ``/playlist <page:number?>`` Shows the current playlist in real time in pagination
+- ``/random <count:number?>`` Enque a random mix of songs from your media server
+- ``/volume <volume:number>`` Set the volume of the bot
+- ``/disconnect`` Disconnect the bot from voice channels
+- ``/help`` Show a help message with information regarding the bot
+- ``/next`` Skip the current song
+- ``/pause`` Pause or unpause playback
+- ``/previous`` Go back to the previous song
+- ``/shuffle`` Shuffle the current playlist randomly
+- ``/status`` Show the current bot status including connection information for Jellyfin
+- ``/stop`` Stop playback and clear the queue
+- ``/summon`` Summon the bot to your voice channel
+- ``/bot-status <activity:Activity> <status:Status> <text:string>`` Set the bot's status
+
+
+> [!TIP]
+> <search:string> -> Equals to a required parameter.
+> <next:boolean?> -> Equals to an optional parameter.
+
+## 🚀 Installation
+
+Please check out the Wiki section in the repository for installation instructions:
+
+https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
+
 ## 📌 About this project
 This project was originally started by [KGT1 on GitHub](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when I wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
 
@@ -43,13 +71,6 @@ This project was originally started by [KGT1 on GitHub](https://github.com/KGT1/
 - Bot does not support shards. This means you cannot use it in multiple servers concurrently.
 - Album covers are not visible unless they are remote (e.g., provided by an external metadata provider)
 - Streaming any video content in voice channels (See [this issue](https://github.com/discordjs/discord.js/issues/4116))
-
-## 🚀 Installation
-
-Please check out the Wiki section in the repository for installation instructions:
-
-https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
-
 
 ## 💻 Development
 
