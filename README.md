@@ -25,6 +25,7 @@
 <hr/>
 <br/>
 
+![](docs/play-command.gif)
 
 ## ✨ Features
 
