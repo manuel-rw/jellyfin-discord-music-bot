@@ -18,7 +18,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class StopPlaybackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
   ) {}
 
@@ -29,7 +28,7 @@ export class StopPlaybackCommand {
     if (playlist.tracks.length === 0) {
       await interaction.reply({
         embeds: [
-          this.discordMessageService.buildErrorMessage({
+          DiscordMessageService.buildErrorMessage({
             title: 'Unable to stop when nothing is playing',
           }),
         ],
@@ -44,7 +43,7 @@ export class StopPlaybackCommand {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Playback stopped',
         }),
       ],

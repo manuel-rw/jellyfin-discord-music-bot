@@ -15,8 +15,7 @@ export class UpdatesService {
   private hasAlreadyNotified: boolean;
 
   constructor(
-    @InjectDiscordClient() private readonly client: Client,
-    private readonly discordMessageService: DiscordMessageService,
+    @InjectDiscordClient() private readonly client: Client
   ) {}
 
   @Cron('0 0 */1 * * *')
@@ -80,7 +79,7 @@ export class UpdatesService {
         await owner.send({
           content: 'Update notification',
           embeds: [
-            this.discordMessageService.buildMessage({
+            DiscordMessageService.buildMessage({
               title: 'Update is available',
               description: `Hello @${owner.user.tag},\nI'd like to inform you, that there is a new update available.\nTo ensure best security and being able to use the latest features, please update to the newest version.\n\n**${latestVersion.name}** (published ${relativeReadable})\n`,
               mixin(embedBuilder) {

@@ -7,7 +7,7 @@ import { Constants } from '../../utils/constants';
 
 @Injectable()
 export class DiscordMessageService {
-  buildErrorMessage({
+  static buildErrorMessage({
     title,
     description,
   }: {
@@ -31,7 +31,7 @@ export class DiscordMessageService {
     });
   }
 
-  buildMessage({
+  static buildMessage({
     title,
     description,
     authorUrl,

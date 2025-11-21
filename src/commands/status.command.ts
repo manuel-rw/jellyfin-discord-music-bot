@@ -28,7 +28,6 @@ export class StatusCommand {
   constructor(
     @InjectDiscordClient()
     private readonly client: Client,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly jellyfinService: JellyfinService,
   ) {}
 
@@ -36,7 +35,7 @@ export class StatusCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Retrieving status information...',
         }),
       ],
@@ -56,7 +55,7 @@ export class StatusCommand {
 
     await interaction.editReply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Discord Bot Status',
           mixin(embedBuilder) {
             return embedBuilder.addFields([

@@ -17,7 +17,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class PausePlaybackCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
   ) {}
 
   @Handler()
@@ -26,7 +25,7 @@ export class PausePlaybackCommand {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: shouldBePaused ? 'Paused' : 'Unpaused',
         }),
       ],

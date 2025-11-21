@@ -18,7 +18,6 @@ import { PlaybackService } from 'src/playback/playback.service';
 export class DisconnectCommand {
   constructor(
     private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
   ) {}
 
@@ -26,7 +25,7 @@ export class DisconnectCommand {
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Disconnecting...',
         }),
       ],
@@ -48,7 +47,7 @@ export class DisconnectCommand {
 
     await interaction.editReply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Disconnected from your channel',
         }),
       ],

@@ -24,7 +24,6 @@ export class EnqueueRandomItemsCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly jellyfinSearchService: JellyfinSearchService,
   ) {}
 
@@ -57,7 +56,7 @@ export class EnqueueRandomItemsCommand {
 
     await interaction.editReply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: `Added ${tracks.length} tracks to your playlist`,
           description: 'Use ``/playlist`` to see them',
         }),

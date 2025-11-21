@@ -18,7 +18,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class ShuffleCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
   ) {}
 
@@ -29,7 +28,7 @@ export class ShuffleCommand {
     if (playlist.tracks.length < 2) {
       await interaction.reply({
         embeds: [
-          this.discordMessageService.buildErrorMessage({
+          DiscordMessageService.buildErrorMessage({
             title: 'Tracks length is less than 2',
           }),
         ],
@@ -41,7 +40,7 @@ export class ShuffleCommand {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Playlist Shuffled',
         }),
       ],

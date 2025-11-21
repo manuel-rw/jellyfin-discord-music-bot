@@ -9,4 +9,4 @@ import { UpdatesService } from './updates.service';
   controllers: [],
   exports: [],
 })
-export class UpdatesModule {}
+export class UpdatesModule {} // skipcq: JS-0327

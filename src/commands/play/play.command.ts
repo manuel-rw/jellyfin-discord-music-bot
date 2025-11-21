@@ -41,7 +41,6 @@ export class PlayItemCommand {
 
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly playbackService: PlaybackService,
   ) {}
@@ -70,7 +69,7 @@ export class PlayItemCommand {
     if (!item) {
       await interaction.followUp({
         embeds: [
-          this.discordMessageService.buildMessage({
+          DiscordMessageService.buildMessage({
             title: 'No results found',
             description:
               '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
@@ -113,7 +112,7 @@ export class PlayItemCommand {
 
     await interaction.followUp({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: `Added ${
             tracks.length
           } tracks to your playlist (${formatMillisecondsAsHumanReadable(

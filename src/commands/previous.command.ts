@@ -17,7 +17,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class PreviousTrackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordMessageService: DiscordMessageService,
   ) {}
 
   @Handler()
@@ -25,7 +24,7 @@ export class PreviousTrackCommand {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.reply({
         embeds: [
-          this.discordMessageService.buildErrorMessage({
+          DiscordMessageService.buildErrorMessage({
             title: 'There is no previous track',
           }),
         ],
@@ -36,7 +35,7 @@ export class PreviousTrackCommand {
     this.playbackService.getPlaylistOrDefault().setPreviousTrackAsActiveTrack();
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Went to previous track',
         }),
       ],

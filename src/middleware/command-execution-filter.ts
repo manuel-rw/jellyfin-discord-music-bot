@@ -45,7 +45,7 @@ export class CommandExecutionError implements ExceptionFilter {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildErrorMessage({
+        DiscordMessageService.buildErrorMessage({
           title: 'An unexpected exception occurred',
           description: `Oh no! This isn't supposed to happen. Something did not went right during the execution of your command.\n\nPlease check if there is any update available. If not, please check on ${Constants.Links.Issues} if this problem has already been reported. If not, please report this problem using the button below.\n\n**Debug Information** (please include in your report):\n\`\`\`${exception.stack}\`\`\``,
         }),

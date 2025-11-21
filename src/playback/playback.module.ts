@@ -7,4 +7,4 @@ import { PlaybackService } from './playback.service';
   providers: [PlaybackService],
   exports: [PlaybackService],
 })
-export class PlaybackModule {}
+export class PlaybackModule {} // skipcq: JS-0327

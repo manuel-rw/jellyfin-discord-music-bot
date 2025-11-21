@@ -49,7 +49,6 @@ export class PlaylistCommand {
   private readonly logger = new Logger(PlaylistCommand.name);
 
   constructor(
-    private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
   ) {}
 
@@ -130,7 +129,7 @@ export class PlaylistCommand {
     if (chunks.length === 0) {
       return {
         embeds: [
-          this.discordMessageService.buildMessage({
+          DiscordMessageService.buildMessage({
             title: 'There are no items in your playlist',
             description:
               'Use the ``/play`` command to add new items to your playlist',
@@ -142,7 +141,7 @@ export class PlaylistCommand {
     if (page >= chunks.length) {
       return {
         embeds: [
-          this.discordMessageService.buildMessage({
+          DiscordMessageService.buildMessage({
             title: 'Page does not exist',
             description: 'Please pass a valid page',
           }),
@@ -155,7 +154,7 @@ export class PlaylistCommand {
     if (!contentForPage) {
       return {
         embeds: [
-          this.discordMessageService.buildMessage({
+          DiscordMessageService.buildMessage({
             title: 'Your Playlist',
             description:
               'You do not have any tracks in your playlist.\nUse the ``/play`` command to add new tracks to your playlist',
@@ -219,9 +218,9 @@ export class PlaylistCommand {
         const isCurrent = track === playlist.getActiveTrack();
 
         let line = `\`\`${zeroPad(offset + index + 1, paddingNumber)}.\`\` `;
-        line += this.getTrackName(track, isCurrent) + ' • ';
+        line += `${this.getTrackName(track, isCurrent)} • `;
         if (isCurrent) {
-          line += lightFormat(track.getPlaybackProgress(), 'mm:ss') + ' / ';
+          line +=  `${lightFormat(track.getPlaybackProgress(), 'mm:ss')} / `;
         }
         line += lightFormat(track.getDuration(), 'mm:ss');
         if (isCurrent) {

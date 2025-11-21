@@ -17,7 +17,6 @@ import { defaultMemberPermissions } from '../utils/environment';
 export class SkipTrackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
-    private readonly discordMessageService: DiscordMessageService,
   ) {}
 
   @Handler()
@@ -25,7 +24,7 @@ export class SkipTrackCommand {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await interaction.reply({
         embeds: [
-          this.discordMessageService.buildErrorMessage({
+          DiscordMessageService.buildErrorMessage({
             title: 'There is no next track',
           }),
         ],
@@ -36,7 +35,7 @@ export class SkipTrackCommand {
     this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        DiscordMessageService.buildMessage({
           title: 'Skipped to the next track',
         }),
       ],
