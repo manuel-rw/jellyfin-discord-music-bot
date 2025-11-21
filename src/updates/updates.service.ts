@@ -73,34 +73,36 @@ export class UpdatesService {
     const isoDate = parseISO(latestVersion.published_at);
     const relativeReadable = formatRelative(isoDate, new Date());
 
-    guilds.forEach(async (guild) => {
-      const owner = await guild.fetchOwner();
+    await Promise.all(
+      guilds.map(async (guild) => {
+        const owner = await guild.fetchOwner();
 
-      await owner.send({
-        content: 'Update notification',
-        embeds: [
-          this.discordMessageService.buildMessage({
-            title: 'Update is available',
-            description: `Hello @${owner.user.tag},\nI'd like to inform you, that there is a new update available.\nTo ensure best security and being able to use the latest features, please update to the newest version.\n\n**${latestVersion.name}** (published ${relativeReadable})\n`,
-            mixin(embedBuilder) {
-              return embedBuilder.addFields([
-                {
-                  name: 'Your version',
-                  value: currentVersion,
-                  inline: true,
-                },
-                {
-                  name: 'Newest version',
-                  value: latestVersion.tag_name,
-                  inline: true,
-                },
-              ]);
-            },
-          }),
-        ],
-        components: [actionRow],
-      });
-    });
+        await owner.send({
+          content: 'Update notification',
+          embeds: [
+            this.discordMessageService.buildMessage({
+              title: 'Update is available',
+              description: `Hello @${owner.user.tag},\nI'd like to inform you, that there is a new update available.\nTo ensure best security and being able to use the latest features, please update to the newest version.\n\n**${latestVersion.name}** (published ${relativeReadable})\n`,
+              mixin(embedBuilder) {
+                return embedBuilder.addFields([
+                  {
+                    name: 'Your version',
+                    value: currentVersion,
+                    inline: true,
+                  },
+                  {
+                    name: 'Newest version',
+                    value: latestVersion.tag_name,
+                    inline: true,
+                  },
+                ]);
+              },
+            }),
+          ],
+          components: [actionRow],
+        });
+      }),
+    );
   }
 
   private async fetchLatestGithubRelease(): Promise<GithubRelease | undefined> {

@@ -1,9 +1,8 @@
+// noinspection ES6UnusedImports
+
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Api, Jellyfin } from '@jellyfin/sdk';
-import { SystemApi } from '@jellyfin/sdk/lib/generated-client/api/system-api';
-import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Constants } from '../../utils/constants';
 import { JellyfinPlayStateService } from './jellyfinPlayStateService';
 

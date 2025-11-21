@@ -29,18 +29,18 @@
 ## ✨ Features
 
 - Lightweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
-- Easy usage with Discord command system (e.g. ``/play``, ``/pause``, ...)
+- Easy usage with the Discord command system (e.g. ``/play``, ``/pause``, ...)
 - Fast and validated configuration using environment variables
-- Typesafe code for quicker development and less bugs
+- Typesafe code for quicker development and fewer bugs
 - Supports ``Music``, ``Playlists`` and ``Albums`` from your Jellyfin instance
 
 ## 📌 About this project
-This project was originally started by [KGT1 on GitHub](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
+This project was originally started by [KGT1 on GitHub](https://github.com/KGT1/jellyfin-discord-music-bot/) in 2020. I came across this project in late 2021, when I wanted to enjoy my music on Discord. I never got it to run as I wanted it to. Since the original project was created under the MIT license, I decided to make a fork in 2022 with my own version. Although this project re-uses some code of the original project, it has been completely rewritten in other parts using NestJs and features now a module-based approach.
 
 ## ⛔ Limitations
 
-- Bot does not support shards. This means, you cannot use it in multiple servers concurrently.
-- Album covers are not visible, unless they are remote (e.g. provided by external metadata provider)
+- Bot does not support shards. This means you cannot use it in multiple servers concurrently.
+- Album covers are not visible unless they are remote (e.g., provided by an external metadata provider)
 - Streaming any video content in voice channels (See [this issue](https://github.com/discordjs/discord.js/issues/4116))
 
 ## 🚀 Installation
@@ -52,7 +52,17 @@ https://github.com/manuel-rw/jellyfin-discord-music-bot/wiki
 
 ## 💻 Development
 
-I'm open to any contributions to this project. You can start contributing using the following commands, after executing the installation commands:
+I'm open to any contributions to this project. Start contributing by:
+- Installing Node.js 24.x or higher
+- Installing pnpm: https://pnpm.io/installation
+- Fork the repository and clone your fork using Git
+- Running ``pnpm install`` in the root director
+- Copy the ``.env.example`` file to ``.env`` and adjust the environment variables
+- Run ``pnpm start:dev`` to start the bot in the HMR (Hot Module Replacement) mode (recommended)
+
+After you made the desired changes, run ``pnpm build`` to build the project.
+Make sure that the Docker build keeps working using ``docker built -t jellyfin-discord-music-bot:latest .`` and running ``docker run --name jellyfin-discord-music-bot -d jellyfin-discord-music-bot:latest`` to run the container with the local image.
+Afterward, please push the changes to your fork and create a pull request targeting this repository.
 
 ## 👤 Credits
 

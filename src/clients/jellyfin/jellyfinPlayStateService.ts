@@ -86,7 +86,7 @@ export class JellyfinPlayStateService {
       return;
     }
 
-    this.playStateApi.reportPlaybackProgress({
+    await this.playStateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         IsPaused: paused,
         ItemId: track.id,

@@ -20,7 +20,6 @@ import { Interval } from '@nestjs/schedule';
 import {
   GuildMember,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   MessagePayload,
   VoiceChannel,
 } from 'discord.js';
@@ -244,7 +243,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
-   * @returns The new paused state - true: paused, false: un-paused
+   * @returns The new paused state - true: paused, false: unpaused
    */
   @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
