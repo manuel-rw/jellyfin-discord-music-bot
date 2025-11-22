@@ -29,11 +29,14 @@
 
 ## ✨ Features
 
-- Lightweight and extendable using the [Nest](https://github.com/nestjs/nest) framework
 - Easy usage with the Discord command system (e.g. ``/play``, ``/pause``, ...)
-- Fast and validated configuration using environment variables
-- Typesafe code for quicker development and fewer bugs
-- Supports ``Music``, ``Playlists`` and ``Albums`` from your Jellyfin instance
+- Can broadcast audio from playlists, albums and songa directly to your audience in Discord
+- Control the bot via the player controls from Jellyfin itself
+- Playback reporting (aka. scrobbling)
+- Interactive playlist manager and pretty embed messages for user feedback
+- Shuffle mode to randomly play through your playlist
+- Random mode to add random songs from your library to the playlist
+...and more!
 
 ## ⚙️ Commands
 
