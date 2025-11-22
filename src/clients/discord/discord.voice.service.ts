@@ -161,7 +161,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     };
   }
 
-  changeVolume(volume: number) {
+  changeCurrentResourceVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
       this.logger.error(
         'Failed to change audio volume, AudioResource or volume was undefined',
@@ -177,6 +177,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
+    resource.volume?.setVolume(this.playbackService.getVolume());
 
     const isPlayable = this.audioPlayer?.checkPlayable();
     if (isPlayable) {
