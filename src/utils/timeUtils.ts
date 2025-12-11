@@ -15,8 +15,8 @@ export const formatMillisecondsAsHumanReadable = (
 ) => {
   return formatDuration(
     intervalToDuration({
-      start: milliseconds,
-      end: 0,
+      start: 0,
+      end: milliseconds,
     }),
     {
       format,
