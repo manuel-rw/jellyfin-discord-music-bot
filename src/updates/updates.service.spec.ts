@@ -8,7 +8,6 @@ import { vitest } from 'vitest';
 
 // mock axios: https://stackoverflow.com/questions/51275434/type-of-axios-mock-using-jest-typescript/55351900#55351900
 vitest.mock('axios');
-const mockedAxios = axios as vitest.MockedFunction<typeof axios>;
 
 describe('UpdatesService', () => {
   const OLD_ENV = process.env;
@@ -50,7 +49,7 @@ describe('UpdatesService', () => {
 
   it('handleCronShouldNotNotifyWhenDisabledViaEnvironmentVariable', async () => {
     process.env.UPDATER_DISABLE_NOTIFICATIONS = 'true';
-    mockedAxios.mockResolvedValue({
+    vi.spyOn(axios, 'get').mockResolvedValue({
       data: {
         html_url: 'https://github.com',
         name: 'testing release',
@@ -65,7 +64,7 @@ describe('UpdatesService', () => {
 
     await updatesService.handleCron();
 
-    expect(mockedAxios).not.toHaveBeenCalled();
+    expect(axios.get).not.toHaveBeenCalled();
   });
 
   it('handleCronShouldNotifyWhenNewRelease', async () => {
@@ -77,7 +76,7 @@ describe('UpdatesService', () => {
       Patch: 5,
     };
 
-    mockedAxios.mockResolvedValue({
+    vi.spyOn(axios, 'get').mockResolvedValue({
       data: {
         html_url: 'https://github.com',
         name: 'testing release',
@@ -92,6 +91,6 @@ describe('UpdatesService', () => {
 
     await updatesService.handleCron();
 
-    expect(mockedAxios).toHaveBeenCalled();
+    expect(axios.get).toHaveBeenCalled();
   });
 });
