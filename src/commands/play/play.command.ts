@@ -56,7 +56,7 @@ export class PlayItemCommand {
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
     let item: SearchItem | undefined;
-    if (dto.name.startsWith('native-')) {
+    if (dto.name?.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),
         baseItems,
@@ -64,7 +64,7 @@ export class PlayItemCommand {
     } else {
       item = (
         await this.jellyfinSearchService.searchItem(dto.name, 1, baseItems)
-      ).find((x) => x);
+      ).find((searchHint) => searchHint);
     }
 
     if (!item) {
@@ -139,8 +139,8 @@ export class PlayItemCommand {
 
     const focusedAutoCompleteAction = interaction.options.getFocused(true);
     const typeIndex = interaction.options.getInteger('type');
-    const type =
-      typeIndex !== null ? Object.values(SearchType)[typeIndex] : undefined;
+    const type: SearchType | undefined =
+      typeIndex !== null ? SearchType[SearchType[typeIndex]] : undefined;
     const searchQuery = focusedAutoCompleteAction.value;
 
     if (!searchQuery || searchQuery.length < 1) {

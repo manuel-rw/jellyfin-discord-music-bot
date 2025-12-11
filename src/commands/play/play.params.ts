@@ -6,15 +6,16 @@ export enum SearchType {
   Audio = 0,
   AudioAlbum = 1,
   Playlist = 2,
+  Artist = 4,
 }
 
 export class PlayCommandParams {
   @Param({
-    required: true,
+    required: false,
     description: 'Item name on Jellyfin',
     autocomplete: true,
   })
-  name: string;
+  name?: string;
 
   @Param({
     description: 'Add to the start of the playlist',
@@ -35,11 +36,14 @@ export class PlayCommandParams {
         return [BaseItemKind.Playlist];
       case SearchType.AudioAlbum:
         return [BaseItemKind.MusicAlbum];
+      case SearchType.Artist:
+        return [BaseItemKind.MusicArtist];
       default:
         return [
           BaseItemKind.Audio,
           BaseItemKind.Playlist,
           BaseItemKind.MusicAlbum,
+          BaseItemKind.MusicArtist,
         ];
     }
   }
