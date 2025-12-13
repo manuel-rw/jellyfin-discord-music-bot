@@ -26,22 +26,20 @@ export class ArtistItem extends SearchItem {
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
-    const arist = schema.parse(hint);
-
-    return new ArtistItem(
-      arist.Id,
-      trimStringToFixedLength(arist.Name, 50),
-      arist.RunTimeTicks / 10000,
-    );
+    return this.constructArtist(hint);
   }
 
   static constructFromBaseItem(baseItem: BaseItemDto) {
-    const arist = schema.parse(baseItem);
+    return this.constructArtist(baseItem);
+  }
+
+  private static constructArtist(data: BaseItemDto | JellyfinSearchHint) {
+    const artist = schema.parse(data);
 
     return new ArtistItem(
-      arist.Id,
-      trimStringToFixedLength(arist.Name, 50),
-      arist.RunTimeTicks / 10000,
+      artist.Id,
+      trimStringToFixedLength(artist.Name, 50),
+      artist.RunTimeTicks / 10000,
     );
   }
 }
