@@ -1,9 +1,9 @@
-import { SearchItem } from './SearchItem';
-import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { Track } from '../music/Track';
-import { flatMapTrackItems } from '../../utils/trackConverter';
+import { SearchItem } from './search.item';
+import { JellyfinSearchService } from './jellyfin.search.service';
+import { Track } from '../../../models/track';
+import { flatMapTrackItems } from '../../../utils/trackConverter';
 import { SearchHint as JellyfinSearchHint } from '@jellyfin/sdk/lib/generated-client/models/search-hint';
-import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
+import { trimStringToFixedLength } from '../../../utils/stringUtils/stringUtils';
 import { z } from 'zod';
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 

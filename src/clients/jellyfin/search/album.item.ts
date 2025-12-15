@@ -3,11 +3,11 @@ import {
   SearchHint as JellyfinSearchHint,
 } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { Track } from '../music/Track';
-import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
+import { Track } from '../../../models/track';
+import { JellyfinSearchService } from './jellyfin.search.service';
 
-import { SearchItem } from './SearchItem';
-import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
+import { SearchItem } from './search.item';
+import { trimStringToFixedLength } from '../../../utils/stringUtils/stringUtils';
 
 export class AlbumSearchItem extends SearchItem {
   override toString(): string {

@@ -16,7 +16,7 @@ import {
   SessionApiSendPlayStateCommandRequest,
 } from '../../types/websocket';
 
-import { JellyfinSearchService } from './jellyfin.search.service';
+import { JellyfinSearchService } from './search/jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
 
 @Injectable()

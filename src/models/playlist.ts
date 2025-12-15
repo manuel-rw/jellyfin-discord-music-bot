@@ -1,6 +1,6 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { Track } from './Track';
+import { Track } from './track';
 
 export class Playlist {
   tracks: Track[];

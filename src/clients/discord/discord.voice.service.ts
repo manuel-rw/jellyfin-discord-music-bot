@@ -24,8 +24,8 @@ import {
   VoiceChannel,
 } from 'discord.js';
 
-import { TryResult } from '../../models/TryResult';
-import { Track } from '../../models/music/Track';
+import { TryResult } from '../../models/try-result.model';
+import { Track } from '../../models/track';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';

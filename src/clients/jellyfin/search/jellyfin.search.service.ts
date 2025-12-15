@@ -13,12 +13,12 @@ import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 
-import { AlbumSearchItem } from '../../models/search/AlbumSearchItem';
-import { PlaylistSearchItem } from '../../models/search/PlaylistSearchItem';
-import { SearchItem } from '../../models/search/SearchItem';
+import { AlbumSearchItem } from './album.item';
+import { PlaylistSearchItem } from './playlist.item';
+import { SearchItem } from './search.item';
 
-import { JellyfinService } from './jellyfin.service';
-import { ArtistItem } from '../../models/search/ArtistItem';
+import { JellyfinService } from '../jellyfin.service';
+import { ArtistItem } from './artist.item';
 
 @Injectable()
 export class JellyfinSearchService {

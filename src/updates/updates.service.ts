@@ -10,7 +10,7 @@ import {
   Client,
   MessageActionRowComponentBuilder,
 } from 'discord.js';
-import { GithubRelease } from '../models/GithubRelease';
+import { GithubRelease } from './github-release.model';
 import { Constants } from '../utils/constants';
 import { buildMessage } from '../clients/discord/discord.message.builder';
 

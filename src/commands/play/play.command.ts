@@ -23,8 +23,8 @@ import {
 
 import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
-import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { SearchItem } from '../../models/search/SearchItem';
+import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.search.service';
+import { SearchItem } from '../../clients/jellyfin/search/search.item';
 import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
