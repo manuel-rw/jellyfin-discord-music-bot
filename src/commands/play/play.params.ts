@@ -11,11 +11,11 @@ export enum SearchType {
 
 export class PlayCommandParams {
   @Param({
-    required: false,
+    required: true,
     description: 'Item name on Jellyfin',
     autocomplete: true,
   })
-  name?: string;
+  name: string;
 
   @Param({
     description: 'Add to the start of the playlist',
