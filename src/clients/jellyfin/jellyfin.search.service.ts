@@ -3,6 +3,7 @@ import {
   BaseItemKind,
   RemoteImageResult,
   SearchHint as JellyfinSearchHint,
+  SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
@@ -17,6 +18,7 @@ import { PlaylistSearchItem } from '../../models/search/PlaylistSearchItem';
 import { SearchItem } from '../../models/search/SearchItem';
 
 import { JellyfinService } from './jellyfin.service';
+import { ArtistItem } from '../../models/search/ArtistItem';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -25,12 +27,13 @@ export class JellyfinSearchService {
   constructor(private readonly jellyfinService: JellyfinService) {}
 
   async searchItem(
-    searchTerm: string,
+    searchTerm = '%s',
     limit?: number,
     includeItemTypes: BaseItemKind[] = [
       BaseItemKind.Audio,
       BaseItemKind.MusicAlbum,
       BaseItemKind.Playlist,
+      BaseItemKind.MusicArtist,
     ],
   ): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
@@ -56,14 +59,12 @@ export class JellyfinSearchService {
         return [];
       }
 
-      const { SearchHints } = data;
-
-      if (!SearchHints) {
+      if (!data.SearchHints) {
         throw new Error('SearchHints were undefined');
       }
 
       const searchItems: SearchItem[] = [];
-      for (const hint of SearchHints) {
+      for (const hint of data.SearchHints) {
         try {
           const searchItem = this.transformToSearchHintFromHint(hint);
           if (searchItem instanceof SearchItem) searchItems.push(searchItem);
@@ -181,6 +182,40 @@ export class JellyfinSearchService {
     ).filter((searchHint) => searchHint !== undefined) as SearchItem[];
   }
 
+  async findArtist(artistId: string) {
+    const api = this.jellyfinService.getApi();
+
+    const searchApi = getItemsApi(api);
+    const { data, status } = await searchApi.getItems({
+      userId: this.jellyfinService.getUserId(),
+      albumArtistIds: [artistId],
+      sortOrder: [
+        SortOrder.Descending,
+        SortOrder.Descending,
+        SortOrder.Ascending,
+      ],
+      sortBy: ['PremiereDate', 'ProductionYear', 'SortName'],
+      recursive: true,
+      includeItemTypes: [BaseItemKind[BaseItemKind.Audio]],
+    });
+
+    if (status !== 200) {
+      this.logger.error(`Jellyfin Search failed with status code ${status}`);
+      return [];
+    }
+
+    if (!data.Items) {
+      this.logger.error(
+        'Received an unexpected empty list but expected a list of tracks of the album',
+      );
+      return [];
+    }
+
+    return [...data.Items].map((hint) =>
+      SearchItem.constructFromBaseItem(hint),
+    );
+  }
+
   async getRemoteImageById(id: string, limit = 20): Promise<RemoteImageResult> {
     const api = this.jellyfinService.getApi();
     const remoteImageApi = getRemoteImageApi(api);
@@ -260,9 +295,11 @@ export class JellyfinSearchService {
         return AlbumSearchItem.constructFromHint(jellyfinHint);
       case BaseItemKind[BaseItemKind.Playlist]:
         return PlaylistSearchItem.constructFromHint(jellyfinHint);
+      case BaseItemKind[BaseItemKind.MusicArtist]:
+        return ArtistItem.constructFromHint(jellyfinHint);
       default:
         this.logger.warn(
-          `Received unexpected item type from Jellyfin search: ${jellyfinHint.Type}`,
+          `Unable to translate '${jellyfinHint.Type}' from API search hint to internal enum. Please report this issue.`,
         );
         return undefined;
     }
@@ -276,9 +313,11 @@ export class JellyfinSearchService {
         return AlbumSearchItem.constructFromBaseItem(baseItemDto);
       case BaseItemKind[BaseItemKind.Playlist]:
         return PlaylistSearchItem.constructFromBaseItem(baseItemDto);
+      case BaseItemKind[BaseItemKind.MusicArtist]:
+        return ArtistItem.constructFromBaseItem(baseItemDto);
       default:
         this.logger.warn(
-          `Received unexpected item type from Jellyfin search: ${baseItemDto.Type}`,
+          `Unable to translate internal enum '${baseItemDto.Type}' to API specific type. Please report this issue.`,
         );
         return undefined;
     }
