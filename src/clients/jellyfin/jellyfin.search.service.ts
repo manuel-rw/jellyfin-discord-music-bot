@@ -189,7 +189,11 @@ export class JellyfinSearchService {
     const { data, status } = await searchApi.getItems({
       userId: this.jellyfinService.getUserId(),
       albumArtistIds: [artistId],
-      sortOrder: [SortOrder.Descending],
+      sortOrder: [
+        SortOrder.Descending,
+        SortOrder.Descending,
+        SortOrder.Ascending,
+      ],
       sortBy: ['PremiereDate', 'ProductionYear', 'SortName'],
       recursive: true,
       includeItemTypes: [BaseItemKind[BaseItemKind.Audio]],
