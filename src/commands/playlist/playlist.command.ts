@@ -22,7 +22,7 @@ import {
 } from 'discord.js';
 
 import { buildMessage } from '../../clients/discord/discord.message.builder';
-import { Track } from '../../models/music/Track';
+import { Track } from '../../models/track';
 import { PlaybackService } from '../../playback/playback.service';
 import { chunkArray } from '../../utils/arrayUtils';
 import {

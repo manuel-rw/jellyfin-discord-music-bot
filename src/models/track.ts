@@ -3,7 +3,7 @@ import {
   RemoteImageResult,
 } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { JellyfinStreamBuilderService } from '../../clients/jellyfin/jellyfin.stream.builder.service';
+import { JellyfinStreamBuilderService } from '../clients/jellyfin/jellyfin.stream.builder.service';
 
 export class Track {
   /**
