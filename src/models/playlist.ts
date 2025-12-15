@@ -1,6 +1,6 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { Track } from './Track';
+import { Track } from './track';
 
 export class Playlist {
   tracks: Track[];
@@ -53,13 +53,14 @@ export class Playlist {
     return true;
   }
   /**
-   * Shuffle all tracks in playlist except the active one
+   * Shuffle all tracks in the playlist except the active one
    */
   shuffle() {
     if (!this.hasActiveTrack())
       this.tracks = this.tracks.sort(() => Math.random() - 0.5);
     else {
       // Shuffle all tracks except the active one
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const activeTrack = this.tracks.splice(this.activeTrackIndex!, 1)[0];
       this.tracks = this.tracks.sort(() => Math.random() - 0.5);
       this.tracks.unshift(activeTrack);
@@ -90,6 +91,7 @@ export class Playlist {
   /**
    * Add new track(-s) to the playlist
    * @param tracks the tracks that should be added
+   * @param playNext play track as the next track in the playlist
    * @returns the new length of the tracks in the playlist
    */
   enqueueTracks(tracks: Track[], playNext = false) {

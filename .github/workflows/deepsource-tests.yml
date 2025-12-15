@@ -15,6 +15,7 @@ env:
 
 jobs:
   report-test-coverage:
+    name: Report test coverage to DeepSource
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -23,7 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: ./.github/actions/setup
+      - run: pnpm run
+        name: Show available scripts
       - run: pnpm run test:cov
+        name: Run tests with coverage
       - name: Add git safe.directory for container
         run: |
           mkdir -p /home/runner/work/_temp/_github_home

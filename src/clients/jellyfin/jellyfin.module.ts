@@ -1,5 +1,5 @@
 import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { JellyfinSearchService } from './jellyfin.search.service';
+import { JellyfinSearchService } from './search/jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
 import { JellyfinStreamBuilderService } from './jellyfin.stream.builder.service';
 import { JellyfinPlayStateService } from './jellyfinPlayStateService';

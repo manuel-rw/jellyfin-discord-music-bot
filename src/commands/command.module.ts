@@ -47,4 +47,4 @@ import { BotStatusCommand } from './bot_status/bot_status.command';
   ],
   exports: [],
 })
-export class CommandModule {}
+export class CommandModule {} // skipcq: JS-0327

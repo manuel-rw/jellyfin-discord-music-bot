@@ -14,7 +14,7 @@ describe('JellyfinHealthIndicator', () => {
         {
           provide: JellyfinService,
           useValue: {
-            isConnected: jest.fn(),
+            isConnected: vi.fn(),
           },
         },
       ],
@@ -25,7 +25,7 @@ describe('JellyfinHealthIndicator', () => {
   });
 
   it('isHealthyWhenJellyfinIsConnected', async () => {
-    jest.spyOn(jellyfinService, 'isConnected').mockImplementation(() => true);
+    vi.spyOn(jellyfinService, 'isConnected').mockImplementation(() => true);
     const result = await service.isHealthy('jellyfin');
 
     expect(result).toStrictEqual({
@@ -36,7 +36,7 @@ describe('JellyfinHealthIndicator', () => {
   });
 
   it('isUnhealthyWhenJellyfinIsNotConnected', async () => {
-    jest.spyOn(jellyfinService, 'isConnected').mockImplementation(() => false);
+    vi.spyOn(jellyfinService, 'isConnected').mockImplementation(() => false);
     const result = await service.isHealthy('jellyfin');
 
     expect(result).toStrictEqual({

@@ -3,6 +3,7 @@ import {
   BaseItemKind,
   RemoteImageResult,
   SearchHint as JellyfinSearchHint,
+  SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
 import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
@@ -12,11 +13,12 @@ import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 
-import { AlbumSearchItem } from '../../models/search/AlbumSearchItem';
-import { PlaylistSearchItem } from '../../models/search/PlaylistSearchItem';
-import { SearchItem } from '../../models/search/SearchItem';
+import { AlbumSearchItem } from './album.item';
+import { PlaylistSearchItem } from './playlist.item';
+import { SearchItem } from './search.item';
 
-import { JellyfinService } from './jellyfin.service';
+import { JellyfinService } from '../jellyfin.service';
+import { ArtistItem } from './artist.item';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -25,12 +27,13 @@ export class JellyfinSearchService {
   constructor(private readonly jellyfinService: JellyfinService) {}
 
   async searchItem(
-    searchTerm: string,
+    searchTerm = '%s',
     limit?: number,
     includeItemTypes: BaseItemKind[] = [
       BaseItemKind.Audio,
       BaseItemKind.MusicAlbum,
       BaseItemKind.Playlist,
+      BaseItemKind.MusicArtist,
     ],
   ): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
@@ -43,7 +46,7 @@ export class JellyfinSearchService {
     }
 
     try {
-      const { data, status } = await searchApi.get({
+      const { data, status } = await searchApi.getSearchHints({
         searchTerm,
         includeItemTypes,
         limit,
@@ -56,16 +59,14 @@ export class JellyfinSearchService {
         return [];
       }
 
-      const { SearchHints } = data;
-
-      if (!SearchHints) {
+      if (!data.SearchHints) {
         throw new Error('SearchHints were undefined');
       }
 
-      var searchItems: SearchItem[] = [];
-      for (let hint of SearchHints) {
+      const searchItems: SearchItem[] = [];
+      for (const hint of data.SearchHints) {
         try {
-          let searchItem = this.transformToSearchHintFromHint(hint);
+          const searchItem = this.transformToSearchHintFromHint(hint);
           if (searchItem instanceof SearchItem) searchItems.push(searchItem);
         } catch (err) {
           this.logger.warn(
@@ -111,7 +112,7 @@ export class JellyfinSearchService {
   async getAlbumItems(albumId: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
     const searchApi = getSearchApi(api);
-    const axiosResponse = await searchApi.get({
+    const axiosResponse = await searchApi.getSearchHints({
       parentId: albumId,
       userId: this.jellyfinService.getUserId(),
       mediaTypes: [BaseItemKind[BaseItemKind.Audio]],
@@ -181,6 +182,40 @@ export class JellyfinSearchService {
     ).filter((searchHint) => searchHint !== undefined) as SearchItem[];
   }
 
+  async findArtist(artistId: string) {
+    const api = this.jellyfinService.getApi();
+
+    const searchApi = getItemsApi(api);
+    const { data, status } = await searchApi.getItems({
+      userId: this.jellyfinService.getUserId(),
+      albumArtistIds: [artistId],
+      sortOrder: [
+        SortOrder.Descending,
+        SortOrder.Descending,
+        SortOrder.Ascending,
+      ],
+      sortBy: ['PremiereDate', 'ProductionYear', 'SortName'],
+      recursive: true,
+      includeItemTypes: [BaseItemKind[BaseItemKind.Audio]],
+    });
+
+    if (status !== 200) {
+      this.logger.error(`Jellyfin Search failed with status code ${status}`);
+      return [];
+    }
+
+    if (!data.Items) {
+      this.logger.error(
+        'Received an unexpected empty list but expected a list of tracks of the album',
+      );
+      return [];
+    }
+
+    return [...data.Items].map((hint) =>
+      SearchItem.constructFromBaseItem(hint),
+    );
+  }
+
   async getRemoteImageById(id: string, limit = 20): Promise<RemoteImageResult> {
     const api = this.jellyfinService.getApi();
     const remoteImageApi = getRemoteImageApi(api);
@@ -229,7 +264,7 @@ export class JellyfinSearchService {
       const response = await searchApi.getItems({
         includeItemTypes: [BaseItemKind.Audio],
         limit,
-        sortBy: ['random'],
+        sortBy: ['Random'],
         userId: this.jellyfinService.getUserId(),
         recursive: true,
       });
@@ -260,9 +295,11 @@ export class JellyfinSearchService {
         return AlbumSearchItem.constructFromHint(jellyfinHint);
       case BaseItemKind[BaseItemKind.Playlist]:
         return PlaylistSearchItem.constructFromHint(jellyfinHint);
+      case BaseItemKind[BaseItemKind.MusicArtist]:
+        return ArtistItem.constructFromHint(jellyfinHint);
       default:
         this.logger.warn(
-          `Received unexpected item type from Jellyfin search: ${jellyfinHint.Type}`,
+          `Unable to translate '${jellyfinHint.Type}' from API search hint to internal enum. Please report this issue.`,
         );
         return undefined;
     }
@@ -276,9 +313,11 @@ export class JellyfinSearchService {
         return AlbumSearchItem.constructFromBaseItem(baseItemDto);
       case BaseItemKind[BaseItemKind.Playlist]:
         return PlaylistSearchItem.constructFromBaseItem(baseItemDto);
+      case BaseItemKind[BaseItemKind.MusicArtist]:
+        return ArtistItem.constructFromBaseItem(baseItemDto);
       default:
         this.logger.warn(
-          `Received unexpected item type from Jellyfin search: ${baseItemDto.Type}`,
+          `Unable to translate internal enum '${baseItemDto.Type}' to API specific type. Please report this issue.`,
         );
         return undefined;
     }

@@ -6,10 +6,10 @@ import {
   GuildMember,
   InteractionReplyOptions,
 } from 'discord.js';
-import { DiscordMessageService } from 'src/clients/discord/discord.message.service';
+import { buildMessage } from 'src/clients/discord/discord.message.builder';
 import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
-import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
-import { SearchItem } from 'src/models/search/SearchItem';
+import { JellyfinSearchService } from 'src/clients/jellyfin/search/jellyfin.search.service';
+import { SearchItem } from 'src/clients/jellyfin/search/search.item';
 import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
 import { defaultMemberPermissions } from '../../utils/environment';
@@ -24,7 +24,6 @@ export class EnqueueRandomItemsCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly jellyfinSearchService: JellyfinSearchService,
   ) {}
 
@@ -57,7 +56,7 @@ export class EnqueueRandomItemsCommand {
 
     await interaction.editReply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: `Added ${tracks.length} tracks to your playlist`,
           description: 'Use ``/playlist`` to see them',
         }),

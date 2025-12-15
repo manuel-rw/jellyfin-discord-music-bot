@@ -4,9 +4,9 @@ import {
 } from '@jellyfin/sdk/lib/generated-client/models';
 import { z } from 'zod';
 
-import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { Track } from '../music/Track';
-import { trimStringToFixedLength } from '../../utils/stringUtils/stringUtils';
+import { JellyfinSearchService } from './jellyfin.search.service';
+import { Track } from '../../../models/track';
+import { trimStringToFixedLength } from '../../../utils/stringUtils/stringUtils';
 
 export class SearchItem {
   constructor(

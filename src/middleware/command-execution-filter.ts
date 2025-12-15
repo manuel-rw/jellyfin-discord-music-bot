@@ -8,13 +8,11 @@ import {
 } from 'discord.js';
 
 import { Constants } from '../utils/constants';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { buildErrorMessage } from '../clients/discord/discord.message.builder';
 
 @Catch(Error)
 export class CommandExecutionError implements ExceptionFilter {
   private readonly logger = new Logger(CommandExecutionError.name);
-
-  constructor(private readonly discordMessageService: DiscordMessageService) {}
 
   async catch(exception: Error, host: ArgumentsHost): Promise<void> {
     const interaction = host.getArgByIndex(0) as CommandInteraction;
@@ -45,7 +43,7 @@ export class CommandExecutionError implements ExceptionFilter {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildErrorMessage({
+        buildErrorMessage({
           title: 'An unexpected exception occurred',
           description: `Oh no! This isn't supposed to happen. Something did not went right during the execution of your command.\n\nPlease check if there is any update available. If not, please check on ${Constants.Links.Issues} if this problem has already been reported. If not, please report this problem using the button below.\n\n**Debug Information** (please include in your report):\n\`\`\`${exception.stack}\`\`\``,
         }),

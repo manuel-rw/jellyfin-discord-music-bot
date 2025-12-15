@@ -4,20 +4,22 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import axios from 'axios';
 import { formatRelative, parseISO } from 'date-fns';
-import { ActionRowBuilder, ButtonStyle, Client } from 'discord.js';
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
-import { GithubRelease } from '../models/GithubRelease';
+import {
+  ActionRowBuilder,
+  ButtonStyle,
+  Client,
+  MessageActionRowComponentBuilder,
+} from 'discord.js';
+import { GithubRelease } from './github-release.model';
 import { Constants } from '../utils/constants';
+import { buildMessage } from '../clients/discord/discord.message.builder';
 
 @Injectable()
 export class UpdatesService {
   private readonly logger = new Logger(UpdatesService.name);
   private hasAlreadyNotified: boolean;
 
-  constructor(
-    @InjectDiscordClient() private readonly client: Client,
-    private readonly discordMessageService: DiscordMessageService,
-  ) {}
+  constructor(@InjectDiscordClient() private readonly client: Client) {}
 
   @Cron('0 0 */1 * * *')
   async handleCron() {
@@ -55,52 +57,55 @@ export class UpdatesService {
   ) {
     const guilds = this.client.guilds.cache;
 
-    const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setLabel('See update')
-        .setStyle(ButtonStyle.Link)
-        .setURL(latestVersion.html_url),
-      new ButtonBuilder()
-        .setLabel('Report an issue')
-        .setStyle(ButtonStyle.Link)
-        .setURL(Constants.Links.ReportIssue),
-      new ButtonBuilder()
-        .setLabel('Turn this notification off')
-        .setStyle(ButtonStyle.Link)
-        .setURL(Constants.Links.Wiki.DisableNotifications),
-    );
+    const actionRow =
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel('See update')
+          .setStyle(ButtonStyle.Link)
+          .setURL(latestVersion.html_url),
+        new ButtonBuilder()
+          .setLabel('Report an issue')
+          .setStyle(ButtonStyle.Link)
+          .setURL(Constants.Links.ReportIssue),
+        new ButtonBuilder()
+          .setLabel('Turn this notification off')
+          .setStyle(ButtonStyle.Link)
+          .setURL(Constants.Links.Wiki.DisableNotifications),
+      );
 
     const isoDate = parseISO(latestVersion.published_at);
     const relativeReadable = formatRelative(isoDate, new Date());
 
-    guilds.forEach(async (guild) => {
-      const owner = await guild.fetchOwner();
+    await Promise.all(
+      guilds.map(async (guild) => {
+        const owner = await guild.fetchOwner();
 
-      await owner.send({
-        content: 'Update notification',
-        embeds: [
-          this.discordMessageService.buildMessage({
-            title: 'Update is available',
-            description: `Hello @${owner.user.tag},\nI'd like to inform you, that there is a new update available.\nTo ensure best security and being able to use the latest features, please update to the newest version.\n\n**${latestVersion.name}** (published ${relativeReadable})\n`,
-            mixin(embedBuilder) {
-              return embedBuilder.addFields([
-                {
-                  name: 'Your version',
-                  value: currentVersion,
-                  inline: true,
-                },
-                {
-                  name: 'Newest version',
-                  value: latestVersion.tag_name,
-                  inline: true,
-                },
-              ]);
-            },
-          }),
-        ],
-        components: [actionRow],
-      });
-    });
+        await owner.send({
+          content: 'Update notification',
+          embeds: [
+            buildMessage({
+              title: 'Update is available',
+              description: `Hello @${owner.user.tag},\nI'd like to inform you, that there is a new update available.\nTo ensure best security and being able to use the latest features, please update to the newest version.\n\n**${latestVersion.name}** (published ${relativeReadable})\n`,
+              mixin(embedBuilder) {
+                return embedBuilder.addFields([
+                  {
+                    name: 'Your version',
+                    value: currentVersion,
+                    inline: true,
+                  },
+                  {
+                    name: 'Newest version',
+                    value: latestVersion.tag_name,
+                    inline: true,
+                  },
+                ]);
+              },
+            }),
+          ],
+          components: [actionRow],
+        });
+      }),
+    );
   }
 
   private async fetchLatestGithubRelease(): Promise<GithubRelease | undefined> {

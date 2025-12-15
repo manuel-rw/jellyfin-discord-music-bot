@@ -18,12 +18,13 @@ import {
   GuildMember,
   Interaction,
   InteractionReplyOptions,
+  MessageFlags,
 } from 'discord.js';
 
-import { DiscordMessageService } from '../../clients/discord/discord.message.service';
+import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
-import { JellyfinSearchService } from '../../clients/jellyfin/jellyfin.search.service';
-import { SearchItem } from '../../models/search/SearchItem';
+import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.search.service';
+import { SearchItem } from '../../clients/jellyfin/search/search.item';
 import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
@@ -41,7 +42,6 @@ export class PlayItemCommand {
 
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,
-    private readonly discordMessageService: DiscordMessageService,
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly playbackService: PlaybackService,
   ) {}
@@ -51,12 +51,12 @@ export class PlayItemCommand {
     @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
   ) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
     let item: SearchItem | undefined;
-    if (dto.name.startsWith('native-')) {
+    if (dto.name?.startsWith('native-')) {
       item = await this.jellyfinSearchService.getById(
         dto.name.replace('native-', ''),
         baseItems,
@@ -64,19 +64,19 @@ export class PlayItemCommand {
     } else {
       item = (
         await this.jellyfinSearchService.searchItem(dto.name, 1, baseItems)
-      ).find((x) => x);
+      ).find((searchHint) => searchHint);
     }
 
     if (!item) {
       await interaction.followUp({
         embeds: [
-          this.discordMessageService.buildMessage({
+          buildMessage({
             title: 'No results found',
             description:
               '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
           }),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -113,7 +113,7 @@ export class PlayItemCommand {
 
     await interaction.followUp({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: `Added ${
             tracks.length
           } tracks to your playlist (${formatMillisecondsAsHumanReadable(
@@ -127,7 +127,7 @@ export class PlayItemCommand {
           },
         }),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -139,8 +139,8 @@ export class PlayItemCommand {
 
     const focusedAutoCompleteAction = interaction.options.getFocused(true);
     const typeIndex = interaction.options.getInteger('type');
-    const type =
-      typeIndex !== null ? Object.values(SearchType)[typeIndex] : undefined;
+    const type: SearchType | undefined =
+      typeIndex !== null ? SearchType[SearchType[typeIndex]] : undefined;
     const searchQuery = focusedAutoCompleteAction.value;
 
     if (!searchQuery || searchQuery.length < 1) {

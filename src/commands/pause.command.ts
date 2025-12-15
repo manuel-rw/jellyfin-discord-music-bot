@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CommandInteraction } from 'discord.js';
 
-import { DiscordMessageService } from '../clients/discord/discord.message.service';
+import { buildMessage } from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
@@ -15,10 +15,7 @@ import { defaultMemberPermissions } from '../utils/environment';
   defaultMemberPermissions,
 })
 export class PausePlaybackCommand {
-  constructor(
-    private readonly discordVoiceService: DiscordVoiceService,
-    private readonly discordMessageService: DiscordMessageService,
-  ) {}
+  constructor(private readonly discordVoiceService: DiscordVoiceService) {}
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
@@ -26,7 +23,7 @@ export class PausePlaybackCommand {
 
     await interaction.reply({
       embeds: [
-        this.discordMessageService.buildMessage({
+        buildMessage({
           title: shouldBePaused ? 'Paused' : 'Unpaused',
         }),
       ],

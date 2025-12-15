@@ -11,7 +11,7 @@ import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
-import { Track } from '../../models/music/Track';
+import { Track } from '../../models/track';
 
 import { PlaybackService } from '../../playback/playback.service';
 
@@ -86,7 +86,7 @@ export class JellyfinPlayStateService {
       return;
     }
 
-    this.playStateApi.reportPlaybackProgress({
+    await this.playStateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         IsPaused: paused,
         ItemId: track.id,

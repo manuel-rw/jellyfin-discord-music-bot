@@ -20,18 +20,17 @@ import { Interval } from '@nestjs/schedule';
 import {
   GuildMember,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   MessagePayload,
   VoiceChannel,
 } from 'discord.js';
 
-import { TryResult } from '../../models/TryResult';
-import { Track } from '../../models/music/Track';
+import { TryResult } from '../../models/try-result.model';
+import { Track } from '../../models/track';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
-import { DiscordMessageService } from './discord.message.service';
+import { buildErrorMessage, buildMessage } from './discord.message.builder';
 
 @Injectable()
 export class DiscordVoiceService implements OnModuleDestroy {
@@ -42,7 +41,6 @@ export class DiscordVoiceService implements OnModuleDestroy {
   private autoLeaveIntervalId: NodeJS.Timeout | null = null;
 
   constructor(
-    private readonly discordMessageService: DiscordMessageService,
     private readonly playbackService: PlaybackService,
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
@@ -63,13 +61,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   @OnEvent('internal.audio.track.announce')
   handleOnNewTrack(track: Track) {
-    const resource = createAudioResource(
-      track.getStreamUrl(this.jellyfinStreamBuilder),
-      {
-        inlineVolume: true,
-      },
-    );
-    this.playResource(resource);
+    const url = track.getStreamUrl(this.jellyfinStreamBuilder);
+    const resource = createAudioResource(url, {
+      inlineVolume: true,
+    });
+    this.playResource(resource, track.name, url);
   }
 
   tryJoinChannelAndEstablishVoiceConnection(
@@ -93,7 +89,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
         success: false,
         reply: {
           embeds: [
-            this.discordMessageService.buildMessage({
+            buildMessage({
               title: 'Unable to join your channel',
               description:
                 "I am unable to join your channel, because you don't seem to be in a voice channel. Connect to a channel first to use this command",
@@ -163,7 +159,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     };
   }
 
-  changeVolume(volume: number) {
+  changeCurrentResourceVolume(volume: number) {
     if (!this.audioResource || !this.audioResource.volume) {
       this.logger.error(
         'Failed to change audio volume, AudioResource or volume was undefined',
@@ -173,20 +169,47 @@ export class DiscordVoiceService implements OnModuleDestroy {
     this.audioResource.volume.setVolume(volume);
   }
 
-  playResource(resource: AudioResource<unknown>) {
+  playResource(resource: AudioResource, name: string, url: string) {
     this.logger.debug(
       `Playing audio resource with volume ${resource.volume?.volume} (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
+    resource.volume?.setVolume(this.playbackService.getVolume());
 
     const isPlayable = this.audioPlayer?.checkPlayable();
     if (isPlayable) {
       return;
     }
+
     this.logger.warn(
-      `Current resource is is not playable. This means playback will get stuck. Please report this issue.`,
+      `Bot attempted to play '${name}' but the resource is non-playable.
+      This means that the audio format is unsupported, the Jellyfin server has encountered an error or there is a bug.
+      The application will attempt to obtain a clear text error message from the server.
+      This may take a moment`,
     );
+
+    fetch(url)
+      .then((response) => {
+        this.logger.debug(
+          `Received response from Jellyfin server to troubleshoot non-playable resource with status ${response.status}`,
+        );
+        response
+          .text()
+          .then((text) => {
+            this.logger.warn(`Clear text message from Jellyfin: ${text}`);
+          })
+          .catch((e: Error) => {
+            this.logger.error(
+              `Unable to await clear text response from Jellyfin (status ${response.status}). This indicates a more serious connection issue: '${e.message}'`,
+            );
+          });
+      })
+      .catch((e: Error) => {
+        this.logger.error(
+          `Unable to connect to Jellyfin server to check resource playability. This indicates a more serious issue: '${e.message}'`,
+        );
+      });
   }
 
   /**
@@ -244,7 +267,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
-   * @returns The new paused state - true: paused, false: un-paused
+   * @returns The new paused state - true: paused, false: unpaused
    */
   @OnEvent('internal.voice.controls.togglePause')
   togglePaused(): boolean {
@@ -265,7 +288,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
         success: false,
         reply: {
           embeds: [
-            this.discordMessageService.buildErrorMessage({
+            buildErrorMessage({
               title: 'Unable to disconnect from voice channel',
               description: 'I am currently not connected to any voice channels',
             }),

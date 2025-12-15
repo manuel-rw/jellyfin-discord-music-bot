@@ -1,5 +1,5 @@
-FROM node:24-alpine
-RUN apk add ffmpeg
+FROM node:25-alpine
+RUN apk add --no-cache ffmpeg
 
 COPY . /app
 WORKDIR /app

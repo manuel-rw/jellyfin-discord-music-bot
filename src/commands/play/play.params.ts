@@ -6,6 +6,7 @@ export enum SearchType {
   Audio = 0,
   AudioAlbum = 1,
   Playlist = 2,
+  Artist = 4,
 }
 
 export class PlayCommandParams {
@@ -35,11 +36,14 @@ export class PlayCommandParams {
         return [BaseItemKind.Playlist];
       case SearchType.AudioAlbum:
         return [BaseItemKind.MusicAlbum];
+      case SearchType.Artist:
+        return [BaseItemKind.MusicArtist];
       default:
         return [
           BaseItemKind.Audio,
           BaseItemKind.Playlist,
           BaseItemKind.MusicAlbum,
+          BaseItemKind.MusicArtist,
         ];
     }
   }

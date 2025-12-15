@@ -31,10 +31,8 @@ export class PlaylistInteractionCollector {
 
   @Filter()
   filter(interaction: ButtonInteraction): boolean {
-    return (
-      interaction.message.interaction !== null &&
-      this.causeInteraction.id === interaction.message.interaction.id
-    );
+    const id = interaction.message.interactionMetadata?.id;
+    return id !== undefined && this.causeInteraction.id === id;
   }
 
   @On('collect')

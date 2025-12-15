@@ -1,6 +1,6 @@
-import { JellyfinSearchService } from 'src/clients/jellyfin/jellyfin.search.service';
-import { SearchItem } from 'src/models/search/SearchItem';
-import { Track } from 'src/models/music/Track';
+import { JellyfinSearchService } from 'src/clients/jellyfin/search/jellyfin.search.service';
+import { SearchItem } from 'src/clients/jellyfin/search/search.item';
+import { Track } from 'src/models/track';
 
 export const flatMapTrackItems = (
   hints: SearchItem[],
