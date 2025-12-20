@@ -40,7 +40,7 @@
     "@nestjs/schedule": "^6.0.1",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/terminus": "^11.0.0",
-    "@snazzah/davey": "^0.1.8",
+    "@snazzah/davey": "^0.1.9",
     "axios": "^1.13.2",
     "cron": "^4.3.4",
     "date-fns": "^4.1.0",
