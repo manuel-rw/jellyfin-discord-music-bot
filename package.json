@@ -42,7 +42,7 @@
     "@nestjs/terminus": "^11.0.0",
     "@snazzah/davey": "^0.1.9",
     "axios": "^1.13.2",
-    "cron": "^4.3.4",
+    "cron": "^4.4.0",
     "date-fns": "^4.1.0",
     "discord.js": "^14.25.1",
     "dotenv": "^17.2.3",
