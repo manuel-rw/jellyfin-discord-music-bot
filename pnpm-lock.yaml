@@ -54,8 +54,8 @@ importers:
         specifier: ^1.13.2
         version: 1.13.2
       cron:
-        specifier: ^4.3.4
-        version: 4.3.4
+        specifier: ^4.4.0
+        version: 4.4.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1817,12 +1817,12 @@ packages:
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
 
-  cron@4.3.4:
-    resolution: {integrity: sha512-OiO0l73MGhQOZQCjYZ0v7r8yFWpBOWteemwR1RIxiHtfVsIOwiTJZDvg7GmKzggkwC0RO8tI3P1QYBUCIZNYRQ==}
-    engines: {node: '>=18.x'}
-
   cron@4.3.5:
     resolution: {integrity: sha512-hKPP7fq1+OfyCqoePkKfVq7tNAdFwiQORr4lZUHwrf0tebC65fYEeWgOrXOL6prn1/fegGOdTfrM6e34PJfksg==}
+    engines: {node: '>=18.x'}
+
+  cron@4.4.0:
+    resolution: {integrity: sha512-fkdfq+b+AHI4cKdhZlppHveI/mgz2qpiYxcm+t5E5TsxX7QrLS1VE0+7GENEk9z0EeGPcpSciGv6ez24duWhwQ==}
     engines: {node: '>=18.x'}
 
   cross-spawn@7.0.6:
@@ -2469,10 +2469,6 @@ packages:
   lru-cache@11.0.2:
     resolution: {integrity: sha512-123qHRfJBmo2jXDbo/a5YOQrJoHF/GNQTLzQ5+IdK5pWpceK17yRc6ozlWd25FxvGKQbIUs91fDFkXmDHTKcyA==}
     engines: {node: 20 || >=22}
-
-  luxon@3.7.1:
-    resolution: {integrity: sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==}
-    engines: {node: '>=12'}
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -4384,7 +4380,7 @@ snapshots:
 
   '@types/cron@2.4.3':
     dependencies:
-      cron: 4.3.4
+      cron: 4.4.0
 
   '@types/deep-eql@4.0.2': {}
 
@@ -5014,12 +5010,12 @@ snapshots:
 
   create-require@1.1.1: {}
 
-  cron@4.3.4:
+  cron@4.3.5:
     dependencies:
       '@types/luxon': 3.7.1
-      luxon: 3.7.1
+      luxon: 3.7.2
 
-  cron@4.3.5:
+  cron@4.4.0:
     dependencies:
       '@types/luxon': 3.7.1
       luxon: 3.7.2
@@ -5717,8 +5713,6 @@ snapshots:
       is-unicode-supported: 0.1.0
 
   lru-cache@11.0.2: {}
-
-  luxon@3.7.1: {}
 
   luxon@3.7.2: {}
 
