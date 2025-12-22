@@ -160,8 +160,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       unplugin-swc:
-        specifier: ^1.5.8
-        version: 1.5.8(@swc/core@1.15.3)(rollup@4.53.3)
+        specifier: ^1.5.9
+        version: 1.5.9(@swc/core@1.15.3)(rollup@4.53.3)
       vitest:
         specifier: ^4.0.13
         version: 4.0.13(@types/node@24.10.1)(terser@5.44.1)
@@ -3131,13 +3131,13 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  unplugin-swc@1.5.8:
-    resolution: {integrity: sha512-6qVAQsCn/AMFiw7XGXkNC/q/Or4OpL0zRPertzLT1BoigjOQp0ktPxDWY4lc51FGwVbzW4V1BURaal1rpbJwSg==}
+  unplugin-swc@1.5.9:
+    resolution: {integrity: sha512-RKwK3yf0M+MN17xZfF14bdKqfx0zMXYdtOdxLiE6jHAoidupKq3jGdJYANyIM1X/VmABhh1WpdO+/f4+Ol89+g==}
     peerDependencies:
       '@swc/core': ^1.2.108
 
-  unplugin@2.3.10:
-    resolution: {integrity: sha512-6NCPkv1ClwH+/BGE9QeoTIl09nuiAt0gS28nn1PvYXsGKRwM2TCbFA2QiilmehPDTXIe684k4rZI1yl3A1PCUw==}
+  unplugin@2.3.11:
+    resolution: {integrity: sha512-5uKD0nqiYVzlmCRs01Fhs2BdkEgBS3SAVP6ndrBsuK42iC2+JHyxM05Rm9G8+5mkmRtzMZGY8Ct5+mliZxU/Ww==}
     engines: {node: '>=18.12.0'}
 
   update-browserslist-db@1.2.3:
@@ -6311,16 +6311,16 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-swc@1.5.8(@swc/core@1.15.3)(rollup@4.53.3):
+  unplugin-swc@1.5.9(@swc/core@1.15.3)(rollup@4.53.3):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       '@swc/core': 1.15.3
       load-tsconfig: 0.2.5
-      unplugin: 2.3.10
+      unplugin: 2.3.11
     transitivePeerDependencies:
       - rollup
 
-  unplugin@2.3.10:
+  unplugin@2.3.11:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.15.0
