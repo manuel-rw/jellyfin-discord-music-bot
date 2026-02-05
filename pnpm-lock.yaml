@@ -69,8 +69,8 @@ importers:
         specifier: ^18.0.2
         version: 18.0.2
       libsodium-wrappers:
-        specifier: ^0.7.15
-        version: 0.7.15
+        specifier: ^0.7.16
+        version: 0.7.16
       opusscript:
         specifier: ^0.1.1
         version: 0.1.1
@@ -2398,11 +2398,11 @@ packages:
   libphonenumber-js@1.10.56:
     resolution: {integrity: sha512-d0GdKshNnyfl5gM7kZ9rXjGiAbxT/zCXp0k+EAzh8H4zrb2R7GXtMCrULrX7UQxtfx6CLy/vz/lomvW79FAFdA==}
 
-  libsodium-wrappers@0.7.15:
-    resolution: {integrity: sha512-E4anqJQwcfiC6+Yrl01C1m8p99wEhLmJSs0VQqST66SbQXXBoaJY0pF4BNjRYa/sOQAxx6lXAaAFIlx+15tXJQ==}
+  libsodium-wrappers@0.7.16:
+    resolution: {integrity: sha512-Gtr/WBx4dKjvRL1pvfwZqu7gO6AfrQ0u9vFL+kXihtHf6NfkROR8pjYWn98MFDI3jN19Ii1ZUfPR9afGiPyfHg==}
 
-  libsodium@0.7.15:
-    resolution: {integrity: sha512-sZwRknt/tUpE2AwzHq3jEyUU5uvIZHtSssktXq7owd++3CSgn8RGrv6UZJJBpP7+iBghBqe7Z06/2M31rI2NKw==}
+  libsodium@0.7.16:
+    resolution: {integrity: sha512-3HrzSPuzm6Yt9aTYCDxYEG8x8/6C0+ag655Y7rhhWZM9PT4NpdnbqlzXhGZlDnkgR6MeSTnOt/VIyHLs9aSf+Q==}
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -5632,11 +5632,11 @@ snapshots:
 
   libphonenumber-js@1.10.56: {}
 
-  libsodium-wrappers@0.7.15:
+  libsodium-wrappers@0.7.16:
     dependencies:
-      libsodium: 0.7.15
+      libsodium: 0.7.16
 
-  libsodium@0.7.15: {}
+  libsodium@0.7.16: {}
 
   lines-and-columns@1.2.4: {}
 
