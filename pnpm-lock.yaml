@@ -22,7 +22,7 @@ importers:
         version: 0.19.0(@discordjs/opus@0.9.0)(opusscript@0.1.1)
       '@jellyfin/sdk':
         specifier: ^0.13.0
-        version: 0.13.0(axios@1.13.5)
+        version: 0.13.0(axios@1.13.6)
       '@nestjs/common':
         specifier: ^11.1.9
         version: 11.1.9(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -51,8 +51,8 @@ importers:
         specifier: ^0.1.9
         version: 0.1.9
       axios:
-        specifier: ^1.13.5
-        version: 1.13.5
+        specifier: ^1.13.6
+        version: 1.13.6
       cron:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1608,8 +1608,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.13.5:
-    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
+  axios@1.13.6:
+    resolution: {integrity: sha512-ChTCHMouEe2kn713WHbQGcuYrr6fXTBiu460OTwWrWob16g1bXn4vtz07Ope7ewMozJAnEquLk5lWQWtBig9DQ==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -3910,9 +3910,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.10.1
 
-  '@jellyfin/sdk@0.13.0(axios@1.13.5)':
+  '@jellyfin/sdk@0.13.0(axios@1.13.6)':
     dependencies:
-      axios: 1.13.5
+      axios: 1.13.6
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -4812,7 +4812,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.13.5:
+  axios@1.13.6:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.5
