@@ -10,6 +10,7 @@ import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
 import { PlayItemCommand } from './play/play.command';
 import { PreviousTrackCommand } from './previous.command';
+import { NowPlayingCommand } from './nowplaying.command';
 import { SkipTrackCommand } from './next.command';
 import { StatusCommand } from './status.command';
 import { StopPlaybackCommand } from './stop.command';
@@ -32,6 +33,7 @@ import { BotStatusCommand } from './bot_status/bot_status.command';
     PlaylistInteractionCollector,
     HelpCommand,
     StatusCommand,
+    NowPlayingCommand,
     EnqueueRandomItemsCommand,
     PlaylistCommand,
     DisconnectCommand,
