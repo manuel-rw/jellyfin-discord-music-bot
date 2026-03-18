@@ -6,12 +6,21 @@ import { PlaybackModule } from '../../playback/playback.module';
 
 import { DiscordConfigService } from './discord.config.service';
 import { DiscordVoiceService } from './discord.voice.service';
+import { DiscordEventSubscriberService } from './discord.event-subscriber.service';
 
 @Module({
   imports: [PlaybackModule, JellyfinClientModule],
   controllers: [],
-  providers: [DiscordConfigService, DiscordVoiceService],
-  exports: [DiscordConfigService, DiscordVoiceService],
+  providers: [
+    DiscordConfigService,
+    DiscordVoiceService,
+    DiscordEventSubscriberService,
+  ],
+  exports: [
+    DiscordConfigService,
+    DiscordVoiceService,
+    DiscordEventSubscriberService,
+  ],
 })
 export class DiscordClientModule implements OnModuleDestroy {
   constructor(private readonly discordVoiceService: DiscordVoiceService) {}

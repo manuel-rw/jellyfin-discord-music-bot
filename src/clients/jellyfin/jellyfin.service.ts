@@ -5,6 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Api, Jellyfin } from '@jellyfin/sdk';
 import { Constants } from '../../utils/constants';
 import { JellyfinPlayStateService } from './jellyfinPlayStateService';
+import { getUserApi } from '@jellyfin/sdk/lib/utils/api';
 
 @Injectable()
 export class JellyfinService {
@@ -35,11 +36,13 @@ export class JellyfinService {
   }
 
   authenticate() {
-    this.api
-      .authenticateUserByName(
-        process.env.JELLYFIN_AUTHENTICATION_USERNAME ?? '',
-        process.env.JELLYFIN_AUTHENTICATION_PASSWORD,
-      )
+    getUserApi(this.api)
+      .authenticateUserByName({
+        authenticateUserByName: {
+          Username: process.env.JELLYFIN_AUTHENTICATION_USERNAME ?? '',
+          Pw: process.env.JELLYFIN_AUTHENTICATION_PASSWORD,
+        },
+      })
       .then(async (response) => {
         if (response.data.SessionInfo?.UserId === undefined) {
           this.logger.error(

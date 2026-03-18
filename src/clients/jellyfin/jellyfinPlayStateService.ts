@@ -25,22 +25,23 @@ export class JellyfinPlayStateService {
   private readonly logger = new Logger(JellyfinPlayStateService.name);
 
   async initializePlayState(api: Api) {
-    await this.initializeApis(api);
-    await this.reportCapabilities();
+    this.initializeApis(api);
+    await this.reportCapabilitiesAsync();
   }
 
-  private async initializeApis(api: Api) {
+  private initializeApis(api: Api) {
     this.sessionApi = getSessionApi(api);
     this.playStateApi = getPlaystateApi(api);
   }
 
-  private async reportCapabilities() {
+  private async reportCapabilitiesAsync() {
     await this.sessionApi.postCapabilities({
       playableMediaTypes: [BaseItemKind[BaseItemKind.Audio]],
       supportsMediaControl: true,
       supportedCommands: [
         GeneralCommandType.Play,
         GeneralCommandType.PlayState,
+        GeneralCommandType.SetVolume,
       ],
     });
 

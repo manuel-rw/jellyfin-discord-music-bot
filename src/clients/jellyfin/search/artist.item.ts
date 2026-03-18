@@ -22,7 +22,7 @@ export class ArtistItem extends SearchItem {
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
     const tracks = await searchService.findArtist(this.id);
-    return flatMapTrackItems(tracks, searchService);
+    return await flatMapTrackItems(tracks, searchService);
   }
 
   static constructFromHint(hint: JellyfinSearchHint) {
