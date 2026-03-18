@@ -18,6 +18,7 @@ import {
 
 import { JellyfinSearchService } from './search/jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
+import { z } from 'zod';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -102,22 +103,24 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
           `Processing ${ids.length} ids received via websocket and adding them to the queue`,
         );
         const searchHints = await this.jellyfinSearchService.getAllById(ids);
-        const tracks = flatMapTrackItems(
+        const tracks = await flatMapTrackItems(
           searchHints,
           this.jellyfinSearchService,
         );
+        this.logger.debug(`Mapped ${tracks.length} tracks to Jellyfin`);
         this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
         break;
       }
       case SessionMessageType[SessionMessageType.Playstate]: {
         const sendPlayStateCommandRequest =
           msg.Data as SessionApiSendPlayStateCommandRequest;
-        await this.handleSendPlayStateCommandRequest(
-          sendPlayStateCommandRequest,
-        );
+        this.handleSendPlayStateCommandRequest(sendPlayStateCommandRequest);
         break;
       }
       case SessionMessageType[SessionMessageType.UserDataChanged]:
+        break;
+      case SessionMessageType[SessionMessageType.GeneralCommand]:
+        this.handleGeneralCommand(msg);
         break;
       default:
         this.logger.warn(
@@ -127,7 +130,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     }
   }
 
-  private async handleSendPlayStateCommandRequest(
+  private handleSendPlayStateCommandRequest(
     request: SessionApiSendPlayStateCommandRequest,
   ) {
     switch (request.Command) {
@@ -148,7 +151,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
         break;
       default:
         this.logger.warn(
-          `Unable to process incoming playstate command request: ${request.Command}`,
+          `Unable to process incoming play state command request: ${request.Command}`,
         );
         break;
     }
@@ -172,6 +175,33 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   onModuleDestroy() {
     this.disconnect();
+  }
+
+  private handleGeneralCommand(msg: JellyMessage<unknown>) {
+    this.logger.warn(JSON.stringify(msg));
+    const data = z
+      .xor([
+        z.object({
+          Name: z.literal('SetVolume'),
+          Arguments: z.object({
+            Volume: z.string().transform((value) => Number(value) / 100),
+          }),
+        }),
+      ])
+      .parse(msg.Data);
+
+    switch (data.Name) {
+      case 'SetVolume':
+        this.eventEmitter.emit('internal.voice.controls.setVolume', {
+          volume: data.Arguments.Volume,
+        });
+        break;
+      default:
+        this.logger.debug(
+          `Unable to handle message: '${data.Name}': ${msg.Data}`,
+        );
+        break;
+    }
   }
 }
 

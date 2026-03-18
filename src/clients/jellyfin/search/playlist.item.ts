@@ -47,6 +47,6 @@ export class PlaylistSearchItem extends SearchItem {
     searchService: JellyfinSearchService,
   ): Promise<Track[]> {
     const playlistItems = await searchService.getPlaylistItems(this.id);
-    return flatMapTrackItems(playlistItems, searchService);
+    return await flatMapTrackItems(playlistItems, searchService);
   }
 }
