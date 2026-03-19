@@ -71,6 +71,9 @@ export class JellyfinSearchService {
         } catch (err) {
           this.logger.warn(
             `Failed to include an item in the search results for ${searchTerm}: ${hint}`,
+            {
+              err,
+            },
           );
         }
       }
@@ -253,6 +256,41 @@ export class JellyfinSearchService {
         Providers: [],
         TotalRecordCount: 0,
       };
+    }
+  }
+
+  async getLikedTracks(limit = 1000) {
+    const api = this.jellyfinService.getApi();
+    const itemsApi = getItemsApi(api);
+
+    try {
+      const response = await itemsApi.getItems({
+        includeItemTypes: [
+          BaseItemKind.Audio,
+          BaseItemKind.MusicArtist,
+          BaseItemKind.MusicAlbum,
+        ],
+        limit,
+        userId: this.jellyfinService.getUserId(),
+        recursive: true,
+        isFavorite: true,
+      });
+
+      if (!response.data.Items) {
+        this.logger.warn(
+          'No liked tracks were found in Jellyfin for the current user.',
+        );
+        return [];
+      }
+
+      return response.data.Items.map((item) => {
+        return SearchItem.constructFromBaseItem(item);
+      });
+    } catch (err) {
+      this.logger.error(
+        `Unable to retrieve liked tracks from Jellyfin: ${err}`,
+      );
+      return [];
     }
   }
 
