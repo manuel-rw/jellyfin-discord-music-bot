@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Playlist } from '../models/playlist';
+import { EventNames } from '../events/names';
 
 @Injectable()
 export class PlaybackService {
@@ -36,12 +37,12 @@ export class PlaybackService {
     return this.volume;
   }
 
-  @OnEvent('internal.audio.track.previous')
+  @OnEvent(EventNames.Circuit.PreviousTrack)
   private handlePreviousTrackEvent() {
     this.getPlaylistOrDefault().setPreviousTrackAsActiveTrack();
   }
 
-  @OnEvent('internal.audio.track.next')
+  @OnEvent(EventNames.Circuit.NextTrack)
   private handleNextTrackEvent() {
     this.getPlaylistOrDefault().setNextTrackAsActiveTrack();
   }

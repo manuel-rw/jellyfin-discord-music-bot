@@ -31,6 +31,7 @@ import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builde
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
 
 import { buildErrorMessage, buildMessage } from './discord.message.builder';
+import { EventNames } from '../../events/names';
 
 @Injectable()
 export class DiscordVoiceService implements OnModuleDestroy {
@@ -59,7 +60,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     }
   }
 
-  @OnEvent('internal.audio.track.announce')
+  @OnEvent(EventNames.Circuit.AnnounceTrack)
   handleOnNewTrack(track: Track) {
     const url = track.getStreamUrl(this.jellyfinStreamBuilder);
     const resource = createAudioResource(url, {
@@ -215,26 +216,26 @@ export class DiscordVoiceService implements OnModuleDestroy {
   /**
    * Pauses the current audio player
    */
-  @OnEvent('internal.voice.controls.pause')
+  @OnEvent(EventNames.Controls.Pause)
   pause() {
     this.createAndReturnOrGetAudioPlayer().pause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
     if (track) {
       track.playing = false;
     }
-    this.eventEmitter.emit('playback.state.pause', true);
+    this.eventEmitter.emit(EventNames.Circuit.Paused, true);
   }
 
   /**
    * Stops the audio player
    */
-  @OnEvent('internal.voice.controls.stop')
+  @OnEvent(EventNames.Controls.Stop)
   stop(force: boolean): boolean {
     const hasStopped = this.createAndReturnOrGetAudioPlayer().stop(force);
     if (hasStopped) {
       const playlist = this.playbackService.getPlaylistOrDefault();
       this.eventEmitter.emit(
-        'internal.audio.track.finish',
+        EventNames.Circuit.FinishedTrack,
         playlist.getActiveTrack(),
       );
       playlist.clear();
@@ -251,7 +252,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     if (track) {
       track.playing = true;
     }
-    this.eventEmitter.emit('playback.state.pause', false);
+    this.eventEmitter.emit(EventNames.Circuit.Paused, false);
   }
 
   /**
@@ -269,7 +270,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
    */
-  @OnEvent('internal.voice.controls.togglePause')
+  @OnEvent(EventNames.Controls.TogglePause)
   togglePaused(): boolean {
     if (this.isPaused()) {
       this.unpause();
@@ -399,7 +400,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
       if (finishedTrack) {
         finishedTrack.playing = false;
-        this.eventEmitter.emit('internal.audio.track.finish', finishedTrack);
+        this.eventEmitter.emit(EventNames.Circuit.FinishedTrack, finishedTrack);
       }
 
       const hasNextTrack = playlist.hasNextTrackInPlaylist();

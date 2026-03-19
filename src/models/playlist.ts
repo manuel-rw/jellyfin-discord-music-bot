@@ -1,6 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { Track } from './track';
+import { EventNames } from '../events/names';
 
 export class Playlist {
   tracks: Track[];
@@ -151,7 +152,7 @@ export class Playlist {
     }
 
     const currentTrack = this.getActiveTrack();
-    this.eventEmitter.emit('internal.audio.track.finish', currentTrack);
+    this.eventEmitter.emit(EventNames.Circuit.FinishedTrack, currentTrack);
   }
 
   private announceTrackChange() {
@@ -166,7 +167,7 @@ export class Playlist {
     }
 
     activeTrack.playing = true;
-    this.eventEmitter.emit('internal.audio.track.announce', activeTrack);
+    this.eventEmitter.emit(EventNames.Circuit.AnnounceTrack, activeTrack);
   }
 
   private isActiveTrackOutOfSync(): boolean {

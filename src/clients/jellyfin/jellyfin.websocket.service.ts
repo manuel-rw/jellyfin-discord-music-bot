@@ -19,6 +19,7 @@ import {
 import { JellyfinSearchService } from './search/jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
 import { z } from 'zod';
+import { EventNames } from '../../events/names';
 
 @Injectable()
 export class JellyfinWebSocketService implements OnModuleDestroy {
@@ -135,19 +136,19 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   ) {
     switch (request.Command) {
       case PlaystateCommand.PlayPause:
-        this.eventEmitter.emit('internal.voice.controls.togglePause');
+        this.eventEmitter.emit(EventNames.Controls.TogglePause);
         break;
       case PlaystateCommand.Pause:
-        this.eventEmitter.emit('internal.voice.controls.pause');
+        this.eventEmitter.emit(EventNames.Controls.Pause);
         break;
       case PlaystateCommand.Stop:
-        this.eventEmitter.emit('internal.voice.controls.stop');
+        this.eventEmitter.emit(EventNames.Controls.Stop);
         break;
       case PlaystateCommand.NextTrack:
-        this.eventEmitter.emit('internal.audio.track.next');
+        this.eventEmitter.emit(EventNames.Circuit.NextTrack);
         break;
       case PlaystateCommand.PreviousTrack:
-        this.eventEmitter.emit('internal.audio.track.previous');
+        this.eventEmitter.emit(EventNames.Circuit.PreviousTrack);
         break;
       default:
         this.logger.warn(
@@ -192,7 +193,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
     switch (data.Name) {
       case 'SetVolume':
-        this.eventEmitter.emit('internal.voice.controls.setVolume', {
+        this.eventEmitter.emit(EventNames.Controls.SetVolume, {
           volume: data.Arguments.Volume,
         });
         break;
