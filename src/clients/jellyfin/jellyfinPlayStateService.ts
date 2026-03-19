@@ -14,6 +14,7 @@ import { Interval } from '@nestjs/schedule';
 import { Track } from '../../models/track';
 
 import { PlaybackService } from '../../playback/playback.service';
+import { EventNames } from '../../events/names';
 
 @Injectable()
 export class JellyfinPlayStateService {
@@ -48,7 +49,7 @@ export class JellyfinPlayStateService {
     this.logger.debug('Reported playback capabilities successfully');
   }
 
-  @OnEvent('internal.audio.track.announce')
+  @OnEvent(EventNames.Circuit.AnnounceTrack)
   private async onPlaybackNewTrack(track: Track) {
     this.logger.debug(`Reporting playback start on track '${track.id}'`);
     await this.playStateApi.reportPlaybackStart({
@@ -59,7 +60,7 @@ export class JellyfinPlayStateService {
     });
   }
 
-  @OnEvent('internal.audio.track.finish')
+  @OnEvent(EventNames.Circuit.FinishedTrack)
   private async onPlaybackFinished(track: Track) {
     if (!track) {
       this.logger.error(
@@ -76,13 +77,13 @@ export class JellyfinPlayStateService {
     });
   }
 
-  @OnEvent('playback.state.pause')
+  @OnEvent(EventNames.Circuit.Paused)
   private async onPlaybackPause(paused: boolean) {
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
 
     if (!track) {
       this.logger.error(
-        'Unable to report changed playstate to Jellyfin because no track was active',
+        'Unable to report changed play state to Jellyfin because no track was active',
       );
       return;
     }
