@@ -10,12 +10,14 @@ import { HelpCommand } from './help.command';
 import { PausePlaybackCommand } from './pause.command';
 import { PlayItemCommand } from './play/play.command';
 import { PreviousTrackCommand } from './previous.command';
+import { NowPlayingCommand } from './nowplaying.command';
 import { SkipTrackCommand } from './next.command';
 import { StatusCommand } from './status.command';
 import { StopPlaybackCommand } from './stop.command';
 import { SummonCommand } from './summon.command';
 import { PlaylistInteractionCollector } from './playlist/playlist.interaction-collector';
 import { EnqueueRandomItemsCommand } from './random/random.command';
+import { PlayLikedCommand } from './playliked/playliked.command';
 import { VolumeCommand } from './volume/volume.command';
 import { ShuffleCommand } from './shuffle.command';
 import { BotStatusCommand } from './bot_status/bot_status.command';
@@ -32,7 +34,9 @@ import { BotStatusCommand } from './bot_status/bot_status.command';
     PlaylistInteractionCollector,
     HelpCommand,
     StatusCommand,
+    NowPlayingCommand,
     EnqueueRandomItemsCommand,
+    PlayLikedCommand,
     PlaylistCommand,
     DisconnectCommand,
     PausePlaybackCommand,

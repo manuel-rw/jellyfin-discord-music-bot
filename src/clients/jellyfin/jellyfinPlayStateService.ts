@@ -14,6 +14,7 @@ import { Interval } from '@nestjs/schedule';
 import { Track } from '../../models/track';
 
 import { PlaybackService } from '../../playback/playback.service';
+import { EventNames } from '../../events/names';
 
 @Injectable()
 export class JellyfinPlayStateService {
@@ -25,29 +26,30 @@ export class JellyfinPlayStateService {
   private readonly logger = new Logger(JellyfinPlayStateService.name);
 
   async initializePlayState(api: Api) {
-    await this.initializeApis(api);
-    await this.reportCapabilities();
+    this.initializeApis(api);
+    await this.reportCapabilitiesAsync();
   }
 
-  private async initializeApis(api: Api) {
+  private initializeApis(api: Api) {
     this.sessionApi = getSessionApi(api);
     this.playStateApi = getPlaystateApi(api);
   }
 
-  private async reportCapabilities() {
+  private async reportCapabilitiesAsync() {
     await this.sessionApi.postCapabilities({
       playableMediaTypes: [BaseItemKind[BaseItemKind.Audio]],
       supportsMediaControl: true,
       supportedCommands: [
         GeneralCommandType.Play,
         GeneralCommandType.PlayState,
+        GeneralCommandType.SetVolume,
       ],
     });
 
     this.logger.debug('Reported playback capabilities successfully');
   }
 
-  @OnEvent('internal.audio.track.announce')
+  @OnEvent(EventNames.Circuit.AnnounceTrack)
   private async onPlaybackNewTrack(track: Track) {
     this.logger.debug(`Reporting playback start on track '${track.id}'`);
     await this.playStateApi.reportPlaybackStart({
@@ -58,7 +60,7 @@ export class JellyfinPlayStateService {
     });
   }
 
-  @OnEvent('internal.audio.track.finish')
+  @OnEvent(EventNames.Circuit.FinishedTrack)
   private async onPlaybackFinished(track: Track) {
     if (!track) {
       this.logger.error(
@@ -75,13 +77,13 @@ export class JellyfinPlayStateService {
     });
   }
 
-  @OnEvent('playback.state.pause')
+  @OnEvent(EventNames.Circuit.Paused)
   private async onPlaybackPause(paused: boolean) {
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
 
     if (!track) {
       this.logger.error(
-        'Unable to report changed playstate to Jellyfin because no track was active',
+        'Unable to report changed play state to Jellyfin because no track was active',
       );
       return;
     }
