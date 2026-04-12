@@ -41,7 +41,7 @@
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/terminus": "^11.1.1",
     "@snazzah/davey": "^0.1.9",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "cron": "^4.4.0",
     "date-fns": "^4.1.0",
     "discord.js": "^14.25.1",
