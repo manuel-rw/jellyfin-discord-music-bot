@@ -80,6 +80,6 @@
     "tsconfig-paths": "4.2.0",
     "typescript": "^5.9.3",
     "unplugin-swc": "^1.5.9",
-    "vitest": "^4.0.13"
+    "vitest": "^4.1.0"
   }
 }
