@@ -1,5 +1,6 @@
 allowBuilds:
   '@swc/core': true
+engineStrict: true
 onlyBuiltDependencies:
   - '@discordjs/opus'
   - '@nestjs/core'
