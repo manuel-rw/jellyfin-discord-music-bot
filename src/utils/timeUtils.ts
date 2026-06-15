@@ -1,5 +1,4 @@
-import { formatDuration, intervalToDuration } from 'date-fns';
-import { Duration } from 'date-fns/types';
+import { Duration, formatDuration, intervalToDuration } from 'date-fns';
 
 export const formatMillisecondsAsHumanReadable = (
   milliseconds: number,

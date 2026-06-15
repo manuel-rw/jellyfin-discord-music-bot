@@ -24,11 +24,11 @@ import { fromZodError } from 'zod-validation-error';
   imports: [
     ConfigModule.forRoot({
       validate(config) {
-        try {
-          return environmentVariablesSchema.parse(config);
-        } catch (err) {
-          throw fromZodError(err);
+        const result = environmentVariablesSchema.safeParse(config);
+        if (result.success) {
+          return result.data;
         }
+        throw fromZodError(result.error);
       },
     }),
     ServeStaticModule.forRoot({

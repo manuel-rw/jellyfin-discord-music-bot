@@ -6,13 +6,13 @@ import {
   GuildMember,
   InteractionReplyOptions,
 } from 'discord.js';
-import { buildMessage } from 'src/clients/discord/discord.message.builder';
-import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
-import { JellyfinSearchService } from 'src/clients/jellyfin/search/jellyfin.search.service';
-import { SearchItem } from 'src/clients/jellyfin/search/search.item';
-import { PlaybackService } from 'src/playback/playback.service';
 import { RandomCommandParams } from './random.params';
 import { defaultMemberPermissions } from '../../utils/environment';
+import { PlaybackService } from '../../playback/playback.service';
+import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
+import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.search.service';
+import { buildMessage } from '../../clients/discord/discord.message.builder';
+import { SearchItem } from '../../clients/jellyfin/search/search.item';
 
 @Command({
   name: 'random',

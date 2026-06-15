@@ -6,5 +6,5 @@ export class PlaylistCommandParams {
     description: 'The page',
     type: ParamType.INTEGER,
   })
-  page: number;
+  page!: number;
 }

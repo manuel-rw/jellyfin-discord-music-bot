@@ -15,14 +15,14 @@ export class PlayCommandParams {
     description: 'Item name on Jellyfin',
     autocomplete: true,
   })
-  name: string;
+  name!: string;
 
   @Param({
     description: 'Add to the start of the playlist',
     required: false,
     type: ParamType.BOOLEAN,
   })
-  next: boolean;
+  next!: boolean;
 
   @Choice(SearchType)
   @Param({ description: 'Desired item type', type: ParamType.INTEGER })

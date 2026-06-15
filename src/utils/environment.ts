@@ -28,11 +28,11 @@ export const environmentVariablesSchema = z.object({
 });
 
 export const getEnvironmentVariables = () => {
-  try {
-    return environmentVariablesSchema.strip().parse(process.env);
-  } catch (err) {
-    throw fromZodError(err);
+  const result = environmentVariablesSchema.strip().safeParse(process.env);
+  if (result.success) {
+    return result.data;
   }
+  throw fromZodError(result.error);
 };
 
 export const defaultMemberPermissions: PermissionResolvable | undefined =

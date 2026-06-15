@@ -8,5 +8,5 @@ export class VolumeCommandParams {
     minValue: 0,
     maxValue: 150,
   })
-  volume: number;
+  volume!: number;
 }

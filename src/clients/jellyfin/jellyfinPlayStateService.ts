@@ -18,8 +18,8 @@ import { EventNames } from '../../events/names';
 
 @Injectable()
 export class JellyfinPlayStateService {
-  private playStateApi: PlaystateApi;
-  private sessionApi: SessionApi;
+  private playStateApi?: PlaystateApi;
+  private sessionApi?: SessionApi;
 
   constructor(private readonly playbackService: PlaybackService) {}
 
@@ -36,6 +36,9 @@ export class JellyfinPlayStateService {
   }
 
   private async reportCapabilitiesAsync() {
+    if (!this.sessionApi) {
+      throw new Error(`Session API is not initalized yet`);
+    }
     await this.sessionApi.postCapabilities({
       playableMediaTypes: [BaseItemKind[BaseItemKind.Audio]],
       supportsMediaControl: true,
@@ -51,6 +54,9 @@ export class JellyfinPlayStateService {
 
   @OnEvent(EventNames.Circuit.AnnounceTrack)
   private async onPlaybackNewTrack(track: Track) {
+    if (!this.playStateApi) {
+      throw new Error(`Play State API is not initalized yet`);
+    }
     this.logger.debug(`Reporting playback start on track '${track.id}'`);
     await this.playStateApi.reportPlaybackStart({
       playbackStartInfo: {
@@ -68,6 +74,11 @@ export class JellyfinPlayStateService {
       );
       return;
     }
+
+    if (!this.playStateApi) {
+      throw new Error(`Play State API is not initalized yet`);
+    }
+
     this.logger.debug(`Reporting playback finish on track '${track.id}'`);
     await this.playStateApi.reportPlaybackStopped({
       playbackStopInfo: {
@@ -88,6 +99,10 @@ export class JellyfinPlayStateService {
       return;
     }
 
+    if (!this.playStateApi) {
+      throw new Error(`Play State API is not initalized yet`);
+    }
+
     await this.playStateApi.reportPlaybackProgress({
       playbackProgressInfo: {
         IsPaused: paused,
@@ -103,6 +118,10 @@ export class JellyfinPlayStateService {
     const track = playlist.getActiveTrack();
     if (!track || !playlist.hasAnyPlaying()) {
       return;
+    }
+
+    if (!this.playStateApi) {
+      throw new Error(`Play State API is not initalized yet`);
     }
 
     await this.playStateApi.reportPlaybackProgress({

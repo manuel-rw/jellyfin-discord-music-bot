@@ -23,7 +23,7 @@ export class BotStatusDto {
     required: true,
     type: ParamType.INTEGER,
   })
-  activity: ActivityType;
+  activity!: ActivityType;
 
   @Choice(ClientPresenceStatus)
   @Param({
@@ -31,12 +31,12 @@ export class BotStatusDto {
     description: 'The status to set',
     required: true,
   })
-  status: ClientPresenceStatus;
+  status!: ClientPresenceStatus;
 
   @Param({
     name: 'text',
     description: 'The text to set',
     required: true,
   })
-  text: string;
+  text!: string;
 }

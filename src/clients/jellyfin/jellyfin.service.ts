@@ -10,14 +10,19 @@ import { getUserApi } from '@jellyfin/sdk/lib/utils/api';
 @Injectable()
 export class JellyfinService {
   private readonly logger = new Logger(JellyfinService.name);
-  private jellyfin: Jellyfin;
-  private api: Api;
-  private userId: string;
+  private jellyfin?: Jellyfin;
+  private api?: Api;
+  private userId?: string;
   private connected = false;
 
   constructor(private readonly jellyfinPlayState: JellyfinPlayStateService) {}
 
   init() {
+    this.initializeClient();
+    this.logger.debug('Created Jellyfin Client and Api');
+  }
+
+  initializeClient() {
     this.jellyfin = new Jellyfin({
       clientInfo: {
         name: Constants.Metadata.ApplicationName,
@@ -32,10 +37,12 @@ export class JellyfinService {
     this.api = this.jellyfin.createApi(
       process.env.JELLYFIN_SERVER_ADDRESS ?? '',
     );
-    this.logger.debug('Created Jellyfin Client and Api');
   }
 
   authenticate() {
+    if (!this.api) {
+      throw new Error(`Unexpected call before API was initialized.`);
+    }
     getUserApi(this.api)
       .authenticateUserByName({
         authenticateUserByName: {
@@ -57,7 +64,7 @@ export class JellyfinService {
         this.userId = response.data.SessionInfo.UserId;
         this.connected = true;
 
-        await this.jellyfinPlayState.initializePlayState(this.api);
+        await this.jellyfinPlayState.initializePlayState(this.api!);
       })
       .catch((test) => {
         this.logger.error(test);
@@ -77,11 +84,17 @@ export class JellyfinService {
   }
 
   getApi() {
-    return this.api;
+    if (!this.api) {
+      this.initializeClient();
+    }
+    return this.api!;
   }
 
   getJellyfin() {
-    return this.jellyfin;
+    if (!this.jellyfin) {
+      this.initializeClient();
+    }
+    return this.jellyfin!;
   }
 
   getUserId() {

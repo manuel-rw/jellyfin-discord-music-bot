@@ -1,6 +1,6 @@
-import { JellyfinSearchService } from 'src/clients/jellyfin/search/jellyfin.search.service';
-import { SearchItem } from 'src/clients/jellyfin/search/search.item';
-import { Track } from 'src/models/track';
+import { SearchItem } from '../clients/jellyfin/search/search.item';
+import { JellyfinSearchService } from '../clients/jellyfin/search/jellyfin.search.service';
+import { Track } from '../models/track';
 
 /**
  * Maps an array of search items from Jellyfin to internal models asynchronously.
