@@ -17,7 +17,7 @@ import { buildMessage } from '../clients/discord/discord.message.builder';
 @Injectable()
 export class UpdatesService {
   private readonly logger = new Logger(UpdatesService.name);
-  private hasAlreadyNotified: boolean;
+  private hasAlreadyNotified = false;
 
   constructor(@InjectDiscordClient() private readonly client: Client) {}
 

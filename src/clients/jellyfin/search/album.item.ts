@@ -56,8 +56,9 @@ export class AlbumSearchItem extends SearchItem {
     const remoteImages = await searchService.getRemoteImageById(this.id);
     const albumItems = await searchService.getAlbumItems(this.id);
     const tracks = await Promise.all(
-      albumItems.map(async (x) =>
-        (await x.toTracks(searchService)).find((x) => x !== null),
+      albumItems.map(
+        async (x): Promise<Track> =>
+          (await x.toTracks(searchService)).find((track) => track !== null)!,
       ),
     );
     return tracks.map((track: Track): Track => {

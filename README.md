@@ -41,6 +41,7 @@
 ## ⚙️ Commands
 
 - ``/play <search:string> <next:boolean?> <type:Type?>`` Play a song, album or playlist from your media server
+- ``/playliked`` Plays songs, that you have liked
 - ``/playlist <page:number?>`` Shows the current playlist in real time in pagination
 - ``/random <count:number?>`` Enque a random mix of songs from your media server
 - ``/volume <volume:number>`` Set the volume of the bot
@@ -54,7 +55,7 @@
 - ``/stop`` Stop playback and clear the queue
 - ``/summon`` Summon the bot to your voice channel
 - ``/bot-status <activity:Activity> <status:Status> <text:string>`` Set the bot's status
-
+- ``/nowplaying`` Shows what the bot is currently playing.
 
 > [!TIP]
 > ``<search:string>`` -> Equals to a required parameter.<br/>

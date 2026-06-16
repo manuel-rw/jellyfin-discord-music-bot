@@ -5,12 +5,12 @@ import { Logger } from '@nestjs/common';
 import { Injectable } from '@nestjs/common/decorators';
 
 import { CommandInteraction } from 'discord.js';
-import { buildMessage } from 'src/clients/discord/discord.message.builder';
-import { DiscordVoiceService } from 'src/clients/discord/discord.voice.service';
-import { PlaybackService } from 'src/playback/playback.service';
 import { sleepAsync } from '../../utils/timeUtils';
 import { VolumeCommandParams } from './volume.params';
 import { defaultMemberPermissions } from '../../utils/environment';
+import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
+import { PlaybackService } from '../../playback/playback.service';
+import { buildMessage } from '../../clients/discord/discord.message.builder';
 
 @Injectable()
 @Command({

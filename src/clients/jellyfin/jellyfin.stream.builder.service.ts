@@ -22,7 +22,7 @@ export class JellyfinStreamBuilderService {
       url.pathname += '/';
     }
     url.pathname += `Audio/${jellyfinItemId}/universal`;
-    url.searchParams.set('UserId', this.jellyfinService.getUserId());
+    url.searchParams.set('UserId', this.jellyfinService.getUserId() ?? '');
     url.searchParams.set(
       'DeviceId',
       this.jellyfinService.getJellyfin().clientInfo.name,
