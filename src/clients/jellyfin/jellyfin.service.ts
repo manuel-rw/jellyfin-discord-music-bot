@@ -14,6 +14,10 @@ export class JellyfinService {
   private api?: Api;
   private userId?: string;
   private connected = false;
+  private reconnectTimeoutId: NodeJS.Timeout | null = null;
+  private reconnecting = false;
+
+  private static readonly RECONNECT_INTERVAL_MS = 5000;
 
   constructor(private readonly jellyfinPlayState: JellyfinPlayStateService) {}
 
@@ -69,10 +73,12 @@ export class JellyfinService {
       .catch((test) => {
         this.logger.error(test);
         this.connected = false;
+        this.scheduleReconnect();
       });
   }
 
   async destroy() {
+    this.cancelReconnect();
     if (!this.api) {
       this.logger.warn(
         'Jellyfin Api Client was unexpectedly undefined. Graceful destroy has failed',
@@ -81,6 +87,33 @@ export class JellyfinService {
     }
     await this.api.logout();
     this.connected = false;
+  }
+
+  private scheduleReconnect() {
+    if (this.reconnecting) {
+      return;
+    }
+    this.reconnecting = true;
+    this.logger.warn(
+      `Jellyfin connection lost. Reconnecting in ${JellyfinService.RECONNECT_INTERVAL_MS}ms...`,
+    );
+    this.reconnectTimeoutId = setTimeout(() => {
+      this.reconnecting = false;
+      this.reconnectTimeoutId = null;
+      this.logger.log('Attempting to reconnect to Jellyfin...');
+      if (!this.api) {
+        this.initializeClient();
+      }
+      this.authenticate();
+    }, JellyfinService.RECONNECT_INTERVAL_MS);
+  }
+
+  private cancelReconnect() {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
+    }
+    this.reconnecting = false;
   }
 
   getApi() {
