@@ -48,7 +48,7 @@
     "discord.js": "^14.26.4",
     "dotenv": "^17.3.1",
     "joi": "^18.2.3",
-    "libsodium-wrappers": "^0.8.2",
+    "libsodium-wrappers": "^0.8.4",
     "opusscript": "^0.1.1",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^6.1.2",
