@@ -34,6 +34,10 @@ async function updateUI() {
   const playIcon = document.getElementById('playIcon');
   const pauseIcon = document.getElementById('pauseIcon');
   const volSlider = document.getElementById('volumeSlider');
+  const playBtn = document.getElementById('playBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
 
   if (!status) {
     jellyfinDot.className = 'inline-block w-2.5 h-2.5 rounded-full bg-gray-500';
@@ -52,7 +56,7 @@ async function updateUI() {
 
   if (status.voiceConnection?.connected) {
     if (status.voiceConnection.channel && status.voiceConnection.bitrate) {
-      voiceInfo.textContent = `${status.voiceConnection.channel} \u00B7 ${fmtBitrate(status.voiceConnection.bitrate)}`;
+      voiceInfo.textContent = `Connected to '${status.voiceConnection.channel}' \u00B7 streaming on ${fmtBitrate(status.voiceConnection.bitrate)}`;
     } else if (status.voiceConnection.channel) {
       voiceInfo.textContent = status.voiceConnection.channel;
     } else {
@@ -96,16 +100,30 @@ async function updateUI() {
 
   paused = status.paused;
   if (paused) {
-    playIcon.classList.add('hidden');
-    pauseIcon.classList.remove('hidden');
-  } else {
     playIcon.classList.remove('hidden');
     pauseIcon.classList.add('hidden');
+  } else {
+    playIcon.classList.add('hidden');
+    pauseIcon.classList.remove('hidden');
   }
 
   if (status.volume !== undefined && volSlider.value !== String(status.volume)) {
     volSlider.value = status.volume;
   }
+
+  const hasTrack = !!status.activeTrack;
+  [playBtn, stopBtn, prevBtn, nextBtn].forEach(btn => {
+    if (hasTrack) {
+      btn.disabled = false;
+      btn.classList.remove('opacity-40', 'cursor-not-allowed');
+    } else {
+      btn.disabled = true;
+      btn.classList.add('opacity-40', 'cursor-not-allowed');
+    }
+  });
+  volSlider.disabled = !hasTrack;
+  volSlider.classList.toggle('opacity-40', !hasTrack);
+  volSlider.classList.toggle('cursor-not-allowed', !hasTrack);
 
   queueInfo.textContent = status.activeTrack
     ? `Track ${(status.queuePosition ?? 0) + 1} of ${status.queueLength}`

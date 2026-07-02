@@ -68,17 +68,17 @@
 
         <!-- Controls -->
         <div class="flex items-center justify-center gap-3 mt-6">
-          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" onclick="previous()">
+          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" id="prevBtn" onclick="previous()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
           </button>
           <button class="bg-purple-600 hover:bg-purple-500 text-white p-3.5 rounded-full transition" id="playBtn" onclick="togglePause()">
             <svg id="playIcon" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             <svg id="pauseIcon" class="hidden w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
           </button>
-          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" onclick="stop()">
+          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" id="stopBtn" onclick="stop()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
           </button>
-          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" onclick="next()">
+          <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" id="nextBtn" onclick="next()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
           </button>
         </div>

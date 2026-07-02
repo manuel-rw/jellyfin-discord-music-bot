@@ -83,6 +83,13 @@ export class WebController {
     return { volume: vol };
   }
 
+  @Post('disconnect')
+  disconnect() {
+    this.playbackService.getPlaylistOrDefault().clear();
+    this.discordVoice.disconnect();
+    return { disconnected: true };
+  }
+
   @Get('album-art/:itemId')
   async proxyAlbumArt(
     @Param('itemId') itemId: string,
