@@ -26,6 +26,10 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   private webSocket: WebSocket;
 
   private readonly logger = new Logger(JellyfinWebSocketService.name);
+  private reconnectTimeoutId: NodeJS.Timeout | null = null;
+  private reconnecting = false;
+
+  private static readonly RECONNECT_INTERVAL_MS = 5000;
 
   constructor(
     private readonly jellyfinService: JellyfinService,
@@ -62,6 +66,7 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   }
 
   disconnect() {
+    this.cancelReconnect();
     if (!this.webSocket) {
       this.logger.warn(
         'Tried to disconnect but WebSocket was unexpectedly undefined',
@@ -160,6 +165,14 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
 
   private bindWebSocketEvents() {
     this.webSocket.on('message', this.messageHandler.bind(this));
+    this.webSocket.on('close', () => {
+      this.logger.warn('WebSocket closed. Scheduling reconnect...');
+      this.scheduleReconnect();
+    });
+    this.webSocket.on('error', (err) => {
+      this.logger.error(`WebSocket error: ${err.message}`);
+      this.webSocket.close();
+    });
   }
 
   private static buildSocketUrl(
@@ -175,7 +188,32 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   }
 
   onModuleDestroy() {
+    this.cancelReconnect();
     this.disconnect();
+  }
+
+  private scheduleReconnect() {
+    if (this.reconnecting) {
+      return;
+    }
+    this.reconnecting = true;
+    this.logger.warn(
+      `WebSocket disconnected. Reconnecting in ${JellyfinWebSocketService.RECONNECT_INTERVAL_MS}ms...`,
+    );
+    this.reconnectTimeoutId = setTimeout(() => {
+      this.reconnecting = false;
+      this.reconnectTimeoutId = null;
+      this.logger.log('Attempting to reconnect WebSocket...');
+      this.initializeAndConnect();
+    }, JellyfinWebSocketService.RECONNECT_INTERVAL_MS);
+  }
+
+  private cancelReconnect() {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
+    }
+    this.reconnecting = false;
   }
 
   private handleGeneralCommand(msg: JellyMessage<unknown>) {
