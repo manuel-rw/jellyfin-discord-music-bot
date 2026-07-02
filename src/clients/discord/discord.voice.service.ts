@@ -40,6 +40,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
   private autoLeaveIntervalId: NodeJS.Timeout | null = null;
+  private voiceChannelInfo: { name: string; bitrate: number; channelId: string } | null = null;
 
   constructor(
     private readonly playbackService: PlaybackService,
@@ -101,6 +102,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
     }
 
     const channel = member.voice.channel;
+    this.voiceChannelInfo = {
+      name: channel.name,
+      bitrate: channel.bitrate,
+      channelId: channel.id,
+    };
 
     joinVoiceChannel({
       channelId: channel.id,
@@ -158,6 +164,10 @@ export class DiscordVoiceService implements OnModuleDestroy {
       success: true,
       reply: {},
     };
+  }
+
+  getVoiceConnection() {
+    return this.voiceConnection;
   }
 
   changeCurrentResourceVolume(volume: number) {
@@ -266,6 +276,10 @@ export class DiscordVoiceService implements OnModuleDestroy {
     );
   }
 
+  getVoiceChannelInfo() {
+    return this.voiceChannelInfo;
+  }
+
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
@@ -301,6 +315,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     this.voiceConnection.disconnect();
     this.audioPlayer = undefined;
     this.voiceConnection = undefined;
+    this.voiceChannelInfo = null;
     return {
       success: true,
       reply: {},
