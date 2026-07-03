@@ -31,7 +31,7 @@
 
     <div class="mx-auto max-w-lg py-8 px-4">
       <!-- Connection Status -->
-      <div class="flex justify-center gap-6 mb-6 text-sm" id="connectionStatus">
+      <div class="flex justify-center gap-6 mb-6 text-sm">
         <div class="flex items-center gap-2">
           <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-500" id="jellyfinDot"></span>
           <span class="text-gray-400">Jellyfin</span>
@@ -40,13 +40,11 @@
           <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-500" id="discordDot"></span>
           <span class="text-gray-400">Discord</span>
         </div>
-        <div class="text-gray-500" id="voiceInfo"></div>
       </div>
 
       <!-- Player Card -->
       <div class="bg-zinc-800 rounded-2xl p-6 shadow-xl">
         <div class="flex items-start gap-5">
-          <!-- Album Art -->
           <div class="w-24 h-24 rounded-xl bg-zinc-700 flex-shrink-0 overflow-hidden flex items-center justify-center" id="artworkContainer">
             <svg id="defaultIcon" class="w-12 h-12 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M9 18V5l12-2v13" />
@@ -55,8 +53,6 @@
             </svg>
             <img id="albumArt" class="hidden w-full h-full object-cover" alt="Album art" />
           </div>
-
-          <!-- Track Info -->
           <div class="flex-1 min-w-0">
             <div class="text-gray-100 font-semibold text-lg truncate" id="trackName">Not playing</div>
             <div class="text-gray-400 text-sm mt-1" id="trackStatus">Waiting for a track...</div>
@@ -66,7 +62,6 @@
           </div>
         </div>
 
-        <!-- Controls -->
         <div class="flex items-center justify-center gap-3 mt-6">
           <button class="text-gray-300 hover:text-white hover:bg-zinc-700 p-2.5 rounded-full transition" id="prevBtn" onclick="previous()">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
@@ -83,7 +78,6 @@
           </button>
         </div>
 
-        <!-- Volume -->
         <div class="flex items-center gap-3 mt-5">
           <svg class="w-4 h-4 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M11 5L6 9H2v6h4l5 4V5z" />
@@ -92,8 +86,26 @@
           <input type="range" min="0" max="1" step="0.01" value="1" class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-purple-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500" id="volumeSlider" oninput="setVolume(this.value)" />
         </div>
 
-        <!-- Queue Info -->
         <div class="text-center text-gray-500 text-xs mt-4" id="queueInfo"></div>
+      </div>
+
+      <!-- Voice Info & Disconnect -->
+      <div class="flex items-center justify-between mt-4" id="voiceInfoRow">
+        <div class="text-gray-400 text-xs" id="voiceInfo"></div>
+        <button class="text-xs text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-300/50 rounded-lg px-3 py-1.5 transition hidden" id="disconnectBtn" onclick="disconnect()">Disconnect</button>
+      </div>
+
+      <!-- Server / Channel Selector -->
+      <div class="bg-zinc-800 rounded-2xl p-5 shadow-xl mt-6">
+        <label class="text-gray-400 text-xs font-medium uppercase tracking-wide">Server</label>
+        <select class="mt-1.5 w-full bg-zinc-700 text-gray-200 rounded-lg px-3 py-2 border border-zinc-600 focus:outline-none focus:border-purple-500 text-sm" id="guildSelect" onchange="onGuildChange()">
+          <option value="">Select a server</option>
+        </select>
+
+        <div id="channelSection" class="hidden mt-4">
+          <label class="text-gray-400 text-xs font-medium uppercase tracking-wide">Voice Channels</label>
+          <div class="mt-2 space-y-1.5" id="channelList"></div>
+        </div>
       </div>
     </div>
 

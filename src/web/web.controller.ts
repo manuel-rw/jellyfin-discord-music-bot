@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Param, Body, Res, Logger } from '@nestjs/common';
 import { InjectDiscordClient } from '@discord-nestjs/core';
-import { Client, Status } from 'discord.js';
+import { ChannelType, Client, Status } from 'discord.js';
 import { Response } from 'express';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { PlaybackService } from '../playback/playback.service';
@@ -86,8 +86,41 @@ export class WebController {
   @Post('disconnect')
   disconnect() {
     this.playbackService.getPlaylistOrDefault().clear();
-    this.discordVoice.disconnect();
+    this.discordVoice.leaveChannel();
     return { disconnected: true };
+  }
+
+  @Get('guilds')
+  getGuilds() {
+    return this.discordClient.guilds.cache.map((g) => ({
+      id: g.id,
+      name: g.name,
+    }));
+  }
+
+  @Get('guilds/:guildId/channels')
+  getChannels(@Param('guildId') guildId: string) {
+    const guild = this.discordClient.guilds.cache.get(guildId);
+    if (!guild) {
+      return [];
+    }
+    return guild.channels.cache
+      .filter((c) => c.type === ChannelType.GuildVoice)
+      .map((c) => ({ id: c.id, name: c.name }));
+  }
+
+  @Post('join')
+  joinChannel(@Body() body: { guildId: string; channelId: string }) {
+    const channel = this.discordClient.channels.cache.get(body.channelId);
+    if (!channel || channel.type !== ChannelType.GuildVoice) {
+      return { error: 'Voice channel not found' };
+    }
+    this.discordVoice.joinChannel(
+      body.guildId,
+      body.channelId,
+      (channel as any).guild.voiceAdapterCreator,
+    );
+    return { joined: true };
   }
 
   @Get('album-art/:itemId')

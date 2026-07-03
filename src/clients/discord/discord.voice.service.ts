@@ -280,6 +280,37 @@ export class DiscordVoiceService implements OnModuleDestroy {
     return this.voiceChannelInfo;
   }
 
+  leaveChannel() {
+    if (!this.voiceConnection) {
+      return;
+    }
+    this.stop(true);
+    this.voiceConnection.disconnect();
+    this.audioPlayer = undefined;
+    this.voiceConnection = undefined;
+    this.voiceChannelInfo = null;
+  }
+
+  joinChannel(
+    guildId: string,
+    channelId: string,
+    adapterCreator: Parameters<typeof joinVoiceChannel>[0]['adapterCreator'],
+  ) {
+    this.leaveChannel();
+    joinVoiceChannel({
+      channelId,
+      guildId,
+      adapterCreator,
+    });
+    this.voiceConnection = getVoiceConnection(guildId);
+    this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
+      if (this.voiceConnection !== undefined) {
+        this.playbackService.getPlaylistOrDefault().clear();
+        this.leaveChannel();
+      }
+    });
+  }
+
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
    * @returns The new paused state - true: paused, false: unpaused
