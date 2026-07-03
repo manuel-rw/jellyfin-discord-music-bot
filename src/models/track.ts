@@ -36,6 +36,7 @@ export class Track {
    * A result object that contains a collection of images that are available outside the current network.
    */
   remoteImages?: RemoteImageResult;
+  readonly normalizationGain?: number;
 
   playing: boolean;
 
@@ -48,6 +49,7 @@ export class Track {
     remoteImages?: RemoteImageResult,
     artist?: string,
     album?: string,
+    normalizationGain?: number,
   ) {
     this.id = id;
     this.name = name;
@@ -55,6 +57,7 @@ export class Track {
     this.remoteImages = remoteImages;
     this.artist = artist;
     this.album = album;
+    this.normalizationGain = normalizationGain;
     this.playing = false;
     this.playbackProgress = 0;
   }
