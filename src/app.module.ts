@@ -14,6 +14,7 @@ import { CommandModule } from './commands/command.module';
 import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
+import { WebModule } from './web/web.module';
 import {
   environmentVariablesSchema,
   getEnvironmentVariables,
@@ -45,6 +46,7 @@ import { fromZodError } from 'zod-validation-error';
     JellyfinClientModule,
     PlaybackModule,
     UpdatesModule,
+    WebModule,
     HealthModule,
   ],
   controllers: [],
