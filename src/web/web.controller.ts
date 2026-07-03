@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Param, Body, Res, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Res,
+  Logger,
+} from '@nestjs/common';
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { ChannelType, Client, Status } from 'discord.js';
 import { Response } from 'express';
@@ -32,7 +40,11 @@ export class WebController {
       discordConnected,
       jellyfinConnected: this.jellyfinService.isConnected(),
       voiceConnection: voiceConnection
-        ? { connected: true, channel: channelInfo?.name, bitrate: channelInfo?.bitrate }
+        ? {
+            connected: true,
+            channel: channelInfo?.name,
+            bitrate: channelInfo?.bitrate,
+          }
         : { connected: false },
       paused,
       volume: this.playbackService.getVolume(),
@@ -124,10 +136,7 @@ export class WebController {
   }
 
   @Get('album-art/:itemId')
-  async proxyAlbumArt(
-    @Param('itemId') itemId: string,
-    @Res() res: Response,
-  ) {
+  async proxyAlbumArt(@Param('itemId') itemId: string, @Res() res: Response) {
     try {
       const api = this.jellyfinService.getApi();
       const url = `${api.basePath}/Items/${itemId}/Images/Primary?api_key=${api.accessToken}`;
@@ -137,8 +146,7 @@ export class WebController {
         return;
       }
       const buffer = Buffer.from(await response.arrayBuffer());
-      const contentType =
-        response.headers.get('content-type') ?? 'image/jpeg';
+      const contentType = response.headers.get('content-type') ?? 'image/jpeg';
       res.setHeader('Content-Type', contentType);
       res.setHeader('Cache-Control', 'public, max-age=86400');
       res.end(buffer);

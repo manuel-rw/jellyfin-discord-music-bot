@@ -40,7 +40,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
   private voiceConnection: VoiceConnection | undefined;
   private audioResource: AudioResource | undefined;
   private autoLeaveIntervalId: NodeJS.Timeout | null = null;
-  private voiceChannelInfo: { name: string; bitrate: number; channelId: string } | null = null;
+  private voiceChannelInfo: {
+    name: string;
+    bitrate: number;
+    channelId: string;
+  } | null = null;
 
   constructor(
     private readonly playbackService: PlaybackService,
