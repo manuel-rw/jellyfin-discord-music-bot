@@ -13,6 +13,7 @@ export class SearchItem {
     protected readonly id: string,
     protected readonly name: string,
     protected runtimeInMilliseconds: number,
+    protected readonly normalizationGain?: number,
   ) {}
 
   toString() {
@@ -21,7 +22,7 @@ export class SearchItem {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
-    return [new Track(this.id, this.name, this.runtimeInMilliseconds, {})];
+    return [new Track(this.id, this.name, this.runtimeInMilliseconds, {}, this.normalizationGain)];
   }
 
   getId(): string {
@@ -71,6 +72,7 @@ export class SearchItem {
       baseItem.Id,
       trimStringToFixedLength(baseItem.Name, 50),
       baseItem.RunTimeTicks / 10000,
+      baseItem.NormalizationGain ?? undefined,
     );
   }
 }

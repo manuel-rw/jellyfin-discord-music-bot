@@ -41,6 +41,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
   private audioResource: AudioResource | undefined;
   private autoLeaveIntervalId: NodeJS.Timeout | null = null;
   private voiceChannelInfo: { name: string; bitrate: number; channelId: string } | null = null;
+  private normalizationFactor = 1;
 
   constructor(
     private readonly playbackService: PlaybackService,
@@ -67,6 +68,16 @@ export class DiscordVoiceService implements OnModuleDestroy {
     const resource = createAudioResource(url, {
       inlineVolume: true,
     });
+
+    if (track.normalizationGain !== undefined) {
+      this.normalizationFactor = Math.min(4, Math.pow(10, track.normalizationGain / 20));
+      this.logger.debug(
+        `Applying normalization gain ${track.normalizationGain} dB (factor ${this.normalizationFactor}) for track '${track.name}'`,
+      );
+    } else {
+      this.normalizationFactor = 1;
+    }
+
     this.playResource(resource, track.name, url);
   }
 
@@ -177,7 +188,9 @@ export class DiscordVoiceService implements OnModuleDestroy {
       );
       return;
     }
-    this.audioResource.volume.setVolume(volume);
+    this.audioResource.volume.setVolume(
+      Math.min(1, volume * this.normalizationFactor),
+    );
   }
 
   playResource(resource: AudioResource, name: string, url: string) {
@@ -186,7 +199,9 @@ export class DiscordVoiceService implements OnModuleDestroy {
     );
     this.createAndReturnOrGetAudioPlayer().play(resource);
     this.audioResource = resource;
-    resource.volume?.setVolume(this.playbackService.getVolume());
+    resource.volume?.setVolume(
+      Math.min(1, this.playbackService.getVolume() * this.normalizationFactor),
+    );
 
     const isPlayable = this.audioPlayer?.checkPlayable();
     if (isPlayable) {
