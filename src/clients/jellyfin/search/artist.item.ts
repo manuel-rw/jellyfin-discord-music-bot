@@ -7,10 +7,11 @@ import { trimStringToFixedLength } from '../../../utils/stringUtils/stringUtils'
 import { z } from 'zod';
 import { BaseItemDto } from '@jellyfin/sdk/lib/generated-client/models';
 
-const schema = z.object({
+const itemSchema = z.object({
   Id: z.string(),
   Name: z.string(),
   RunTimeTicks: z.number(),
+  NormalizationGain: z.number().optional(),
 });
 
 export class ArtistItem extends SearchItem {
@@ -34,12 +35,13 @@ export class ArtistItem extends SearchItem {
   }
 
   private static constructArtist(data: BaseItemDto | JellyfinSearchHint) {
-    const artist = schema.parse(data);
+    const artist = itemSchema.parse(data);
 
     return new ArtistItem(
       artist.Id,
       trimStringToFixedLength(artist.Name, 50),
       artist.RunTimeTicks / 10000,
+      artist.NormalizationGain,
     );
   }
 }
