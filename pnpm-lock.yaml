@@ -51,8 +51,8 @@ importers:
         specifier: ^0.1.11
         version: 0.1.11(@emnapi/core@1.7.1)(@emnapi/runtime@1.7.1)
       '@snazzah/davey-linux-x64-musl':
-        specifier: ^0.1.11
-        version: 0.1.11
+        specifier: ^0.1.12
+        version: 0.1.12
       axios:
         specifier: ^1.18.1
         version: 1.18.1
@@ -1123,6 +1123,12 @@ packages:
 
   '@snazzah/davey-linux-x64-musl@0.1.11':
     resolution: {integrity: sha512-5j6Pmc+Wzv5lSxVP6quA7teYRJXibkZqQyYGfTDnTsUOO5dPpcojpqlXlkhyvsA1OAQTj4uxbOCciN3cVWwzug==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@snazzah/davey-linux-x64-musl@0.1.12':
+    resolution: {integrity: sha512-LLNnO+hfG41ymeI+O1YHo5/0h3aKaetUNLdkBwpdJsjoyKMXZaeCnB+aHNkkupJCMPmWS0g6iPMCHUOqZSBcTg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -4258,7 +4264,10 @@ snapshots:
   '@snazzah/davey-linux-x64-gnu@0.1.11':
     optional: true
 
-  '@snazzah/davey-linux-x64-musl@0.1.11': {}
+  '@snazzah/davey-linux-x64-musl@0.1.11':
+    optional: true
+
+  '@snazzah/davey-linux-x64-musl@0.1.12': {}
 
   '@snazzah/davey-wasm32-wasi@0.1.11(@emnapi/core@1.7.1)(@emnapi/runtime@1.7.1)':
     dependencies:
