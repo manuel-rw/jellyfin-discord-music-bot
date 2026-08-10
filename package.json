@@ -62,7 +62,7 @@
     "@nestjs/cli": "^11.0.23",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.27",
-    "@swc/core": "^1.15.43",
+    "@swc/core": "^1.15.47",
     "@types/cron": "^2.4.3",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.0",
