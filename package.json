@@ -59,7 +59,7 @@
     "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.23",
+    "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.27",
     "@swc/core": "^1.15.47",
