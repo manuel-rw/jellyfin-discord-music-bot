@@ -205,20 +205,29 @@ export class DiscordVoiceService implements OnModuleDestroy {
     );
 
     fetch(url)
-      .then((response) => {
+      .then(async (response) => {
         this.logger.debug(
           `Received response from Jellyfin server to troubleshoot non-playable resource with status ${response.status}`,
         );
-        response
-          .text()
-          .then((text) => {
-            this.logger.warn(`Clear text message from Jellyfin: ${text}`);
-          })
-          .catch((e: Error) => {
-            this.logger.error(
-              `Unable to await clear text response from Jellyfin (status ${response.status}). This indicates a more serious connection issue: '${e.message}'`,
-            );
-          });
+
+        // Reading the full body is only useful for text/JSON error pages. For
+        // media (audio/ogg, audio/mpeg, ...) or any other binary the body would
+        // be dumped as a huge, unreadable blob, which helps nobody. So we only
+        // log textual bodies, truncated, and otherwise just the content type.
+        const contentType = response.headers.get('content-type') ?? '';
+        if (contentType.includes('text') || contentType.includes('json')) {
+          const text = await response.text().catch(() => '');
+          const snippet =
+            text.length > 500 ? `${text.slice(0, 500)}… (truncated)` : text;
+          this.logger.warn(
+            `Clear text message from Jellyfin (${contentType}): ${snippet}`,
+          );
+        } else {
+          this.logger.warn(
+            `Response from Jellyfin server is not a text error (content-type: ${contentType}). ` +
+              'The resource may still become playable once buffering completes.',
+          );
+        }
       })
       .catch((e: Error) => {
         this.logger.error(

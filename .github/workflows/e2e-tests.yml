@@ -1,0 +1,47 @@
+name: E2E tests
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+    branches: [master, dev]
+  workflow_dispatch:
+
+# Allow at most ONE instance of this workflow to run at a time. The live Discord
+# tests use shared bot accounts and a shared voice channel, so parallel runs
+# would collide (e.g. two bots racing for the same session). Additional runs
+# queue until the currently running one finishes.
+concurrency:
+  group: e2e-tests
+  cancel-in-progress: false
+
+jobs:
+  run-e2e-tests:
+    name: Run e2e tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - name: Install ffmpeg
+        # @discordjs/voice (via prism-media) needs an ffmpeg binary to probe and
+        # transcode the audio stream. The runner image does not reliably ship it.
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Run e2e tests
+        run: pnpm run test:e2e
+        env:
+          # The web API e2e tests always run. The live Discord connection/audio
+          # tests run only when ALL of the following are set as repository
+          # secrets; otherwise they are skipped:
+          #   - DISCORD_CLIENT_TOKEN (the bot under test)
+          #   - E2E_LISTENER_TOKEN (a second bot that "hears" playback)
+          #   - E2E_DISCORD_GUILD_ID
+          #   - E2E_DISCORD_VOICE_CHANNEL_ID
+          DISCORD_CLIENT_TOKEN: ${{ secrets.DISCORD_CLIENT_TOKEN }}
+          E2E_LISTENER_TOKEN: ${{ secrets.E2E_LISTENER_TOKEN }}
+          E2E_DISCORD_GUILD_ID: ${{ secrets.E2E_DISCORD_GUILD_ID }}
+          E2E_DISCORD_VOICE_CHANNEL_ID: ${{ secrets.E2E_DISCORD_VOICE_CHANNEL_ID }}
