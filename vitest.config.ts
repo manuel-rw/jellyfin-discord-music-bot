@@ -5,6 +5,12 @@ export default defineConfig({
   test: {
     globals: true,
     root: './',
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.e2e-spec.ts',
+      '**/helpers/e2e/**',
+    ],
     coverage: {
       reporter: ['lcov'],
     },
