@@ -1,6 +1,6 @@
 import { Command, Handler, IA } from '@discord-nestjs/core';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 
 import { CommandInteraction } from 'discord.js';
 
@@ -10,6 +10,8 @@ import {
   buildMessage,
 } from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
+import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
+import { DiscordMessageCleanupService } from '../clients/discord/discord.message-cleanup.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
@@ -18,10 +20,12 @@ import { defaultMemberPermissions } from '../utils/environment';
   defaultMemberPermissions,
 })
 @Injectable()
+@UseGuards(ChannelLockGuard)
 export class StopPlaybackCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordVoiceService: DiscordVoiceService,
+    private readonly messageCleanupService: DiscordMessageCleanupService,
   ) {}
 
   @Handler()
@@ -29,13 +33,16 @@ export class StopPlaybackCommand {
     const playlist = this.playbackService.getPlaylistOrDefault();
 
     if (playlist.tracks.length === 0) {
-      await interaction.reply({
-        embeds: [
-          buildErrorMessage({
-            title: 'Unable to stop when nothing is playing',
-          }),
-        ],
-      });
+      await this.messageCleanupService.scheduleResponseDeletion(
+        await interaction.reply({
+          withResponse: true,
+          embeds: [
+            buildErrorMessage({
+              title: 'Unable to stop when nothing is playing',
+            }),
+          ],
+        }),
+      );
       return;
     }
 
@@ -44,12 +51,15 @@ export class StopPlaybackCommand {
     }
     playlist.clear();
 
-    await interaction.reply({
-      embeds: [
-        buildMessage({
-          title: 'Playback stopped',
-        }),
-      ],
-    });
+    await this.messageCleanupService.scheduleResponseDeletion(
+      await interaction.reply({
+        withResponse: true,
+        embeds: [
+          buildMessage({
+            title: 'Playback stopped',
+          }),
+        ],
+      }),
+    );
   }
 }

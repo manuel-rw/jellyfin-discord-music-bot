@@ -1,6 +1,6 @@
 import { SlashCommandPipe } from '@discord-nestjs/common';
 import { Command, Handler, IA, InteractionEvent } from '@discord-nestjs/core';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import {
   CommandInteraction,
   GuildMember,
@@ -12,6 +12,8 @@ import { PlaybackService } from '../../playback/playback.service';
 import { DiscordVoiceService } from '../../clients/discord/discord.voice.service';
 import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.search.service';
 import { buildMessage } from '../../clients/discord/discord.message.builder';
+import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 import { SearchItem } from '../../clients/jellyfin/search/search.item';
 
 @Command({
@@ -20,11 +22,13 @@ import { SearchItem } from '../../clients/jellyfin/search/search.item';
   defaultMemberPermissions,
 })
 @Injectable()
+@UseGuards(ChannelLockGuard)
 export class EnqueueRandomItemsCommand {
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly discordVoiceService: DiscordVoiceService,
     private readonly jellyfinSearchService: JellyfinSearchService,
+    private readonly messageCleanupService: DiscordMessageCleanupService,
   ) {}
 
   @Handler()
@@ -43,9 +47,11 @@ export class EnqueueRandomItemsCommand {
 
     if (!tryResult.success) {
       const replyOptions = tryResult.reply as InteractionReplyOptions;
-      await interaction.editReply({
-        embeds: replyOptions.embeds,
-      });
+      await this.messageCleanupService.scheduleResponseDeletion(
+        await interaction.editReply({
+          embeds: replyOptions.embeds,
+        }),
+      );
       return;
     }
 
@@ -54,14 +60,16 @@ export class EnqueueRandomItemsCommand {
 
     this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
 
-    await interaction.editReply({
-      embeds: [
-        buildMessage({
-          title: `Added ${tracks.length} tracks to your playlist`,
-          description: 'Use ``/playlist`` to see them',
-        }),
-      ],
-    });
+    await this.messageCleanupService.scheduleResponseDeletion(
+      await interaction.editReply({
+        embeds: [
+          buildMessage({
+            title: `Added ${tracks.length} tracks to your playlist`,
+            description: 'Use ``/playlist`` to see them',
+          }),
+        ],
+      }),
+    );
   }
 
   private async getTracks(hints: SearchItem[]) {

@@ -1,6 +1,6 @@
 import { Command, Handler, IA } from '@discord-nestjs/core';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 
 import { CommandInteraction } from 'discord.js';
 
@@ -9,6 +9,8 @@ import {
   buildErrorMessage,
   buildMessage,
 } from '../clients/discord/discord.message.builder';
+import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
+import { DiscordMessageCleanupService } from '../clients/discord/discord.message-cleanup.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Command({
@@ -17,29 +19,39 @@ import { defaultMemberPermissions } from '../utils/environment';
   defaultMemberPermissions,
 })
 @Injectable()
+@UseGuards(ChannelLockGuard)
 export class SkipTrackCommand {
-  constructor(private readonly playbackService: PlaybackService) {}
+  constructor(
+    private readonly playbackService: PlaybackService,
+    private readonly messageCleanupService: DiscordMessageCleanupService,
+  ) {}
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
-      await interaction.reply({
-        embeds: [
-          buildErrorMessage({
-            title: 'There is no next track',
-          }),
-        ],
-      });
+      await this.messageCleanupService.scheduleResponseDeletion(
+        await interaction.reply({
+          withResponse: true,
+          embeds: [
+            buildErrorMessage({
+              title: 'There is no next track',
+            }),
+          ],
+        }),
+      );
       return;
     }
 
     this.playbackService.getPlaylistOrDefault().setNextTrackAsActiveTrack();
-    await interaction.reply({
-      embeds: [
-        buildMessage({
-          title: 'Skipped to the next track',
-        }),
-      ],
-    });
+    await this.messageCleanupService.scheduleResponseDeletion(
+      await interaction.reply({
+        withResponse: true,
+        embeds: [
+          buildMessage({
+            title: 'Skipped to the next track',
+          }),
+        ],
+      }),
+    );
   }
 }
