@@ -109,20 +109,20 @@ export class UpdatesService {
   }
 
   private async fetchLatestGithubRelease(): Promise<GithubRelease | undefined> {
-    return axios({
-      method: 'GET',
-      url: Constants.Links.Api.GetLatestRelease,
-    })
-      .then((response) => {
-        if (response.status !== 200) {
-          return undefined;
-        }
-
-        return response.data as GithubRelease;
-      })
-      .catch((err) => {
-        this.logger.error('Error while checking for updates', err);
-        return undefined;
+    try {
+      const response = await axios({
+        method: 'GET',
+        url: Constants.Links.Api.GetLatestRelease,
       });
+
+      if (response.status !== 200) {
+        return undefined;
+      }
+
+      return response.data as GithubRelease;
+    } catch (err) {
+      this.logger.error('Error while checking for updates', err);
+      return undefined;
+    }
   }
 }

@@ -9,7 +9,7 @@ export class DiscordHealthIndicator extends HealthIndicator {
     super();
   }
 
-  async isHealthy(key: string): Promise<HealthIndicatorResult> {
+  isHealthy(key: string): HealthIndicatorResult {
     const status = this.client.ws.status;
 
     return this.getStatus(key, status === Status.Ready, {
