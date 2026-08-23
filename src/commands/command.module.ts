@@ -2,6 +2,7 @@ import { DiscordModule } from '@discord-nestjs/core';
 import { Module } from '@nestjs/common';
 
 import { DiscordClientModule } from '../clients/discord/discord.module';
+import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
 import { JellyfinClientModule } from '../clients/jellyfin/jellyfin.module';
 import { PlaybackModule } from '../playback/playback.module';
 import { PlaylistCommand } from './playlist/playlist.command';
@@ -48,6 +49,7 @@ import { BotStatusCommand } from './bot_status/bot_status.command';
     VolumeCommand,
     ShuffleCommand,
     BotStatusCommand,
+    ChannelLockGuard,
   ],
   exports: [],
 })
