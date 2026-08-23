@@ -7,7 +7,7 @@ import {
   UseCollectors,
 } from '@discord-nestjs/core';
 
-import { Injectable, Logger, UseInterceptors } from '@nestjs/common';
+import { Injectable, Logger, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import {
   ActionRowBuilder,
@@ -33,11 +33,14 @@ import {
 import { Interval } from '@nestjs/schedule';
 import { lightFormat } from 'date-fns';
 import { defaultMemberPermissions } from '../../utils/environment';
+import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
 import { PlaylistTempCommandData } from './playlist.types';
 
 @Injectable()
+@UseGuards(ChannelLockGuard)
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
@@ -49,7 +52,10 @@ export class PlaylistCommand {
   public pageData: Map<string, PlaylistTempCommandData> = new Map();
   private readonly logger = new Logger(PlaylistCommand.name);
 
-  constructor(private readonly playbackService: PlaybackService) {}
+  constructor(
+    private readonly playbackService: PlaybackService,
+    private readonly messageCleanupService: DiscordMessageCleanupService,
+  ) {}
 
   @Handler()
   async handler(
@@ -58,8 +64,10 @@ export class PlaylistCommand {
   ): Promise<void> {
     const page = dto.page ?? 0;
 
-    await interaction.reply(
-      this.getReplyForPage(page) as InteractionReplyOptions,
+    await this.messageCleanupService.scheduleResponseDeletion(
+      await interaction.reply(
+        this.getReplyForPage(page) as InteractionReplyOptions,
+      ),
     );
 
     this.pageData.set(interaction.id, {

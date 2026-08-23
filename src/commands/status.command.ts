@@ -7,7 +7,7 @@ import {
 
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 
 import { Client, CommandInteraction, Status } from 'discord.js';
 
@@ -17,6 +17,8 @@ import { buildMessage } from '../clients/discord/discord.message.builder';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
 import { Constants } from '../utils/constants';
 import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
+import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
+import { DiscordMessageCleanupService } from '../clients/discord/discord.message-cleanup.service';
 
 @Command({
   name: 'status',
@@ -24,22 +26,27 @@ import { trimStringToFixedLength } from '../utils/stringUtils/stringUtils';
   defaultMemberPermissions: 'ViewChannel',
 })
 @Injectable()
+@UseGuards(ChannelLockGuard)
 export class StatusCommand {
   constructor(
     @InjectDiscordClient()
     private readonly client: Client,
     private readonly jellyfinService: JellyfinService,
+    private readonly messageCleanupService: DiscordMessageCleanupService,
   ) {}
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
-    await interaction.reply({
-      embeds: [
-        buildMessage({
-          title: 'Retrieving status information...',
-        }),
-      ],
-    });
+    await this.messageCleanupService.scheduleResponseDeletion(
+      await interaction.reply({
+        withResponse: true,
+        embeds: [
+          buildMessage({
+            title: 'Retrieving status information...',
+          }),
+        ],
+      }),
+    );
 
     const ping = this.client.ws.ping;
     const status = Status[this.client.ws.status];
