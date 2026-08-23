@@ -2,8 +2,8 @@ import { PermissionResolvable } from 'discord.js';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
-import * as env from 'dotenv';
-env.config();
+import { config } from 'dotenv';
+config();
 
 export const environmentVariablesSchema = z.object({
   DISCORD_CLIENT_TOKEN: z.string(),
