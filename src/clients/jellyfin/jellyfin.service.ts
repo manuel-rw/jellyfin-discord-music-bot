@@ -44,10 +44,11 @@ export class JellyfinService {
   }
 
   authenticate() {
-    if (!this.api) {
-      throw new Error(`Unexpected call before API was initialized.`);
+    const api = this.api;
+    if (!api) {
+      throw new Error('Unexpected call before API was initialized.');
     }
-    getUserApi(this.api)
+    getUserApi(api)
       .authenticateUserByName({
         authenticateUserByName: {
           Username: process.env.JELLYFIN_AUTHENTICATION_USERNAME ?? '',
@@ -68,7 +69,7 @@ export class JellyfinService {
         this.userId = response.data.SessionInfo.UserId;
         this.connected = true;
 
-        await this.jellyfinPlayState.initializePlayState(this.api!);
+        await this.jellyfinPlayState.initializePlayState(api);
       })
       .catch((test) => {
         this.logger.error(test);
@@ -120,14 +121,20 @@ export class JellyfinService {
     if (!this.api) {
       this.initializeClient();
     }
-    return this.api!;
+    if (!this.api) {
+      throw new Error('Jellyfin API failed to initialize.');
+    }
+    return this.api;
   }
 
   getJellyfin() {
     if (!this.jellyfin) {
       this.initializeClient();
     }
-    return this.jellyfin!;
+    if (!this.jellyfin) {
+      throw new Error('Jellyfin client failed to initialize.');
+    }
+    return this.jellyfin;
   }
 
   getUserId() {

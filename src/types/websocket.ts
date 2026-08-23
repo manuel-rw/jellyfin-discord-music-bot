@@ -18,7 +18,7 @@ export class PlayNowCommand {
    * An enum of possible play modes.
    * PlayNow: Play the selection immediately
    */
-  PlayCommand: 'PlayNow' = 'PlayNow';
+  PlayCommand = 'PlayNow' as const;
 
   hasSelection() {
     return this.StartIndex !== undefined;

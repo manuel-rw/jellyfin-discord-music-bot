@@ -20,8 +20,10 @@ export class SearchItem {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
-    return [new Track(this.id, this.name, this.runtimeInMilliseconds, {})];
+  toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
+    return Promise.resolve([
+      new Track(this.id, this.name, this.runtimeInMilliseconds, {}),
+    ]);
   }
 
   getId(): string {

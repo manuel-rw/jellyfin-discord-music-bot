@@ -8,7 +8,7 @@ export class JellyfinHealthIndicator extends HealthIndicator {
     super();
   }
 
-  async isHealthy(key: string): Promise<HealthIndicatorResult> {
+  isHealthy(key: string): HealthIndicatorResult {
     const isConnected = this.jellyfinService.isConnected();
 
     return this.getStatus(key, isConnected);
