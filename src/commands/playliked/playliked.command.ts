@@ -1,5 +1,5 @@
 import { Command, Handler, IA } from '@discord-nestjs/core';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import {
   CommandInteraction,
   GuildMember,
@@ -12,6 +12,7 @@ import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.se
 import { PlaybackService } from '../../playback/playback.service';
 import { defaultMemberPermissions } from '../../utils/environment';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
+import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
 
 @Command({
   name: 'playliked',
@@ -19,6 +20,7 @@ import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
   defaultMemberPermissions,
 })
 @Injectable()
+@UseGuards(ChannelLockGuard)
 export class PlayLikedCommand {
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,

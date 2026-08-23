@@ -9,7 +9,7 @@ import {
 
 import { RemoteImageInfo } from '@jellyfin/sdk/lib/generated-client/models';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { Logger } from '@nestjs/common/services';
 
 import {
@@ -29,9 +29,11 @@ import { PlaybackService } from '../../playback/playback.service';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
 import { defaultMemberPermissions } from '../../utils/environment';
+import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
 import { PlayCommandParams, SearchType } from './play.params';
 
 @Injectable()
+@UseGuards(ChannelLockGuard)
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',

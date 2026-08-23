@@ -25,6 +25,19 @@ export const environmentVariablesSchema = z.object({
     .enum(['true', 'false'])
     .default('false')
     .transform((value) => value === 'true'),
+  AUTO_DELETE_BOT_MESSAGES_SECONDS: z.preprocess((value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }, z.number().default(0)),
+  LOCKED_CHANNEL_IDS: z
+    .string()
+    .default('')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0),
+    ),
 });
 
 export const getEnvironmentVariables = () => {
