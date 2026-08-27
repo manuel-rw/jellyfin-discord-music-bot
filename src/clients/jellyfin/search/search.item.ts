@@ -13,6 +13,8 @@ export class SearchItem {
     protected readonly id: string,
     protected readonly name: string,
     protected runtimeInMilliseconds: number,
+    protected readonly artist?: string,
+    protected readonly album?: string,
   ) {}
 
   toString() {
@@ -22,7 +24,14 @@ export class SearchItem {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   toTracks(searchService: JellyfinSearchService): Promise<Track[]> {
     return Promise.resolve([
-      new Track(this.id, this.name, this.runtimeInMilliseconds, {}),
+      new Track(
+        this.id,
+        this.name,
+        this.runtimeInMilliseconds,
+        {},
+        this.artist,
+        this.album,
+      ),
     ]);
   }
 
@@ -33,7 +42,9 @@ export class SearchItem {
   static constructFromHint(hint: JellyfinSearchHint) {
     const schema = z.object({
       Id: z.string(),
-      Artists: z.array(z.string()),
+      Artists: z.array(z.string()).optional(),
+      Album: z.string().optional(),
+      AlbumArtist: z.string().optional(),
       Name: z.string(),
       RunTimeTicks: z.number(),
     });
@@ -47,19 +58,24 @@ export class SearchItem {
         )}`,
       );
     }
-    let artist = '';
-    if (result.data.Artists !== null) {
-      artist = result.data.Artists[0];
-      if (result.data.Artists.length > 1) {
-        artist += ',... - ';
-      } else {
-        artist += ' - ';
-      }
+
+    const artist =
+      result.data.Artists?.[0] ??
+      result.data.AlbumArtist?.split('/')[0]?.trim() ??
+      '';
+    const album = result.data.Album ?? '';
+
+    let displayName = result.data.Name;
+    if (artist) {
+      displayName = `${artist} - ${displayName}`;
     }
+
     return new SearchItem(
       result.data.Id,
-      trimStringToFixedLength(artist + result.data.Name, 70),
+      trimStringToFixedLength(displayName, 70),
       result.data.RunTimeTicks / 10000,
+      artist || undefined,
+      album || undefined,
     );
   }
 
@@ -69,10 +85,19 @@ export class SearchItem {
         'Unable to construct search hint from base item, required properties were undefined',
       );
     }
+    const artist =
+      baseItem.AlbumArtist?.split('/')[0]?.trim() ??
+      baseItem.Artists?.[0] ??
+      '';
+    const album = baseItem.Album ?? '';
+    const displayName = artist ? `${artist} - ${baseItem.Name}` : baseItem.Name;
+
     return new SearchItem(
       baseItem.Id,
-      trimStringToFixedLength(baseItem.Name, 50),
+      trimStringToFixedLength(displayName, 50),
       baseItem.RunTimeTicks / 10000,
+      artist || undefined,
+      album || undefined,
     );
   }
 }
