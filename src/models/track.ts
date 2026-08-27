@@ -18,6 +18,16 @@ export class Track {
   readonly name: string;
 
   /**
+   * The name of the artist that performed the track, if known
+   */
+  readonly artist?: string;
+
+  /**
+   * The name of the album the track belongs to, if known
+   */
+  readonly album?: string;
+
+  /**
    * The duration of the track
    */
   readonly duration: number;
@@ -36,11 +46,15 @@ export class Track {
     name: string,
     duration: number,
     remoteImages?: RemoteImageResult,
+    artist?: string,
+    album?: string,
   ) {
     this.id = id;
     this.name = name;
     this.duration = duration;
     this.remoteImages = remoteImages;
+    this.artist = artist;
+    this.album = album;
     this.playing = false;
     this.playbackProgress = 0;
   }

@@ -10,6 +10,8 @@ import {
 import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
 import { DiscordMessageCleanupService } from '../clients/discord/discord.message-cleanup.service';
 import { PlaybackService } from '../playback/playback.service';
+import { Track } from '../models/track';
+import { getEnvironmentVariables } from '../utils/environment';
 
 @Injectable()
 @UseGuards(ChannelLockGuard)
@@ -66,6 +68,11 @@ export class NowPlayingCommand {
     const formattedProgress = lightFormat(new Date(progressMs), 'mm:ss');
     const formattedTotal = lightFormat(new Date(totalMs), 'mm:ss');
 
+    const description = this.buildTrackDescription(activeTrack, {
+      progress: formattedProgress,
+      duration: formattedTotal,
+    });
+
     const remoteImages = activeTrack.getRemoteImages();
     const thumbnailUrl = remoteImages?.[0]?.Url;
 
@@ -75,7 +82,7 @@ export class NowPlayingCommand {
         embeds: [
           buildMessage({
             title: 'Now Playing',
-            description: `**${activeTrack.name}**`,
+            description,
             mixin: (embedBuilder) => {
               embedBuilder.addFields([
                 {
@@ -99,6 +106,26 @@ export class NowPlayingCommand {
           }),
         ],
       }),
+    );
+  }
+
+  private buildTrackDescription(
+    track: Track,
+    values: { progress: string; duration: string },
+  ) {
+    const placeholders: Record<string, string> = {
+      '%Track': track.name,
+      '%Artist': track.artist ?? 'Unknown',
+      '%Album': track.album ?? 'Unknown',
+      '%Progress': values.progress,
+      '%Duration': values.duration,
+    };
+
+    const template = getEnvironmentVariables().NOW_PLAYING_MESSAGE_TEMPLATE;
+
+    return Object.entries(placeholders).reduce(
+      (message, [placeholder, value]) => message.split(placeholder).join(value),
+      template,
     );
   }
 }
