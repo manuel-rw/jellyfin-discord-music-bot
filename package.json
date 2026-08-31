@@ -42,7 +42,7 @@
     "@nestjs/terminus": "^11.1.1",
     "@snazzah/davey": "^0.1.12",
     "@snazzah/davey-linux-x64-musl": "^0.1.12",
-    "axios": "^1.18.1",
+    "axios": "^1.20.0",
     "cron": "^4.4.0",
     "date-fns": "^4.4.0",
     "discord.js": "^14.27.0",
