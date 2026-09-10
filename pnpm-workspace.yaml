@@ -4,6 +4,8 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
 engineStrict: true
+minimumReleaseAgeExclude:
+  - zod@4.6.1
 onlyBuiltDependencies:
   - '@discordjs/opus'
   - '@nestjs/core'
