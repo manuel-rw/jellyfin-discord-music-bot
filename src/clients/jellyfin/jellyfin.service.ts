@@ -5,7 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Api, Jellyfin } from '@jellyfin/sdk';
 import { Constants } from '../../utils/constants';
 import { JellyfinPlayStateService } from './jellyfinPlayStateService';
-import { getUserApi } from '@jellyfin/sdk/lib/utils/api';
+import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api';
 
 @Injectable()
 export class JellyfinService {
@@ -48,7 +48,7 @@ export class JellyfinService {
     if (!api) {
       throw new Error('Unexpected call before API was initialized.');
     }
-    getUserApi(api)
+    getAuthenticationApi(api)
       .authenticateUserByName({
         authenticateUserByName: {
           Username: process.env.JELLYFIN_AUTHENTICATION_USERNAME ?? '',
