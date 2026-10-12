@@ -10,3 +10,14 @@ onlyBuiltDependencies:
   - '@discordjs/opus'
   - '@nestjs/core'
   - unrs-resolver
+supportedArchitectures:
+  os:
+    - linux
+    - darwin
+    - win32
+  cpu:
+    - x64
+    - arm64
+  libc:
+    - glibc
+    - musl
