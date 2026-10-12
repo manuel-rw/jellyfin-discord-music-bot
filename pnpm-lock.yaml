@@ -50,9 +50,6 @@ importers:
       '@snazzah/davey':
         specifier: ^0.1.12
         version: 0.1.12(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
-      '@snazzah/davey-linux-x64-musl':
-        specifier: ^0.1.12
-        version: 0.1.12
       axios:
         specifier: ^1.20.0
         version: 1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -3837,7 +3834,8 @@ snapshots:
   '@snazzah/davey-linux-x64-gnu@0.1.12':
     optional: true
 
-  '@snazzah/davey-linux-x64-musl@0.1.12': {}
+  '@snazzah/davey-linux-x64-musl@0.1.12':
+    optional: true
 
   '@snazzah/davey-wasm32-wasi@0.1.12(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)':
     dependencies:
