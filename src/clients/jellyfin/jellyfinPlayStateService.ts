@@ -1,11 +1,9 @@
 import { Api } from '@jellyfin/sdk';
-import { PlaystateApi } from '@jellyfin/sdk/lib/generated-client/api/playstate-api';
 import { SessionApi } from '@jellyfin/sdk/lib/generated-client/api/session-api';
 import {
   BaseItemKind,
   GeneralCommandType,
 } from '@jellyfin/sdk/lib/generated-client/models';
-import { getPlaystateApi } from '@jellyfin/sdk/lib/utils/api/playstate-api';
 import { getSessionApi } from '@jellyfin/sdk/lib/utils/api/session-api';
 
 import { Injectable, Logger } from '@nestjs/common';
@@ -18,7 +16,6 @@ import { EventNames } from '../../events/names';
 
 @Injectable()
 export class JellyfinPlayStateService {
-  private playStateApi?: PlaystateApi;
   private sessionApi?: SessionApi;
 
   constructor(private readonly playbackService: PlaybackService) {}
@@ -32,7 +29,6 @@ export class JellyfinPlayStateService {
 
   private initializeApis(api: Api) {
     this.sessionApi = getSessionApi(api);
-    this.playStateApi = getPlaystateApi(api);
   }
 
   private async reportCapabilitiesAsync() {
@@ -54,11 +50,11 @@ export class JellyfinPlayStateService {
 
   @OnEvent(EventNames.Circuit.AnnounceTrack)
   private async onPlaybackNewTrack(track: Track) {
-    if (!this.playStateApi) {
+    if (!this.sessionApi) {
       throw new Error('Play State API is not initalized yet');
     }
     this.logger.debug(`Reporting playback start on track '${track.id}'`);
-    await this.playStateApi.reportPlaybackStart({
+    await this.sessionApi.reportPlaybackStart({
       playbackStartInfo: {
         ItemId: track.id,
         PositionTicks: 0,
@@ -75,12 +71,12 @@ export class JellyfinPlayStateService {
       return;
     }
 
-    if (!this.playStateApi) {
+    if (!this.sessionApi) {
       throw new Error('Play State API is not initalized yet');
     }
 
     this.logger.debug(`Reporting playback finish on track '${track.id}'`);
-    await this.playStateApi.reportPlaybackStopped({
+    await this.sessionApi.reportPlaybackStopped({
       playbackStopInfo: {
         ItemId: track.id,
         PositionTicks: track.playbackProgress * 10000,
@@ -99,11 +95,11 @@ export class JellyfinPlayStateService {
       return;
     }
 
-    if (!this.playStateApi) {
+    if (!this.sessionApi) {
       throw new Error('Play State API is not initalized yet');
     }
 
-    await this.playStateApi.reportPlaybackProgress({
+    await this.sessionApi.reportPlaybackProgress({
       playbackProgressInfo: {
         IsPaused: paused,
         ItemId: track.id,
@@ -120,11 +116,11 @@ export class JellyfinPlayStateService {
       return;
     }
 
-    if (!this.playStateApi) {
+    if (!this.sessionApi) {
       throw new Error('Play State API is not initalized yet');
     }
 
-    await this.playStateApi.reportPlaybackProgress({
+    await this.sessionApi.reportPlaybackProgress({
       playbackProgressInfo: {
         ItemId: track.id,
         PositionTicks: track.playbackProgress * 10000,

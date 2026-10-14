@@ -5,8 +5,6 @@ import {
   SearchHint as JellyfinSearchHint,
   SortOrder,
 } from '@jellyfin/sdk/lib/generated-client/models';
-import { getItemsApi } from '@jellyfin/sdk/lib/utils/api/items-api';
-import { getPlaylistsApi } from '@jellyfin/sdk/lib/utils/api/playlists-api';
 import { getRemoteImageApi } from '@jellyfin/sdk/lib/utils/api/remote-image-api';
 import { getSearchApi } from '@jellyfin/sdk/lib/utils/api/search-api';
 
@@ -19,6 +17,7 @@ import { SearchItem } from './search.item';
 
 import { JellyfinService } from '../jellyfin.service';
 import { ArtistItem } from './artist.item';
+import { getLibraryApi, getPlaylistApi } from '@jellyfin/sdk/lib/utils/api';
 
 @Injectable()
 export class JellyfinSearchService {
@@ -86,7 +85,8 @@ export class JellyfinSearchService {
 
   async getPlaylistItems(id: string): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
-    const searchApi = getPlaylistsApi(api);
+
+    const searchApi = getPlaylistApi(api);
 
     const axiosResponse = await searchApi.getPlaylistItems({
       userId: this.jellyfinService.getUserId(),
@@ -147,8 +147,8 @@ export class JellyfinSearchService {
   ): Promise<SearchItem | undefined> {
     const api = this.jellyfinService.getApi();
 
-    const searchApi = getItemsApi(api);
-    const { data } = await searchApi.getItems({
+    const libraryApi = getLibraryApi(api);
+    const { data } = await libraryApi.getItems({
       ids: [id],
       userId: this.jellyfinService.getUserId(),
       includeItemTypes,
@@ -168,8 +168,8 @@ export class JellyfinSearchService {
   ): Promise<SearchItem[]> {
     const api = this.jellyfinService.getApi();
 
-    const searchApi = getItemsApi(api);
-    const { data } = await searchApi.getItems({
+    const libraryApi = getLibraryApi(api);
+    const { data } = await libraryApi.getItems({
       ids,
       userId: this.jellyfinService.getUserId(),
       includeItemTypes,
@@ -188,8 +188,8 @@ export class JellyfinSearchService {
   async findArtist(artistId: string) {
     const api = this.jellyfinService.getApi();
 
-    const searchApi = getItemsApi(api);
-    const { data, status } = await searchApi.getItems({
+    const libraryApi = getLibraryApi(api);
+    const { data, status } = await libraryApi.getItems({
       userId: this.jellyfinService.getUserId(),
       albumArtistIds: [artistId],
       sortOrder: [
@@ -261,10 +261,10 @@ export class JellyfinSearchService {
 
   async getLikedTracks(limit = 1000) {
     const api = this.jellyfinService.getApi();
-    const itemsApi = getItemsApi(api);
+    const libraryApi = getLibraryApi(api);
 
     try {
-      const response = await itemsApi.getItems({
+      const response = await libraryApi.getItems({
         includeItemTypes: [
           BaseItemKind.Audio,
           BaseItemKind.MusicArtist,
@@ -296,10 +296,10 @@ export class JellyfinSearchService {
 
   async getRandomTracks(limit: number) {
     const api = this.jellyfinService.getApi();
-    const searchApi = getItemsApi(api);
+    const libraryApi = getLibraryApi(api);
 
     try {
-      const response = await searchApi.getItems({
+      const response = await libraryApi.getItems({
         includeItemTypes: [BaseItemKind.Audio],
         limit,
         sortBy: ['Random'],

@@ -4,7 +4,20 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
 engineStrict: true
+minimumReleaseAgeExclude:
+  - zod@4.6.1
 onlyBuiltDependencies:
   - '@discordjs/opus'
   - '@nestjs/core'
   - unrs-resolver
+supportedArchitectures:
+  os:
+    - linux
+    - darwin
+    - win32
+  cpu:
+    - x64
+    - arm64
+  libc:
+    - glibc
+    - musl

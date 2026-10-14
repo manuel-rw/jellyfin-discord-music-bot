@@ -38,6 +38,7 @@ export const environmentVariablesSchema = z.object({
         .map((id) => id.trim())
         .filter((id) => id.length > 0),
     ),
+  NOW_PLAYING_MESSAGE_TEMPLATE: z.string().default('**%Track**'),
 });
 
 export const getEnvironmentVariables = () => {

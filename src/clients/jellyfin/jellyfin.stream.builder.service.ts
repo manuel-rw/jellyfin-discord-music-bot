@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { AUTHORIZATION_PARAMETER } from '@jellyfin/sdk/lib/constants';
+
 import { JellyfinService } from './jellyfin.service';
 
 @Injectable()
@@ -8,34 +10,25 @@ export class JellyfinStreamBuilderService {
 
   constructor(private readonly jellyfinService: JellyfinService) {}
 
-  buildStreamUrl(jellyfinItemId: string, bitrate: number) {
+  buildStreamUrl(jellyfinItemId: string) {
     const api = this.jellyfinService.getApi();
 
-    this.logger.debug(
-      `Building stream for '${jellyfinItemId}' with bitrate ${bitrate}`,
-    );
+    this.logger.debug(`Building stream for '${jellyfinItemId}'`);
 
-    const accessToken = this.jellyfinService.getApi().accessToken;
-
-    const url = new URL(api.basePath);
-    if (!url.pathname.endsWith('/')) {
-      url.pathname += '/';
-    }
-    url.pathname += `Audio/${jellyfinItemId}/universal`;
-    url.searchParams.set('UserId', this.jellyfinService.getUserId() ?? '');
-    url.searchParams.set(
-      'DeviceId',
-      this.jellyfinService.getJellyfin().clientInfo.name,
-    );
-    url.searchParams.set('MaxStreamingBitrate', `${bitrate}`);
-    url.searchParams.set('Container', 'ogg,opus');
-    url.searchParams.set('AudioCodec', 'opus');
-    url.searchParams.set('TranscodingContainer', 'ts');
-    url.searchParams.set('TranscodingProtocol', 'hls');
-    url.searchParams.set('api_key', accessToken);
+    const url = api.getUri(`Audio/${jellyfinItemId}/universal`, {
+      UserId: this.jellyfinService.getUserId() ?? '',
+      DeviceId: this.jellyfinService.getJellyfin().clientInfo.name,
+      // The stream is piped through FFmpeg, which decodes all of these
+      // formats locally. Requesting direct play for them avoids a server
+      // side transcode. Anything else is transcoded to Opus.
+      Container: 'mp3,flac,m4a,aac,webma,wav,ogg,opus',
+      AudioCodec: 'opus,flac,mp3,aac,vorbis',
+      TranscodingContainer: 'ogg',
+      [AUTHORIZATION_PARAMETER]: api.accessToken,
+    });
 
     this.logger.debug(`Built stream URL '${url}'`);
 
-    return url.toString();
+    return url;
   }
 }

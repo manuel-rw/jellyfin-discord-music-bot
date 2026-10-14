@@ -3,6 +3,11 @@ import {
   SessionMessageType,
 } from '@jellyfin/sdk/lib/generated-client/models';
 
+import { Api } from '@jellyfin/sdk';
+import { AUTHORIZATION_PARAMETER } from '@jellyfin/sdk/lib/constants';
+import { WEBSOCKET_URL_PATH } from '@jellyfin/sdk/lib/websocket/constants';
+import { buildWebSocketUrl } from '@jellyfin/sdk/lib/utils';
+
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Cron } from '@nestjs/schedule';
@@ -52,12 +57,9 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
   }
 
   initializeAndConnect() {
+    const api = this.jellyfinService.getApi();
     const deviceId = this.jellyfinService.getJellyfin().deviceInfo.id;
-    const url = JellyfinWebSocketService.buildSocketUrl(
-      this.jellyfinService.getApi().basePath,
-      this.jellyfinService.getApi().accessToken,
-      deviceId,
-    );
+    const url = JellyfinWebSocketService.buildSocketUrl(api, deviceId);
 
     this.logger.debug(`Opening WebSocket with client id ${deviceId}...`);
 
@@ -175,16 +177,13 @@ export class JellyfinWebSocketService implements OnModuleDestroy {
     });
   }
 
-  private static buildSocketUrl(
-    baseName: string,
-    apiToken: string,
-    device: string,
-  ) {
-    const url = new URL(baseName);
-    url.pathname += '/socket';
-    url.protocol = url.protocol.replace('http', 'ws');
-    url.search = `?api_key=${apiToken}&deviceId=${device}`;
-    return url;
+  private static buildSocketUrl(api: Api, device: string) {
+    return buildWebSocketUrl(
+      api.getUri(WEBSOCKET_URL_PATH, {
+        [AUTHORIZATION_PARAMETER]: api.accessToken,
+        deviceId: device,
+      }),
+    );
   }
 
   onModuleDestroy() {
