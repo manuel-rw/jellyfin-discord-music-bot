@@ -45,7 +45,7 @@
     "cron": "^4.4.0",
     "date-fns": "^4.4.0",
     "discord.js": "^14.27.0",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.7",
     "joi": "^18.2.9",
     "libsodium-wrappers": "^0.8.4",
     "opusscript": "^0.1.1",
