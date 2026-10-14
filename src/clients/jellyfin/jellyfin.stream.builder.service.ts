@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { AUTHORIZATION_PARAMETER } from '@jellyfin/sdk/lib/constants';
+
 import { JellyfinService } from './jellyfin.service';
 
 @Injectable()
@@ -15,27 +17,19 @@ export class JellyfinStreamBuilderService {
       `Building stream for '${jellyfinItemId}' with bitrate ${bitrate}`,
     );
 
-    const accessToken = this.jellyfinService.getApi().accessToken;
-
-    const url = new URL(api.basePath);
-    if (!url.pathname.endsWith('/')) {
-      url.pathname += '/';
-    }
-    url.pathname += `Audio/${jellyfinItemId}/universal`;
-    url.searchParams.set('UserId', this.jellyfinService.getUserId() ?? '');
-    url.searchParams.set(
-      'DeviceId',
-      this.jellyfinService.getJellyfin().clientInfo.name,
-    );
-    url.searchParams.set('MaxStreamingBitrate', `${bitrate}`);
-    url.searchParams.set('Container', 'ogg,opus');
-    url.searchParams.set('AudioCodec', 'opus');
-    url.searchParams.set('TranscodingContainer', 'ts');
-    url.searchParams.set('TranscodingProtocol', 'hls');
-    url.searchParams.set('api_key', accessToken);
+    const url = api.getUri(`Audio/${jellyfinItemId}/universal`, {
+      UserId: this.jellyfinService.getUserId() ?? '',
+      DeviceId: this.jellyfinService.getJellyfin().clientInfo.name,
+      MaxStreamingBitrate: bitrate,
+      Container: 'ogg,opus',
+      AudioCodec: 'opus',
+      TranscodingContainer: 'ts',
+      TranscodingProtocol: 'hls',
+      [AUTHORIZATION_PARAMETER]: api.accessToken,
+    });
 
     this.logger.debug(`Built stream URL '${url}'`);
 
-    return url.toString();
+    return url;
   }
 }

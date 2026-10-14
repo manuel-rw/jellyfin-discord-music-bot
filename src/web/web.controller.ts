@@ -10,6 +10,8 @@ import {
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { ChannelType, Client, Status } from 'discord.js';
 import { Response } from 'express';
+import { ImageType } from '@jellyfin/sdk/lib/generated-client/models';
+import { AUTHORIZATION_PARAMETER } from '@jellyfin/sdk/lib/constants';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { PlaybackService } from '../playback/playback.service';
 import { JellyfinService } from '../clients/jellyfin/jellyfin.service';
@@ -139,7 +141,9 @@ export class WebController {
   async proxyAlbumArt(@Param('itemId') itemId: string, @Res() res: Response) {
     try {
       const api = this.jellyfinService.getApi();
-      const url = `${api.basePath}/Items/${itemId}/Images/Primary?api_key=${api.accessToken}`;
+      const url = api.getUri(`Items/${itemId}/Images/${ImageType.Primary}`, {
+        [AUTHORIZATION_PARAMETER]: api.accessToken,
+      });
       const response = await fetch(url);
       if (!response.ok) {
         res.status(404).end();
