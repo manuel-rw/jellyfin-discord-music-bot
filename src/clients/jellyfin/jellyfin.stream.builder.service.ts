@@ -10,21 +10,20 @@ export class JellyfinStreamBuilderService {
 
   constructor(private readonly jellyfinService: JellyfinService) {}
 
-  buildStreamUrl(jellyfinItemId: string, bitrate: number) {
+  buildStreamUrl(jellyfinItemId: string) {
     const api = this.jellyfinService.getApi();
 
-    this.logger.debug(
-      `Building stream for '${jellyfinItemId}' with bitrate ${bitrate}`,
-    );
+    this.logger.debug(`Building stream for '${jellyfinItemId}'`);
 
     const url = api.getUri(`Audio/${jellyfinItemId}/universal`, {
       UserId: this.jellyfinService.getUserId() ?? '',
       DeviceId: this.jellyfinService.getJellyfin().clientInfo.name,
-      MaxStreamingBitrate: bitrate,
-      Container: 'ogg,opus',
-      AudioCodec: 'opus',
-      TranscodingContainer: 'ts',
-      TranscodingProtocol: 'hls',
+      // The stream is piped through FFmpeg, which decodes all of these
+      // formats locally. Requesting direct play for them avoids a server
+      // side transcode. Anything else is transcoded to Opus.
+      Container: 'mp3,flac,m4a,aac,webma,wav,ogg,opus',
+      AudioCodec: 'opus,flac,mp3,aac,vorbis',
+      TranscodingContainer: 'ogg',
       [AUTHORIZATION_PARAMETER]: api.accessToken,
     });
 

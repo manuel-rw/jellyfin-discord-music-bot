@@ -64,7 +64,7 @@ export class Track {
   }
 
   getStreamUrl(streamBuilder: JellyfinStreamBuilderService) {
-    return streamBuilder.buildStreamUrl(this.id, 96000);
+    return streamBuilder.buildStreamUrl(this.id);
   }
 
   getRemoteImages(): RemoteImageInfo[] {
