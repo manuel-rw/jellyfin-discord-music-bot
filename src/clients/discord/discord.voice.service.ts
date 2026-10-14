@@ -12,8 +12,7 @@ import {
   VoiceConnectionStatus,
 } from '@discordjs/voice';
 
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-import { Logger } from '@nestjs/common/services';
+import { Injectable, Logger, OnModuleDestroy, Scope } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Interval } from '@nestjs/schedule';
 
@@ -29,40 +28,57 @@ import { Track } from '../../models/track';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinStreamBuilderService } from '../jellyfin/jellyfin.stream.builder.service';
 import { JellyfinWebSocketService } from '../jellyfin/jellyfin.websocket.service';
+import { JellyfinWebSocketManagerService } from '../jellyfin/jellyfin.websocket.manager.service';
 
 import { buildErrorMessage, buildMessage } from './discord.message.builder';
 import { EventNames } from '../../events/names';
 
-@Injectable()
+/**
+ * Service for managing Discord voice connections and audio playback
+ * Supports sharding by maintaining separate state per guild
+ * Each guild can have its own voice connection and audio player
+ */
+@Injectable({ scope: Scope.DEFAULT })
 export class DiscordVoiceService implements OnModuleDestroy {
   private readonly logger = new Logger(DiscordVoiceService.name);
-  private audioPlayer: AudioPlayer | undefined;
-  private voiceConnection: VoiceConnection | undefined;
-  private audioResource: AudioResource | undefined;
-  private autoLeaveIntervalId: NodeJS.Timeout | null = null;
-  private voiceChannelInfo: {
+  
+  // Maps guildId to their respective voice connections and audio players
+  private audioPlayers: Map<string, AudioPlayer> = new Map();
+  private voiceConnections: Map<string, VoiceConnection> = new Map();
+  private audioResources: Map<string, AudioResource> = new Map();
+  private autoLeaveIntervalIds: Map<string, NodeJS.Timeout> = new Map();
+  private voiceChannelInfos: Map<string, {
     name: string;
     bitrate: number;
     channelId: string;
-  } | null = null;
+  }> = new Map();
+  
+  // Track the currently active guild for audio events
+  private activeGuildId: string | null = null;
 
   constructor(
     private readonly playbackService: PlaybackService,
     private readonly jellyfinWebSocketService: JellyfinWebSocketService,
+    private readonly jellyfinWebSocketManagerService: JellyfinWebSocketManagerService,
     private readonly jellyfinStreamBuilder: JellyfinStreamBuilderService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) {
+    this.logger.debug('DiscordVoiceService initialized');
+  }
 
   onModuleDestroy() {
-    if (this.autoLeaveIntervalId) {
+    // Clean up all intervals
+    for (const [guildId, intervalId] of this.autoLeaveIntervalIds) {
       try {
-        clearInterval(this.autoLeaveIntervalId);
-        this.autoLeaveIntervalId = null;
-        this.logger.debug('autoLeaveIntervalId Cleared');
+        clearInterval(intervalId);
+        this.logger.debug(`Cleared autoLeaveIntervalId for guild ${guildId}`);
       } catch (error) {
-        this.logger.error(`Error while clearing autoLeaveIntervalId: ${error}`);
+        this.logger.error(`Error while clearing autoLeaveIntervalId for guild ${guildId}: ${error}`);
       }
     }
+    
+    // Disconnect all voice connections
+    this.disconnectAllGuilds();
   }
 
   @OnEvent(EventNames.Circuit.AnnounceTrack)
@@ -77,9 +93,12 @@ export class DiscordVoiceService implements OnModuleDestroy {
   tryJoinChannelAndEstablishVoiceConnection(
     member: GuildMember,
   ): TryResult<InteractionEditReplyOptions> {
-    if (this.voiceConnection !== undefined) {
+    const guildId = member.guild.id;
+    
+    // Check if we already have a voice connection for this guild
+    if (this.voiceConnections.has(guildId)) {
       this.logger.debug(
-        'Avoided joining the voice channel because voice connection is already defined',
+        `Avoided joining the voice channel for guild ${guildId} because voice connection is already defined`,
       );
       return {
         success: true,
@@ -106,11 +125,14 @@ export class DiscordVoiceService implements OnModuleDestroy {
     }
 
     const channel = member.voice.channel;
-    this.voiceChannelInfo = {
+    const guildId = channel.guildId;
+    
+    // Store voice channel info for this guild
+    this.voiceChannelInfos.set(guildId, {
       name: channel.name,
       bitrate: channel.bitrate,
       channelId: channel.id,
-    };
+    });
 
     joinVoiceChannel({
       channelId: channel.id,
@@ -118,31 +140,39 @@ export class DiscordVoiceService implements OnModuleDestroy {
       guildId: channel.guildId,
     });
 
-    this.jellyfinWebSocketService.initializeAndConnect();
+    // Initialize WebSocket connection for this specific guild
+    // This allows each guild to have its own WebSocket control
+    this.jellyfinWebSocketManagerService.initializeAndConnect(guildId);
+    this.logger.debug(`Initialized WebSocket connection for guild ${guildId}`);
 
-    if (this.voiceConnection === undefined) {
-      this.voiceConnection = getVoiceConnection(member.guild.id);
-    }
-    this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
-      if (this.voiceConnection !== undefined) {
-        this.playbackService.getPlaylistOrDefault().clear();
-        this.disconnect();
-      }
+    // Set this guild as the active one
+    this.activeGuildId = guildId;
+
+    // Get the voice connection after joining
+    const voiceConnection = getVoiceConnection(guildId);
+    this.voiceConnections.set(guildId, voiceConnection);
+    
+    voiceConnection.on(VoiceConnectionStatus.Disconnected, () => {
+      this.logger.debug(`Voice connection for guild ${guildId} disconnected`);
+      this.playbackService.getPlaylistOrDefault().clear();
+      this.leaveGuildChannel(guildId);
     });
 
     const voiceChannelId = channel.id;
-    this.autoLeaveIntervalId = setInterval(async () => {
+    const intervalId = setInterval(async () => {
       const voiceChannel = (await member.guild.channels.fetch(
         voiceChannelId,
       )) as VoiceChannel | undefined;
       if (voiceChannel === undefined) {
-        if (!this.autoLeaveIntervalId) {
+        const intervalId = this.autoLeaveIntervalIds.get(guildId);
+        if (!intervalId) {
           this.logger.error(
-            'Unable to cancel interval because interval id is not defined',
+            `Unable to cancel interval for guild ${guildId} because interval id is not defined`,
           );
           return;
         }
-        clearInterval(this.autoLeaveIntervalId);
+        clearInterval(intervalId);
+        this.autoLeaveIntervalIds.delete(guildId);
         return;
       }
       const voiceChannelMembersExpectBots = voiceChannel.members.filter(
@@ -151,18 +181,22 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
       if (voiceChannelMembersExpectBots.size > 0) return;
 
-      if (!this.autoLeaveIntervalId) {
+      const intervalId = this.autoLeaveIntervalIds.get(guildId);
+      if (!intervalId) {
         return;
       }
 
       try {
-        this.stop(true);
-        this.disconnect();
-        clearInterval(this.autoLeaveIntervalId);
+        this.stop(true, guildId);
+        this.leaveGuildChannel(guildId);
+        clearInterval(intervalId);
+        this.autoLeaveIntervalIds.delete(guildId);
       } catch (error) {
-        this.logger.error(`Failed to disconnect voice channel ${error}`);
+        this.logger.error(`Failed to disconnect voice channel for guild ${guildId}: ${error}`);
       }
     }, 5000);
+    
+    this.autoLeaveIntervalIds.set(guildId, intervalId);
 
     return {
       success: true,
@@ -170,26 +204,58 @@ export class DiscordVoiceService implements OnModuleDestroy {
     };
   }
 
-  getVoiceConnection() {
-    return this.voiceConnection;
+  getVoiceConnection(guildId?: string): VoiceConnection | undefined {
+    if (guildId) {
+      return this.voiceConnections.get(guildId);
+    }
+    // For backwards compatibility, return the first connection if no guildId specified
+    if (this.activeGuildId) {
+      return this.voiceConnections.get(this.activeGuildId);
+    }
+    return undefined;
+  }
+  
+  /**
+   * Get voice connection for a specific guild
+   * @param guildId The Discord guild ID
+   * @returns The voice connection for the guild or undefined
+   */
+  getVoiceConnectionForGuild(guildId: string): VoiceConnection | undefined {
+    return this.voiceConnections.get(guildId);
   }
 
-  changeCurrentResourceVolume(volume: number) {
-    if (!this.audioResource || !this.audioResource.volume) {
+  changeCurrentResourceVolume(volume: number, guildId?: string) {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to change audio volume, no active guild');
+      return;
+    }
+    
+    const audioResource = this.audioResources.get(targetGuildId);
+    if (!audioResource || !audioResource.volume) {
       this.logger.error(
-        'Failed to change audio volume, AudioResource or volume was undefined',
+        `Failed to change audio volume for guild ${targetGuildId}, AudioResource or volume was undefined`,
       );
       return;
     }
-    this.audioResource.volume.setVolume(volume);
+    audioResource.volume.setVolume(volume);
   }
 
-  playResource(resource: AudioResource, name: string, url: string) {
+  playResource(resource: AudioResource, name: string, url: string, guildId?: string) {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to play resource, no active guild');
+      return;
+    }
+    
     this.logger.debug(
-      `Playing audio resource with volume ${resource.volume?.volume} (${resource.playbackDuration}) (readable: ${resource.readable}) (volume: ${resource.volume?.volume} (${resource.volume?.volumeDecibels}dB)) (silence remaining: ${resource.silenceRemaining}) (silence padding frames: ${resource.silencePaddingFrames}) (metadata: ${resource.metadata})`,
+      `Playing audio resource for guild ${targetGuildId} with volume ${resource.volume?.volume} (${resource.playbackDuration}) (readable: ${resource.readable})`,
     );
-    this.createAndReturnOrGetAudioPlayer().play(resource);
-    this.audioResource = resource;
+    
+    const audioPlayer = this.getOrCreateAudioPlayer(targetGuildId);
+    audioPlayer.play(resource);
+    
+    this.audioResources.set(targetGuildId, resource);
     resource.volume?.setVolume(this.playbackService.getVolume());
 
     const isPlayable = this.audioPlayer?.checkPlayable();
@@ -237,11 +303,19 @@ export class DiscordVoiceService implements OnModuleDestroy {
   }
 
   /**
-   * Pauses the current audio player
+   * Pauses the current audio player for a specific guild
+   * @param guildId The guild ID to pause playback for
    */
   @OnEvent(EventNames.Controls.Pause)
-  pause() {
-    this.createAndReturnOrGetAudioPlayer().pause();
+  pause(guildId?: string) {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to pause, no active guild');
+      return;
+    }
+    
+    const audioPlayer = this.getOrCreateAudioPlayer(targetGuildId);
+    audioPlayer.pause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
     if (track) {
       track.playing = false;
@@ -250,11 +324,21 @@ export class DiscordVoiceService implements OnModuleDestroy {
   }
 
   /**
-   * Stops the audio player
+   * Stops the audio player for a specific guild
+   * @param force Whether to force stop
+   * @param guildId The guild ID to stop playback for
+   * @returns Whether the audio player was stopped
    */
   @OnEvent(EventNames.Controls.Stop)
-  stop(force: boolean): boolean {
-    const hasStopped = this.createAndReturnOrGetAudioPlayer().stop(force);
+  stop(force: boolean, guildId?: string): boolean {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to stop, no active guild');
+      return false;
+    }
+    
+    const audioPlayer = this.getOrCreateAudioPlayer(targetGuildId);
+    const hasStopped = audioPlayer.stop(force);
     if (hasStopped) {
       const playlist = this.playbackService.getPlaylistOrDefault();
       this.eventEmitter.emit(
@@ -267,10 +351,18 @@ export class DiscordVoiceService implements OnModuleDestroy {
   }
 
   /**
-   * Unpauses the current audio player
+   * Unpauses the current audio player for a specific guild
+   * @param guildId The guild ID to unpause playback for
    */
-  unpause() {
-    this.createAndReturnOrGetAudioPlayer().unpause();
+  unpause(guildId?: string) {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to unpause, no active guild');
+      return;
+    }
+    
+    const audioPlayer = this.getOrCreateAudioPlayer(targetGuildId);
+    audioPlayer.unpause();
     const track = this.playbackService.getPlaylistOrDefault().getActiveTrack();
     if (track) {
       track.playing = true;
@@ -279,29 +371,67 @@ export class DiscordVoiceService implements OnModuleDestroy {
   }
 
   /**
-   * Check if the current state is paused
+   * Check if the current state is paused for a specific guild
+   * @param guildId The guild ID to check
    * @returns The current pause state as a boolean
    */
-  isPaused() {
-    return (
-      this.createAndReturnOrGetAudioPlayer().state.status ===
-      AudioPlayerStatus.Paused
-    );
+  isPaused(guildId?: string): boolean {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to check pause state, no active guild');
+      return false;
+    }
+    
+    const audioPlayer = this.audioPlayers.get(targetGuildId);
+    if (!audioPlayer) {
+      return false;
+    }
+    return audioPlayer.state.status === AudioPlayerStatus.Paused;
   }
 
-  getVoiceChannelInfo() {
-    return this.voiceChannelInfo;
+  getVoiceChannelInfo(guildId?: string) {
+    if (guildId) {
+      return this.voiceChannelInfos.get(guildId);
+    }
+    if (this.activeGuildId) {
+      return this.voiceChannelInfos.get(this.activeGuildId);
+    }
+    return null;
   }
 
-  leaveChannel() {
-    if (!this.voiceConnection) {
+  leaveChannel(guildId?: string) {
+    const targetGuildId = guildId || this.activeGuildId;
+    if (!targetGuildId) {
+      this.logger.error('Failed to leave channel, no active guild');
       return;
     }
-    this.stop(true);
-    this.voiceConnection.disconnect();
-    this.audioPlayer = undefined;
-    this.voiceConnection = undefined;
-    this.voiceChannelInfo = null;
+    
+    this.leaveGuildChannel(targetGuildId);
+  }
+  
+  /**
+   * Leave the voice channel for a specific guild
+   * @param guildId The guild ID to leave
+   */
+  leaveGuildChannel(guildId: string) {
+    const voiceConnection = this.voiceConnections.get(guildId);
+    if (!voiceConnection) {
+      this.logger.debug(`No voice connection found for guild ${guildId}`);
+      return;
+    }
+    
+    this.stop(true, guildId);
+    voiceConnection.disconnect();
+    this.audioPlayers.delete(guildId);
+    this.voiceConnections.delete(guildId);
+    this.audioResources.delete(guildId);
+    this.voiceChannelInfos.delete(guildId);
+    
+    if (this.activeGuildId === guildId) {
+      this.activeGuildId = null;
+    }
+    
+    this.logger.debug(`Left voice channel for guild ${guildId}`);
   }
 
   joinChannel(
@@ -309,40 +439,48 @@ export class DiscordVoiceService implements OnModuleDestroy {
     channelId: string,
     adapterCreator: Parameters<typeof joinVoiceChannel>[0]['adapterCreator'],
   ) {
-    this.leaveChannel();
+    this.leaveGuildChannel(guildId);
     joinVoiceChannel({
       channelId,
       guildId,
       adapterCreator,
     });
-    this.voiceConnection = getVoiceConnection(guildId);
-    this.voiceConnection?.on(VoiceConnectionStatus.Disconnected, () => {
-      if (this.voiceConnection !== undefined) {
+    
+    const voiceConnection = getVoiceConnection(guildId);
+    this.voiceConnections.set(guildId, voiceConnection);
+    this.activeGuildId = guildId;
+    
+    voiceConnection.on(VoiceConnectionStatus.Disconnected, () => {
+      const existingConnection = this.voiceConnections.get(guildId);
+      if (existingConnection !== undefined) {
         this.playbackService.getPlaylistOrDefault().clear();
-        this.leaveChannel();
+        this.leaveGuildChannel(guildId);
       }
     });
   }
 
   /**
    * Checks if the current state is paused or not and toggles the states to the opposite.
+   * @param guildId The guild ID to toggle pause for
    * @returns The new paused state - true: paused, false: unpaused
    */
   @OnEvent(EventNames.Controls.TogglePause)
-  togglePaused(): boolean {
-    if (this.isPaused()) {
-      this.unpause();
+  togglePaused(guildId?: string): boolean {
+    if (this.isPaused(guildId)) {
+      this.unpause(guildId);
       return false;
     }
 
-    this.pause();
+    this.pause(guildId);
     return true;
   }
 
-  disconnect(): TryResult<
+  disconnect(guildId?: string): TryResult<
     string | MessagePayload | InteractionEditReplyOptions
   > {
-    if (this.voiceConnection === undefined) {
+    const targetGuildId = guildId || this.activeGuildId;
+    
+    if (!targetGuildId || !this.voiceConnections.has(targetGuildId)) {
       return {
         success: false,
         reply: {
@@ -356,10 +494,20 @@ export class DiscordVoiceService implements OnModuleDestroy {
       };
     }
 
-    this.voiceConnection.disconnect();
-    this.audioPlayer = undefined;
-    this.voiceConnection = undefined;
-    this.voiceChannelInfo = null;
+    const voiceConnection = this.voiceConnections.get(targetGuildId);
+    if (voiceConnection) {
+      voiceConnection.disconnect();
+    }
+    
+    this.audioPlayers.delete(targetGuildId);
+    this.voiceConnections.delete(targetGuildId);
+    this.audioResources.delete(targetGuildId);
+    this.voiceChannelInfos.delete(targetGuildId);
+    
+    if (this.activeGuildId === targetGuildId) {
+      this.activeGuildId = null;
+    }
+    
     return {
       success: true,
       reply: {},
@@ -367,72 +515,103 @@ export class DiscordVoiceService implements OnModuleDestroy {
   }
 
   disconnectGracefully() {
-    const connections = getVoiceConnections();
     this.logger.debug(
-      `Disconnecting gracefully from ${
-        Object.keys(connections).length
-      } connections`,
+      `Disconnecting gracefully from ${this.voiceConnections.size} connections`,
     );
-
-    connections.forEach((connection) => {
+    
+    for (const [guildId, connection] of this.voiceConnections) {
+      this.logger.debug(`Disconnecting from guild ${guildId}`);
       connection.disconnect();
-    });
+    }
+    
+    this.voiceConnections.clear();
+    this.audioPlayers.clear();
+    this.audioResources.clear();
+    this.voiceChannelInfos.clear();
+    this.autoLeaveIntervalIds.clear();
+    this.activeGuildId = null;
+  }
+  
+  /**
+   * Disconnect all voice connections
+   */
+  disconnectAllGuilds() {
+    this.logger.debug(
+      `Disconnecting all guilds from ${this.voiceConnections.size} connections`,
+    );
+    
+    for (const [guildId, connection] of this.voiceConnections) {
+      this.logger.debug(`Disconnecting from guild ${guildId}`);
+      connection.disconnect();
+    }
+    
+    this.voiceConnections.clear();
+    this.audioPlayers.clear();
+    this.audioResources.clear();
+    this.voiceChannelInfos.clear();
+    this.autoLeaveIntervalIds.clear();
+    this.activeGuildId = null;
   }
 
-  private createAndReturnOrGetAudioPlayer() {
-    if (this.voiceConnection === undefined) {
+  private getOrCreateAudioPlayer(guildId: string): AudioPlayer {
+    const voiceConnection = this.voiceConnections.get(guildId);
+    if (voiceConnection === undefined) {
       throw new Error(
-        'Voice connection has not been initialized and audio player can\t be created',
+        `Voice connection for guild ${guildId} has not been initialized and audio player can't be created`,
       );
     }
 
-    if (this.audioPlayer === undefined) {
+    let audioPlayer = this.audioPlayers.get(guildId);
+    
+    if (audioPlayer === undefined) {
       this.logger.debug(
-        'Initialized new instance of AudioPlayer because it has not been defined yet',
+        `Initialized new instance of AudioPlayer for guild ${guildId} because it has not been defined yet`,
       );
-      this.audioPlayer = createAudioPlayer({
+      audioPlayer = createAudioPlayer({
         debug: process.env.DEBUG?.toLowerCase() === 'true',
         behaviors: {
           noSubscriber: NoSubscriberBehavior.Play,
         },
       });
-      this.attachEventListenersToAudioPlayer();
-      this.voiceConnection.subscribe(this.audioPlayer);
-      return this.audioPlayer;
+      this.audioPlayers.set(guildId, audioPlayer);
+      this.attachEventListenersToAudioPlayer(guildId, audioPlayer);
+      voiceConnection.subscribe(audioPlayer);
     }
 
-    return this.audioPlayer;
+    return audioPlayer;
   }
 
-  private attachEventListenersToAudioPlayer() {
-    if (!this.voiceConnection) {
+  private attachEventListenersToAudioPlayer(guildId: string, audioPlayer: AudioPlayer) {
+    const voiceConnection = this.voiceConnections.get(guildId);
+    
+    if (!voiceConnection) {
       this.logger.error(
-        'Unable to attach listener events, because the VoiceConnection was undefined',
+        `Unable to attach listener events for guild ${guildId}, because the VoiceConnection was undefined`,
       );
       return;
     }
 
-    if (!this.audioPlayer) {
+    if (!audioPlayer) {
       this.logger.error(
-        'Unable to attach listener events, because the AudioPlayer was undefined',
+        `Unable to attach listener events for guild ${guildId}, because the AudioPlayer was undefined`,
       );
       return;
     }
 
-    this.voiceConnection.on('debug', (message) => {
-      this.logger.debug('Voice connection debug', message);
+    voiceConnection.on('debug', (message) => {
+      this.logger.debug(`Voice connection debug for guild ${guildId}`, message);
     });
-    this.voiceConnection.on('error', (err) => {
-      this.logger.error('Voice connection error', err);
+    voiceConnection.on('error', (err) => {
+      this.logger.error(`Voice connection error for guild ${guildId}`, err);
     });
 
-    this.audioPlayer.on('debug', (message) => {
-      this.logger.debug('Audio player debug', message);
+    audioPlayer.on('debug', (message) => {
+      this.logger.debug(`Audio player debug for guild ${guildId}`, message);
     });
-    this.audioPlayer.on('error', (message) => {
-      this.logger.error('Audio player error', message);
+    audioPlayer.on('error', (message) => {
+      this.logger.error(`Audio player error for guild ${guildId}`, message);
     });
-    this.audioPlayer.on('stateChange', (previousState) => {
+    audioPlayer.on('stateChange', (previousState) => {
       if (!this.audioPlayer) {
         this.logger.error(
           'Unable to process state change from audio player, because the current audio player in the callback was undefined',
@@ -448,11 +627,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
         return;
       }
 
-      if (this.audioPlayer.state.status !== AudioPlayerStatus.Idle) {
+      if (audioPlayer.state.status !== AudioPlayerStatus.Idle) {
         return;
       }
 
-      this.logger.debug('Audio player finished playing old resource');
+      this.logger.debug(`Audio player for guild ${guildId} finished playing old resource`);
 
       const playlist = this.playbackService.getPlaylistOrDefault();
       const finishedTrack = playlist.getActiveTrack();
@@ -465,11 +644,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
       const hasNextTrack = playlist.hasNextTrackInPlaylist();
 
       this.logger.debug(
-        `Playlist has next track: ${hasNextTrack ? 'yes' : 'no'}`,
+        `Playlist for guild ${guildId} has next track: ${hasNextTrack ? 'yes' : 'no'}`,
       );
 
       if (!hasNextTrack) {
-        this.logger.debug('Reached the end of the playlist');
+        this.logger.debug(`Reached the end of the playlist for guild ${guildId}`);
         return;
       }
 
@@ -479,28 +658,31 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
   @Interval(500)
   private checkAudioResourcePlayback() {
-    if (!this.audioResource) {
-      return;
-    }
+    // Check all active audio resources across all guilds
+    for (const [guildId, audioResource] of this.audioResources) {
+      if (!audioResource) {
+        continue;
+      }
 
-    const playlist = this.playbackService.getPlaylistOrDefault();
+      const playlist = this.playbackService.getPlaylistOrDefault();
 
-    if (!playlist) {
-      this.logger.error(
-        'Failed to update elapsed audio time because playlist was unexpectedly undefined',
+      if (!playlist) {
+        this.logger.error(
+          `Failed to update elapsed audio time for guild ${guildId} because playlist was unexpectedly undefined`,
+        );
+        continue;
+      }
+
+      const activeTrack = playlist.getActiveTrack();
+
+      if (!activeTrack) {
+        continue;
+      }
+
+      activeTrack.updatePlaybackProgress(audioResource.playbackDuration);
+      this.logger.debug(
+        `Reporting progress for guild ${guildId}: ${audioResource.playbackDuration} on track ${activeTrack.id}`,
       );
-      return;
     }
-
-    const activeTrack = playlist.getActiveTrack();
-
-    if (!activeTrack) {
-      return;
-    }
-
-    activeTrack.updatePlaybackProgress(this.audioResource.playbackDuration);
-    this.logger.debug(
-      `Reporting progress: ${this.audioResource.playbackDuration} on track ${activeTrack.id} (ended: ${this.audioResource.ended}) (started: ${this.audioResource.started}) (silence remaining: ${this.audioResource.silenceRemaining})`,
-    );
   }
 }

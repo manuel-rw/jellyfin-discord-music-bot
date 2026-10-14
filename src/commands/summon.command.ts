@@ -29,6 +29,9 @@ export class SummonCommand {
 
     const guildMember = interaction.member as GuildMember;
 
+    // Set the active guild for this interaction
+    const guildId = interaction.guildId;
+    
     const tryResult =
       this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(
         guildMember,

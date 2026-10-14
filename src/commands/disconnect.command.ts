@@ -39,13 +39,14 @@ export class DisconnectCommand {
     );
 
     const playlist = this.playbackService.getPlaylistOrDefault();
+    const guildId = interaction.guildId;
 
     if (playlist.hasActiveTrack()) {
-      this.discordVoiceService.stop(false);
+      this.discordVoiceService.stop(false, guildId);
     }
     playlist.clear();
 
-    const disconnect = this.discordVoiceService.disconnect();
+    const disconnect = this.discordVoiceService.disconnect(guildId);
 
     if (!disconnect.success) {
       await interaction.editReply(disconnect.reply);
