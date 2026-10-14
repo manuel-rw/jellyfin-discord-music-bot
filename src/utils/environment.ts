@@ -10,9 +10,6 @@ export const environmentVariablesSchema = z.object({
   JELLYFIN_SERVER_ADDRESS: z.string().url(),
   JELLYFIN_AUTHENTICATION_USERNAME: z.string(),
   JELLYFIN_AUTHENTICATION_PASSWORD: z.string(),
-  MEDIA_SERVER_TYPE: z
-    .enum(['jellyfin', 'emby'])
-    .default('jellyfin'),
   UPDATER_DISABLE_NOTIFICATIONS: z
     .enum(['true', 'false'])
     .default('false')

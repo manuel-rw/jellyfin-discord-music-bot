@@ -6,7 +6,6 @@ import { Api, Jellyfin } from '@jellyfin/sdk';
 import { Constants } from '../../utils/constants';
 import { JellyfinPlayStateService } from './jellyfinPlayStateService';
 import { getAuthenticationApi } from '@jellyfin/sdk/lib/utils/api';
-import { getMediaServerAdapter } from './media-server.config';
 
 @Injectable()
 export class JellyfinService {
@@ -42,11 +41,6 @@ export class JellyfinService {
     this.api = this.jellyfin.createApi(
       process.env.JELLYFIN_SERVER_ADDRESS ?? '',
     );
-
-    if (getMediaServerAdapter().useEmbyAuthorizationHeaders) {
-      this.api.axiosInstance.defaults.headers.common['X-Emby-Authorization'] =
-        this.api.authorizationHeader;
-    }
   }
 
   authenticate() {
@@ -62,22 +56,18 @@ export class JellyfinService {
         },
       })
       .then(async (response) => {
-        const userId = response.data.SessionInfo?.UserId ?? response.data.User?.Id;
-        if (userId === undefined) {
+        if (response.data.SessionInfo?.UserId === undefined) {
           this.logger.error(
             `Failed to authenticate with response code ${response.status}: '${response.data}'`,
           );
           return;
         }
 
-        this.logger.debug(`Connected using user '${userId}'`);
-        this.userId = userId;
+        this.logger.debug(
+          `Connected using user '${response.data.SessionInfo.UserId}'`,
+        );
+        this.userId = response.data.SessionInfo.UserId;
         this.connected = true;
-
-        if (getMediaServerAdapter().useEmbyAuthorizationHeaders) {
-          api.axiosInstance.defaults.headers.common['X-Emby-Token'] =
-            response.data.AccessToken;
-        }
 
         await this.jellyfinPlayState.initializePlayState(api);
       })
