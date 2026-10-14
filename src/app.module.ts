@@ -15,6 +15,7 @@ import { HealthModule } from './health/health.module';
 import { PlaybackModule } from './playback/playback.module';
 import { UpdatesModule } from './updates/updates.module';
 import { WebModule } from './web/web.module';
+import { ShardingModule } from './sharding/sharding.module';
 import {
   environmentVariablesSchema,
   getEnvironmentVariables,
@@ -41,6 +42,7 @@ import { fromZodError } from 'zod-validation-error';
     }),
     DiscordModule,
     EventEmitterModule.forRoot(),
+    ShardingModule,
     CommandModule,
     DiscordClientModule,
     JellyfinClientModule,

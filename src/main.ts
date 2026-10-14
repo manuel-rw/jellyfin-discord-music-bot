@@ -1,7 +1,9 @@
 import { INestApplication, Logger, LogLevel } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
 
 import { AppModule } from './app.module';
+import { ShardService } from './sharding/shard.service';
 
 function getLoggingLevels(): LogLevel[] {
   if (!process.env.LOG_LEVEL) {
@@ -28,10 +30,34 @@ function getLoggingLevels(): LogLevel[] {
 let app: INestApplication;
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
+  // Check if we're running as a shard worker (spawned by ShardingManager)
+  // ShardingManager sets SHARD_ID and SHARD_COUNT environment variables
+  if (process.env.SHARD_ID !== undefined && process.env.SHARD_COUNT !== undefined) {
+    // This is a shard worker process, just start the app normally
+    logger.log(`Starting as shard ${process.env.SHARD_ID}/${process.env.SHARD_COUNT}`);
+    app = await NestFactory.create(AppModule, {
+      logger: getLoggingLevels(),
+    });
+    app.enableShutdownHooks();
+    await app.listen(process.env.PORT || 3000);
+    logger.log(`Shard ${process.env.SHARD_ID} listening on port ${process.env.PORT || 3000}`);
+    return;
+  }
+
+  // This is the main process, start the sharding manager
+  logger.log('Starting as main sharding manager');
   app = await NestFactory.create(AppModule, {
     logger: getLoggingLevels(),
   });
   app.enableShutdownHooks();
+
+  // Get the ShardService and initialize sharding
+  const shardService = app.get(ShardService);
+  shardService.initializeSharding();
+
   await app.listen(process.env.PORT || 3000);
+  logger.log(`Main sharding manager listening on port ${process.env.PORT || 3000}`);
 }
 bootstrap();
