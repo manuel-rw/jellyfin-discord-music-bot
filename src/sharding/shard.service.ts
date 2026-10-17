@@ -17,22 +17,25 @@ export class ShardService {
    */
   initializeSharding() {
     const shardCount = this.getShardCount();
-    
+
     this.logger.log(
       `Initializing sharding with ${shardCount} shards for multi-guild support`,
     );
 
     // Create sharding manager that spawns shard processes
-    this.shardingManager = new ShardingManager(join(__dirname, 'shard.worker.js'), {
-      token: process.env.DISCORD_CLIENT_TOKEN,
-      totalShards: shardCount,
-      mode: 'process',
-    });
+    this.shardingManager = new ShardingManager(
+      join(__dirname, 'shard.worker.js'),
+      {
+        token: process.env.DISCORD_CLIENT_TOKEN,
+        totalShards: shardCount,
+        mode: 'process',
+      },
+    );
 
     // Handle shard launch events
     this.shardingManager.on('shardCreate', (shard) => {
       this.logger.log(`Shard ${shard.id} created`);
-      
+
       shard.on('ready', () => {
         this.logger.log(`Shard ${shard.id} is ready`);
         this.eventEmitter.emit('shard.ready', shard.id);

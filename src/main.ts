@@ -34,15 +34,22 @@ async function bootstrap() {
 
   // Check if we're running as a shard worker (spawned by ShardingManager)
   // ShardingManager sets SHARD_ID and SHARD_COUNT environment variables
-  if (process.env.SHARD_ID !== undefined && process.env.SHARD_COUNT !== undefined) {
+  if (
+    process.env.SHARD_ID !== undefined &&
+    process.env.SHARD_COUNT !== undefined
+  ) {
     // This is a shard worker process, just start the app normally
-    logger.log(`Starting as shard ${process.env.SHARD_ID}/${process.env.SHARD_COUNT}`);
+    logger.log(
+      `Starting as shard ${process.env.SHARD_ID}/${process.env.SHARD_COUNT}`,
+    );
     app = await NestFactory.create(AppModule, {
       logger: getLoggingLevels(),
     });
     app.enableShutdownHooks();
     await app.listen(process.env.PORT || 3000);
-    logger.log(`Shard ${process.env.SHARD_ID} listening on port ${process.env.PORT || 3000}`);
+    logger.log(
+      `Shard ${process.env.SHARD_ID} listening on port ${process.env.PORT || 3000}`,
+    );
     return;
   }
 
@@ -58,6 +65,8 @@ async function bootstrap() {
   shardService.initializeSharding();
 
   await app.listen(process.env.PORT || 3000);
-  logger.log(`Main sharding manager listening on port ${process.env.PORT || 3000}`);
+  logger.log(
+    `Main sharding manager listening on port ${process.env.PORT || 3000}`,
+  );
 }
 bootstrap();

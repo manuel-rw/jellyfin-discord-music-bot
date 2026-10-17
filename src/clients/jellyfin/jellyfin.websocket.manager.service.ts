@@ -9,8 +9,14 @@ import { buildWebSocketUrl } from '@jellyfin/sdk/lib/utils';
 import { PlaybackService } from '../../playback/playback.service';
 import { JellyfinSearchService } from './search/jellyfin.search.service';
 import { JellyfinService } from './jellyfin.service';
-import { PlayNowCommand, SessionApiSendPlayStateCommandRequest } from '../../types/websocket';
-import { PlaystateCommand, SessionMessageType } from '@jellyfin/sdk/lib/generated-client/models';
+import {
+  PlayNowCommand,
+  SessionApiSendPlayStateCommandRequest,
+} from '../../types/websocket';
+import {
+  PlaystateCommand,
+  SessionMessageType,
+} from '@jellyfin/sdk/lib/generated-client/models';
 import { flatMapTrackItems } from '../../utils/trackConverter';
 import { EventNames } from '../../events/names';
 
@@ -46,7 +52,9 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
     const deviceId = `${this.jellyfinService.getJellyfin().deviceInfo.id}-${guildId}`;
     const url = JellyfinWebSocketManagerService.buildSocketUrl(api, deviceId);
 
-    this.logger.debug(`Opening WebSocket for guild ${guildId} with client id ${deviceId}...`);
+    this.logger.debug(
+      `Opening WebSocket for guild ${guildId} with client id ${deviceId}...`,
+    );
 
     const webSocket = new WebSocket(url);
     this.webSockets.set(guildId, webSocket);
@@ -61,7 +69,7 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
   disconnectGuild(guildId: string) {
     this.cancelReconnect(guildId);
     const webSocket = this.webSockets.get(guildId);
-    
+
     if (webSocket) {
       this.logger.debug(`Closing WebSocket for guild ${guildId}...`);
       webSocket.close();
@@ -77,7 +85,7 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
    */
   sendMessage(guildId: string, type: string, data?: any) {
     const webSocket = this.webSockets.get(guildId);
-    
+
     if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
       throw new Error(`Socket for guild ${guildId} not open`);
     }
@@ -119,12 +127,12 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
    */
   disconnectAll() {
     this.logger.debug('Disconnecting all WebSocket connections...');
-    
+
     for (const [guildId, webSocket] of this.webSockets) {
       this.cancelReconnect(guildId);
       webSocket.close();
     }
-    
+
     this.webSockets.clear();
     this.reconnectTimeoutIds.clear();
     this.reconnecting.clear();
@@ -140,14 +148,18 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
       }
 
       this.sendMessage(guildId, 'KeepAlive');
-      this.logger.debug(`Sent a KeepAlive package to the server for guild ${guildId}`);
+      this.logger.debug(
+        `Sent a KeepAlive package to the server for guild ${guildId}`,
+      );
     }
   }
 
   private bindWebSocketEvents(guildId: string, webSocket: WebSocket) {
     webSocket.on('message', this.createMessageHandler(guildId).bind(this));
     webSocket.on('close', () => {
-      this.logger.warn(`WebSocket for guild ${guildId} closed. Scheduling reconnect...`);
+      this.logger.warn(
+        `WebSocket for guild ${guildId} closed. Scheduling reconnect...`,
+      );
       this.scheduleReconnect(guildId);
     });
     webSocket.on('error', (err) => {
@@ -181,7 +193,9 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
             searchHints,
             this.jellyfinSearchService,
           );
-          this.logger.debug(`Mapped ${tracks.length} tracks to Jellyfin for guild ${guildId}`);
+          this.logger.debug(
+            `Mapped ${tracks.length} tracks to Jellyfin for guild ${guildId}`,
+          );
           this.playbackService.getPlaylistOrDefault().enqueueTracks(tracks);
           break;
         }
@@ -253,14 +267,16 @@ export class JellyfinWebSocketManagerService implements OnModuleDestroy {
     this.logger.warn(
       `WebSocket for guild ${guildId} disconnected. Reconnecting in ${JellyfinWebSocketManagerService.RECONNECT_INTERVAL_MS}ms...`,
     );
-    
+
     const timeoutId = setTimeout(() => {
       this.reconnecting.set(guildId, false);
       this.reconnectTimeoutIds.delete(guildId);
-      this.logger.log(`Attempting to reconnect WebSocket for guild ${guildId}...`);
+      this.logger.log(
+        `Attempting to reconnect WebSocket for guild ${guildId}...`,
+      );
       this.initializeAndConnect(guildId);
     }, JellyfinWebSocketManagerService.RECONNECT_INTERVAL_MS);
-    
+
     this.reconnectTimeoutIds.set(guildId, timeoutId);
   }
 

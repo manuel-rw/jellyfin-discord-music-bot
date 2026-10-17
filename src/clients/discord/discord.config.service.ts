@@ -9,12 +9,16 @@ import { GatewayIntentBits } from 'discord.js';
 export class DiscordConfigService implements DiscordOptionsFactory {
   createDiscordOptions(): DiscordModuleOption {
     // Get shard info from environment variables set by ShardingManager
-    const shardId = process.env.SHARD_ID ? parseInt(process.env.SHARD_ID) : undefined;
-    const totalShards = process.env.SHARD_COUNT ? parseInt(process.env.SHARD_COUNT) : undefined;
+    const shardId = process.env.SHARD_ID
+      ? parseInt(process.env.SHARD_ID)
+      : undefined;
+    const totalShards = process.env.SHARD_COUNT
+      ? parseInt(process.env.SHARD_COUNT)
+      : undefined;
 
     // Configure sharding options for the Discord client
     const shardOptions: Record<string, any> = {};
-    
+
     if (shardId !== undefined && totalShards !== undefined) {
       shardOptions.shards = shardId;
       shardOptions.shardCount = totalShards;

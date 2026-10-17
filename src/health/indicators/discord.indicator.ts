@@ -1,6 +1,9 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
-import { HealthIndicatorResult, HealthIndicatorService, } from '@nestjs/terminus';
+import {
+  HealthIndicatorResult,
+  HealthIndicatorService,
+} from '@nestjs/terminus';
 import { Client, Status } from 'discord.js';
 
 @Injectable()
@@ -18,7 +21,7 @@ export class DiscordHealthIndicator extends HealthIndicatorService {
 
     const check = this.check(key);
     if (status === Status.Ready) {
-      return check.up(payload)
+      return check.up(payload);
     }
 
     return check.down(payload);

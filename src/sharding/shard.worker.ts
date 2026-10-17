@@ -14,8 +14,10 @@ async function bootstrapShard() {
   try {
     const shardId = process.env.SHARD_ID || 'unknown';
     const totalShards = process.env.SHARD_COUNT || 'unknown';
-    
-    logger.log(`Starting shard worker process (shard ${shardId}/${totalShards})`);
+
+    logger.log(
+      `Starting shard worker process (shard ${shardId}/${totalShards})`,
+    );
 
     const app = await NestFactory.create(AppModule, {
       logger: ['error', 'warn', 'log', 'debug'],

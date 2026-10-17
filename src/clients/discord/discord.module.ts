@@ -27,9 +27,7 @@ import { DiscordMessageCleanupService } from './discord.message-cleanup.service'
   ],
 })
 export class DiscordClientModule implements OnModuleDestroy {
-  constructor(
-    private readonly discordVoiceService: DiscordVoiceService,
-  ) {}
+  constructor(private readonly discordVoiceService: DiscordVoiceService) {}
 
   onModuleDestroy() {
     this.discordVoiceService.disconnectAllGuilds();
