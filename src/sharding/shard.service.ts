@@ -4,7 +4,7 @@ import { ShardingManager } from 'discord.js';
 import { join } from 'path';
 
 @Injectable()
-export class ShardService implements OnModuleDestroy {
+export class ShardService {
   private readonly logger = new Logger(ShardService.name);
   private shardingManager: ShardingManager | null = null;
 
@@ -25,7 +25,7 @@ export class ShardService implements OnModuleDestroy {
     // Create sharding manager that spawns shard processes
     this.shardingManager = new ShardingManager(join(__dirname, 'shard.worker.js'), {
       token: process.env.DISCORD_CLIENT_TOKEN,
-      shardCount: shardCount,
+      totalShards: shardCount,
       mode: 'process',
     });
 
@@ -74,16 +74,5 @@ export class ShardService implements OnModuleDestroy {
    */
   isShardingEnabled(): boolean {
     return this.shardingManager !== null;
-  }
-
-  onModuleDestroy() {
-    if (this.shardingManager) {
-      this.logger.log('Destroying sharding manager...');
-      try {
-        this.shardingManager.destroy();
-      } catch (error) {
-        this.logger.error(`Error destroying sharding manager: ${error.message}`);
-      }
-    }
   }
 }

@@ -125,7 +125,6 @@ export class DiscordVoiceService implements OnModuleDestroy {
     }
 
     const channel = member.voice.channel;
-    const guildId = channel.guildId;
     
     // Store voice channel info for this guild
     this.voiceChannelInfos.set(guildId, {
@@ -150,6 +149,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
 
     // Get the voice connection after joining
     const voiceConnection = getVoiceConnection(guildId);
+
+    if (!voiceConnection) {
+      throw new Error(`VoiceConnection must be defined after joining`);
+    }
+
     this.voiceConnections.set(guildId, voiceConnection);
     
     voiceConnection.on(VoiceConnectionStatus.Disconnected, () => {
@@ -258,7 +262,7 @@ export class DiscordVoiceService implements OnModuleDestroy {
     this.audioResources.set(targetGuildId, resource);
     resource.volume?.setVolume(this.playbackService.getVolume());
 
-    const isPlayable = this.audioPlayer?.checkPlayable();
+    const isPlayable = audioPlayer.checkPlayable();
     if (isPlayable) {
       return;
     }
@@ -447,6 +451,11 @@ export class DiscordVoiceService implements OnModuleDestroy {
     });
     
     const voiceConnection = getVoiceConnection(guildId);
+
+    if (!voiceConnection) {
+      throw new Error(`VoiceConenction was unexpectedly null for this guild`);
+    }
+
     this.voiceConnections.set(guildId, voiceConnection);
     this.activeGuildId = guildId;
     
@@ -612,17 +621,6 @@ export class DiscordVoiceService implements OnModuleDestroy {
       this.logger.error(`Audio player error for guild ${guildId}`, message);
     });
     audioPlayer.on('stateChange', (previousState) => {
-      if (!this.audioPlayer) {
-        this.logger.error(
-          'Unable to process state change from audio player, because the current audio player in the callback was undefined',
-        );
-        return;
-      }
-
-      this.logger.debug(
-        `Audio player changed state from ${previousState.status} to ${this.audioPlayer.state.status}`,
-      );
-
       if (previousState.status !== AudioPlayerStatus.Playing) {
         return;
       }
