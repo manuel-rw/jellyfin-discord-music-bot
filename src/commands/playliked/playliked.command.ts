@@ -13,6 +13,7 @@ import { PlaybackService } from '../../playback/playback.service';
 import { defaultMemberPermissions } from '../../utils/environment';
 import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 
 @Command({
   name: 'playliked',
@@ -20,7 +21,7 @@ import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guar
   defaultMemberPermissions,
 })
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 export class PlayLikedCommand {
   constructor(
     private readonly jellyfinSearchService: JellyfinSearchService,
@@ -30,8 +31,6 @@ export class PlayLikedCommand {
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
     const guildMember = interaction.member as GuildMember;
     const tryResult =
       this.discordVoiceService.tryJoinChannelAndEstablishVoiceConnection(

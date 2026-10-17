@@ -7,11 +7,12 @@ import { CommandInteraction, GuildMember } from 'discord.js';
 import { buildMessage } from '../clients/discord/discord.message.builder';
 import { DiscordVoiceService } from '../clients/discord/discord.voice.service';
 import { ChannelLockGuard } from '../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../clients/discord/guards/defer-reply.guard';
 import { DiscordMessageCleanupService } from '../clients/discord/discord.message-cleanup.service';
 import { defaultMemberPermissions } from '../utils/environment';
 
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 @Command({
   name: 'summon',
   description: 'Join your current voice channel',
@@ -25,8 +26,6 @@ export class SummonCommand {
 
   @Handler()
   async handler(@IA() interaction: CommandInteraction): Promise<void> {
-    await interaction.deferReply();
-
     const guildMember = interaction.member as GuildMember;
 
     // Set the active guild for this interaction

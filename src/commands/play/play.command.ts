@@ -30,10 +30,11 @@ import { formatMillisecondsAsHumanReadable } from '../../utils/timeUtils';
 
 import { defaultMemberPermissions } from '../../utils/environment';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 import { PlayCommandParams, SearchType } from './play.params';
 
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 @Command({
   name: 'play',
   description: 'Search for an item on your Jellyfin instance',
@@ -53,8 +54,6 @@ export class PlayItemCommand {
     @InteractionEvent(SlashCommandPipe) dto: PlayCommandParams,
     @IA() interaction: CommandInteraction,
   ) {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
     const baseItems = PlayCommandParams.getBaseItemKinds(dto.type);
 
     let item: SearchItem | undefined;
@@ -70,7 +69,7 @@ export class PlayItemCommand {
     }
 
     if (!item) {
-      await interaction.followUp({
+      await interaction.editReply({
         embeds: [
           buildMessage({
             title: 'No results found',
@@ -78,7 +77,6 @@ export class PlayItemCommand {
               '- Check for any misspellings\n- Grant me access to your desired libraries\n- Avoid special characters',
           }),
         ],
-        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -113,7 +111,7 @@ export class PlayItemCommand {
     const remoteImage: RemoteImageInfo | undefined =
       remoteImages.length > 0 ? remoteImages[0] : undefined;
 
-    await interaction.followUp({
+    await interaction.editReply({
       embeds: [
         buildMessage({
           title: `Added ${
@@ -129,7 +127,6 @@ export class PlayItemCommand {
           },
         }),
       ],
-      flags: MessageFlags.Ephemeral,
     });
   }
 

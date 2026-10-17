@@ -34,13 +34,14 @@ import { Interval } from '@nestjs/schedule';
 import { lightFormat } from 'date-fns';
 import { defaultMemberPermissions } from '../../utils/environment';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 import { PlaylistInteractionCollector } from './playlist.interaction-collector';
 import { PlaylistCommandParams } from './playlist.params';
 import { PlaylistTempCommandData } from './playlist.types';
 
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 @Command({
   name: 'playlist',
   description: 'Print the current track information',
@@ -65,8 +66,8 @@ export class PlaylistCommand {
     const page = dto.page ?? 0;
 
     await this.messageCleanupService.scheduleResponseDeletion(
-      await interaction.reply(
-        this.getReplyForPage(page) as InteractionReplyOptions,
+      await interaction.editReply(
+        this.getReplyForPage(page) as InteractionEditReplyOptions,
       ),
     );
 

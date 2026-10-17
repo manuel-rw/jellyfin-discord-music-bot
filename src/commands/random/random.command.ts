@@ -13,6 +13,7 @@ import { DiscordVoiceService } from '../../clients/discord/discord.voice.service
 import { JellyfinSearchService } from '../../clients/jellyfin/search/jellyfin.search.service';
 import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 import { SearchItem } from '../../clients/jellyfin/search/search.item';
 
@@ -22,7 +23,7 @@ import { SearchItem } from '../../clients/jellyfin/search/search.item';
   defaultMemberPermissions,
 })
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 export class EnqueueRandomItemsCommand {
   constructor(
     private readonly playbackService: PlaybackService,
@@ -36,8 +37,6 @@ export class EnqueueRandomItemsCommand {
     @InteractionEvent(SlashCommandPipe) dto: RandomCommandParams,
     @IA() interaction: CommandInteraction,
   ): Promise<void> {
-    await interaction.deferReply();
-
     const guildMember = interaction.member as GuildMember;
 
     const tryResult =
