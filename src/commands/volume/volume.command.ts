@@ -12,10 +12,11 @@ import { DiscordVoiceService } from '../../clients/discord/discord.voice.service
 import { PlaybackService } from '../../playback/playback.service';
 import { buildMessage } from '../../clients/discord/discord.message.builder';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 @Command({
   name: 'volume',
   description: 'Change the volume',
@@ -35,8 +36,6 @@ export class VolumeCommand {
     @InteractionEvent(SlashCommandPipe) dto: VolumeCommandParams,
     @IA() interaction: CommandInteraction,
   ): Promise<void> {
-    await interaction.deferReply();
-
     if (!this.playbackService.getPlaylistOrDefault().hasActiveTrack()) {
       await this.messageCleanupService.scheduleResponseDeletion(
         await interaction.editReply({

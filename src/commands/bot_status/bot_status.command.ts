@@ -10,6 +10,7 @@ import { Injectable, UseGuards } from '@nestjs/common';
 import { Client, CommandInteraction } from 'discord.js';
 import { BotStatusDto } from './bot_status.params';
 import { ChannelLockGuard } from '../../clients/discord/guards/channel-lock.guard';
+import { DeferReplyGuard } from '../../clients/discord/guards/defer-reply.guard';
 import { DiscordMessageCleanupService } from '../../clients/discord/discord.message-cleanup.service';
 
 @Command({
@@ -18,7 +19,7 @@ import { DiscordMessageCleanupService } from '../../clients/discord/discord.mess
   defaultMemberPermissions: ['Administrator'],
 })
 @Injectable()
-@UseGuards(ChannelLockGuard)
+@UseGuards(DeferReplyGuard, ChannelLockGuard)
 export class BotStatusCommand {
   constructor(
     @InjectDiscordClient()
@@ -45,9 +46,8 @@ export class BotStatusCommand {
 
     this.client.user?.setPresence(newStatus);
     await this.messageCleanupService.scheduleResponseDeletion(
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Bot status updated!',
-        withResponse: true,
       }),
     );
   }
