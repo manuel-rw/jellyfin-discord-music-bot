@@ -40,6 +40,9 @@ export class PlaylistSearchItem extends SearchItem {
       baseItem.Id,
       trimStringToFixedLength(baseItem.Name, 50),
       baseItem.RunTimeTicks / 10000,
+      undefined,
+      undefined,
+      baseItem.NormalizationGain ?? undefined,
     );
   }
 

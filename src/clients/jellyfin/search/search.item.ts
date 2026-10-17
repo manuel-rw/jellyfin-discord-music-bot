@@ -15,6 +15,7 @@ export class SearchItem {
     protected runtimeInMilliseconds: number,
     protected readonly artist?: string,
     protected readonly album?: string,
+    protected readonly normalizationGain?: number,
   ) {}
 
   toString() {
@@ -31,6 +32,7 @@ export class SearchItem {
         {},
         this.artist,
         this.album,
+        this.normalizationGain,
       ),
     ]);
   }
@@ -98,6 +100,7 @@ export class SearchItem {
       baseItem.RunTimeTicks / 10000,
       artist || undefined,
       album || undefined,
+      baseItem.NormalizationGain ?? undefined,
     );
   }
 }

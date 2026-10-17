@@ -47,6 +47,9 @@ export class AlbumSearchItem extends SearchItem {
       baseItem.Id,
       trimStringToFixedLength(artist + baseItem.Name, 70),
       baseItem.RunTimeTicks / 10000,
+      undefined,
+      undefined,
+      baseItem.NormalizationGain ?? undefined,
     );
   }
 
