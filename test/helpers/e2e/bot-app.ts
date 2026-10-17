@@ -64,6 +64,8 @@ export async function createBotUnderTest(
     playbackService,
     // The Jellyfin websocket is not exercised in this test.
     { initializeAndConnect: () => undefined } as never,
+    // The Jellyfin websocket manager is not exercised in this test.
+    {} as never,
     // The stream builder is wired to the mock Jellyfin server.
     {
       buildStreamUrl: (id: string) =>
