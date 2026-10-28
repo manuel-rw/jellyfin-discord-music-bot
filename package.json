@@ -31,7 +31,7 @@
     "@discord-nestjs/core": "^5.5.1",
     "@discordjs/builders": "^1.14.1",
     "@discordjs/voice": "^0.19.2",
-    "@jellyfin/sdk": "^1.0.1",
+    "@jellyfin/sdk": "^1.0.2",
     "@nestjs/common": "^11.2.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "11.1.17",
