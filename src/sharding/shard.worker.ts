@@ -1,7 +1,9 @@
 /**
  * Shard worker entry point
  * This file is executed by the ShardingManager for each shard
- * It creates a separate NestJS application instance for each shard
+ * It creates a separate NestJS application instance for each shard.
+ * Shard workers must not bind the HTTP port: the main process owns it,
+ * so listening here would fail with EADDRINUSE.
  */
 
 import { NestFactory } from '@nestjs/core';
@@ -12,23 +14,20 @@ const logger = new Logger('ShardWorker');
 
 async function bootstrapShard() {
   try {
-    const shardId = process.env.SHARD_ID || 'unknown';
+    const shardId = process.env.SHARDS || 'unknown';
     const totalShards = process.env.SHARD_COUNT || 'unknown';
 
     logger.log(
       `Starting shard worker process (shard ${shardId}/${totalShards})`,
     );
 
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.createApplicationContext(AppModule, {
       logger: ['error', 'warn', 'log', 'debug'],
     });
 
     app.enableShutdownHooks();
 
-    // Start the application
-    await app.listen(process.env.PORT || 3000);
-
-    logger.log(`Shard ${shardId} is ready and listening`);
+    logger.log(`Shard ${shardId} is ready (no HTTP server)`);
   } catch (error: any) {
     logger.error(`Failed to start shard worker: ${error.message}`, error.stack);
     process.exit(1);

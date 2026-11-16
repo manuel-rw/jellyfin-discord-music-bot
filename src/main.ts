@@ -1,6 +1,10 @@
-import { INestApplication, Logger, LogLevel } from '@nestjs/common';
+import {
+  INestApplication,
+  INestApplicationContext,
+  Logger,
+  LogLevel,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { join } from 'path';
 
 import { AppModule } from './app.module';
 import { ShardService } from './sharding/shard.service';
@@ -27,29 +31,30 @@ function getLoggingLevels(): LogLevel[] {
   }
 }
 
-let app: INestApplication;
+/**
+ * Whether this process was spawned by the discord.js ShardingManager.
+ * ShardingManager sets SHARDING_MANAGER/SHARDS/SHARD_COUNT in the worker env.
+ */
+function isShardWorker(): boolean {
+  return process.env.SHARDING_MANAGER !== undefined;
+}
+
+let app: INestApplication | INestApplicationContext;
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
-  // Check if we're running as a shard worker (spawned by ShardingManager)
-  // ShardingManager sets SHARD_ID and SHARD_COUNT environment variables
-  if (
-    process.env.SHARD_ID !== undefined &&
-    process.env.SHARD_COUNT !== undefined
-  ) {
-    // This is a shard worker process, just start the app normally
-    logger.log(
-      `Starting as shard ${process.env.SHARD_ID}/${process.env.SHARD_COUNT}`,
-    );
-    app = await NestFactory.create(AppModule, {
+  if (isShardWorker()) {
+    // Shard worker: run the app without an HTTP server. The main process owns
+    // the port, so binding here would fail with EADDRINUSE.
+    const shardId = process.env.SHARDS ?? 'unknown';
+    const totalShards = process.env.SHARD_COUNT ?? 'unknown';
+    logger.log(`Starting as shard worker ${shardId}/${totalShards}`);
+    app = await NestFactory.createApplicationContext(AppModule, {
       logger: getLoggingLevels(),
     });
     app.enableShutdownHooks();
-    await app.listen(process.env.PORT || 3000);
-    logger.log(
-      `Shard ${process.env.SHARD_ID} listening on port ${process.env.PORT || 3000}`,
-    );
+    logger.log(`Shard worker ${shardId} started (no HTTP server)`);
     return;
   }
 
@@ -64,7 +69,7 @@ async function bootstrap() {
   const shardService = app.get(ShardService);
   shardService.initializeSharding();
 
-  await app.listen(process.env.PORT || 3000);
+  await (app as INestApplication).listen(process.env.PORT || 3000);
   logger.log(
     `Main sharding manager listening on port ${process.env.PORT || 3000}`,
   );
