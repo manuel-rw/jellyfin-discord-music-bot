@@ -22,7 +22,7 @@ importers:
         version: 0.19.2(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(opusscript@0.1.1)
       '@jellyfin/sdk':
         specifier: ^1.0.2
-        version: 1.0.2(axios@1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))
+        version: 1.0.2(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))
       '@nestjs/common':
         specifier: ^11.2.1
         version: 11.2.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
@@ -51,8 +51,8 @@ importers:
         specifier: ^0.1.12
         version: 0.1.12(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
       axios:
-        specifier: ^1.20.0
-        version: 1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+        specifier: ^1.21.1
+        version: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       cron:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1425,8 +1425,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.20.0:
-    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
+  axios@1.21.1:
+    resolution: {integrity: sha512-6eI5Q/Y4u/Um9dDlsRoq5pY2rxnUTv+L4PpLitnbk/i4jb3MxLZ5CsN5Ih3IysbeRYK4pR+P7qfMsOQl9fwwFQ==}
 
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
@@ -3374,9 +3374,9 @@ snapshots:
 
   '@isaacs/nonrecursive-glob-match@1.1.0': {}
 
-  '@jellyfin/sdk@1.0.2(axios@1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))':
+  '@jellyfin/sdk@1.0.2(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))':
     dependencies:
-      axios: 1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
+      axios: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -4202,7 +4202,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1):
+  axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       follow-redirects: 1.16.2(debug@4.4.3(supports-color@8.1.1))
       form-data: 4.0.6
